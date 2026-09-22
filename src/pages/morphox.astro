@@ -7,29 +7,30 @@ import BentoCard from '../shared/bento-card/BentoCard.astro';
 // ---------------------------------------------------------------------------
 const project = {
 	title: 'MorphoX',
-	tagline: 'A GPU-accelerated computer vision sandbox for building, chaining and watching morphological operators run in real time.',
+	tagline: 'A visual computer vision sandbox where image-processing pipelines are built by wiring effect nodes together, each one a real algorithm you can tune and watch respond.',
 	meta: [
 		{ label: 'Discipline', value: 'Computer vision · GPU compute' },
-		{ label: 'Stack', value: 'C++, CUDA, ImGui' },
+		{ label: 'Stack', value: 'Angular, Electron, WebGPU, WGSL' },
 		{ label: 'Year', value: '2025' },
 		{ label: 'Role', value: 'Self initiated' },
 	],
-	hero: '/project_animation/MorphoX_animation.mp4',
+	hero: '/project_animation/MorphoX_main2_animation.mp4',
 	sections: [
 		{
 			label: 'Overview',
-			title: 'Morphology you can watch happen',
+			title: 'Computer vision without writing code',
 			body: [
-				'Classical morphology is taught as a stack of formulas — erode, dilate, open, close — and then buried inside a library call that returns a finished image. MorphoX pulls the intermediate steps back out. Every operator in the chain renders its own output, so a pipeline stops being a black box and becomes something you can scrub through.',
-				'The whole graph re-evaluates on the GPU as you drag a slider, which means structuring elements, thresholds and iteration counts can be explored by feel rather than by recompiling and waiting.',
+				'Creative software like Photoshop has spent decades making image editing feel immediate, but it is built for creative work rather than computer vision. The tools that do cover computer vision are almost all code-first, which makes experimenting slow and keeps the effect of an algorithm one compile step away from the person trying to understand it. MorphoX sits between the two: the interaction model of creative software, the algorithms and theoretical depth of computer vision.',
+				'Pipelines are assembled by connecting effect nodes, each holding a computer vision algorithm with editable parameters and live feedback. Graphs, histograms, metrics, false-colour views and debugging panels sit alongside the canvas, so a simple filter and a multi-stage processing chain are built the same way: each step stays visible while you build it.',
+				'The point is the gap between understanding an algorithm and actually applying it. Seeing a transformation happen as a parameter moves builds intuition far faster than reading its definition.'
 			],
 		},
 		{
 			label: 'Approach',
-			title: 'One kernel per operator, one pass per frame',
+			title: 'Sixty effects, one GPU pipeline, recompute only what changed',
 			body: [
-				'Each operator is a single CUDA kernel writing into a ping-pong buffer pair, so chaining costs one pass per node and nothing is copied back to the host until an export is requested. Structuring elements are uploaded once and reused across frames.',
-				'The interface is deliberately flat: a node list on the left, the live result on the right, and a parameter strip that only ever shows the selected node. Nothing is hidden behind a modal.',
+				'MorphoX is an Angular application running inside Electron, accelerated end to end through WebGPU on top of a custom framework written for image-processing workloads. Over sixty effects live as self-contained classes carrying both their parameters and their WGSL shaders, published through a declarative registry.',
+				'The execution engine is a caching dataflow graph: changing a parameter recomputes that node and its descendants and nothing else, which is what keeps the interface responsive as graphs grow. Everything stays on the GPU until an export is requested, so no frame is round-tripped through host memory on its way to the screen. Rendering, node editing, effect management and controls are separate services, which is how a dozen independent tools can read the same image data without becoming entangled.',
 			],
 		},
 	],
