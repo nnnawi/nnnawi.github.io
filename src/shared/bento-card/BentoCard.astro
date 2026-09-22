@@ -1,0 +1,255 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'article'> {
+	/** Text shown in the bottom-left corner. */
+	title: string;
+	/** When set, the whole card becomes a link to this destination. */
+	href?: string;
+	/** Optional secondary line shown under the title. */
+	description?: string;
+	/** Path/URL of the background video (e.g. "/project_animation/VFP_animation.mp4"). */
+	video: string;
+	/** Optional still shown before the video plays / when motion is reduced. */
+	poster?: string;
+	/** Aspect ratio of the card. Defaults to 16:9. */
+	ratio?: string;
+	/** Corner radius. Defaults to a medium-small radius. */
+	radius?: string;
+}
+
+const {
+	title,
+	href,
+	description,
+	video,
+	poster,
+	ratio = '16 / 9',
+	radius,
+	class: className,
+	style,
+	...rest
+} = Astro.props;
+
+// A card with a destination is a link, otherwise it stays a plain article.
+const Tag = href ? 'a' : 'article';
+
+const cardStyle = [
+	`--bento-ratio: ${ratio}`,
+	radius ? `--bento-radius: ${radius}` : null,
+	typeof style === 'string' ? style : null,
+]
+	.filter(Boolean)
+	.join('; ');
+---
+
+<Tag
+	class:list={['bento-card', href && 'bento-card--link', className]}
+	href={href}
+	style={cardStyle}
+	{...rest}
+>
+	<video
+		class="bento-card__video"
+		src={video}
+		poster={poster}
+		autoplay
+		muted
+		loop
+		playsinline
+		preload="metadata"
+		tabindex="-1"
+		aria-hidden="true"
+		data-bento-video
+	></video>
+
+	<div class="bento-card__frost" aria-hidden="true"></div>
+
+	<div class="bento-card__content">
+		<h3 class="bento-card__title">{title}</h3>
+		{description && <p class="bento-card__description">{description}</p>}
+		<slot />
+	</div>
+</Tag>
+
+<style>
+	.bento-card {
+		--bento-radius: 20px;
+
+		position: relative;
+		display: block;
+		inline-size: 100%;
+		/* The grid decides the width, the ratio decides the height. */
+		aspect-ratio: var(--bento-ratio, 16 / 9);
+		container-type: inline-size;
+		overflow: hidden;
+		isolation: isolate;
+		border-radius: var(--bento-radius);
+		background-color: #0a0c11;
+		color: #fff;
+		box-shadow:
+			0 1px 2px rgba(5, 7, 12, 0.28),
+			0 18px 40px -22px rgba(5, 7, 12, 0.7);
+	}
+
+	/* Linked cards get a pointer, a lift on hover and a visible focus ring. */
+	.bento-card--link {
+		cursor: pointer;
+		text-decoration: none;
+		transition:
+			transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.bento-card--link:hover {
+		transform: translateY(-4px);
+		box-shadow:
+			0 1px 2px rgba(5, 7, 12, 0.28),
+			0 26px 52px -22px rgba(5, 7, 12, 0.85);
+	}
+
+	.bento-card--link:focus-visible {
+		outline: 2px solid rgba(232, 234, 240, 0.75);
+		outline-offset: 3px;
+	}
+
+	/* Background video — covers the card whatever its intrinsic size is. */
+	.bento-card__video {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		display: block;
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+		object-position: center;
+		/* Hides sub-pixel seams against the rounded corners. */
+		transform: scale(1.015);
+	}
+
+	/* Frosted glass pulled up from the bottom: blurs the video behind the title. */
+	.bento-card__frost {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		backdrop-filter: blur(14px) saturate(130%);
+		-webkit-backdrop-filter: blur(14px) saturate(130%);
+		background: linear-gradient(
+			to top,
+			rgba(8, 10, 16, 0.55) 0%,
+			rgba(8, 10, 16, 0.22) 30%,
+			rgba(8, 10, 16, 0) 60%
+		);
+		mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 26%, transparent 58%);
+		-webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 26%, transparent 58%);
+	}
+
+	/* Liquid-glass sheen across the surface. */
+	.bento-card::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 2;
+		pointer-events: none;
+		border-radius: inherit;
+		background:
+			linear-gradient(
+				145deg,
+				rgba(255, 255, 255, 0.16) 0%,
+				rgba(255, 255, 255, 0.05) 22%,
+				rgba(255, 255, 255, 0) 46%
+			),
+			radial-gradient(
+				120% 80% at 85% 0%,
+				rgba(255, 255, 255, 0.12) 0%,
+				rgba(255, 255, 255, 0) 55%
+			);
+		mix-blend-mode: screen;
+	}
+
+	/* Light reflection on the edge: 1px gradient stroke + inner highlight. */
+	.bento-card::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 4;
+		pointer-events: none;
+		border-radius: inherit;
+		padding: 1px;
+		opacity: 40%;
+		background: linear-gradient(
+			150deg,
+			rgba(255, 255, 255, 0.75) 0%,
+			rgba(255, 255, 255, 0.22) 18%,
+			rgba(255, 255, 255, 0.04) 42%,
+			rgba(255, 255, 255, 0.1) 70%,
+			rgba(255, 255, 255, 0.45) 100%
+		);
+		mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		mask-composite: exclude;
+		-webkit-mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+	}
+
+	.bento-card__content {
+		position: absolute;
+		inset-block-end: 0;
+		inset-inline: 0;
+		z-index: 3;
+		display: flex;
+		flex-direction: column;
+		gap: 0.2em;
+		padding: clamp(0.875rem, 4.5cqi, 1.5rem);
+	}
+
+	.bento-card__title {
+		margin: 0;
+		font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+		font-size: clamp(0.95rem, 4cqi, 1.5rem);
+		font-weight: 350;
+		line-height: 1.15;
+		letter-spacing: -0.015em;
+		text-wrap: balance;
+		text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
+	}
+
+	.bento-card__description {
+		margin: 0;
+		font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+		font-size: clamp(0.75rem, 2.5cqi, 0.95rem);
+		font-weight: 350;
+		line-height: 1.35;
+		color: rgba(255, 255, 255, 0.62);
+		text-wrap: pretty;
+		text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.bento-card__video {
+			transform: none;
+		}
+
+		.bento-card--link {
+			transition: none;
+		}
+
+		.bento-card--link:hover {
+			transform: none;
+		}
+	}
+</style>
+
+<script>
+	// Autoplaying video is motion: honour the OS setting and show the first frame instead.
+	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		for (const video of document.querySelectorAll<HTMLVideoElement>('video[data-bento-video]')) {
+			video.autoplay = false;
+			video.pause();
+		}
+	}
+</script>
