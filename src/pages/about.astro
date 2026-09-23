@@ -2,117 +2,114 @@
 import Nav from '../shared/nav/Nav.astro';
 
 // ---------------------------------------------------------------------------
-// About page — the résumé, rewritten for the web. Projects live on /projects,
-// so nothing here repeats them.
+// About page — a sticky identity column beside one rail carrying education and
+// then experience. Résumé wording is kept verbatim in the bullets.
+// Projects live on /projects, so nothing here repeats them.
 // ---------------------------------------------------------------------------
-const profile = {
-	name: 'Iwan Ibnoulouafi',
-	tagline:
-		'Computer vision and machine learning engineer based in Paris. I build software that sits between an algorithm and the person using it — GPU pipelines, video tooling, and interfaces that turn a method into something you can watch respond.',
-	contacts: [
-		{ label: 'iwan@ibnoulouafi.com', href: 'mailto:iwan@ibnoulouafi.com', icon: 'mail' },
-		{ label: '+33 7 54 84 89 00', href: 'tel:+33754848900', icon: 'phone' },
-		{ label: 'LinkedIn', href: 'https://www.linkedin.com/in/iwan-ibnoulouafi/', icon: 'linkedin' },
-		{ label: 'GitHub', href: 'https://github.com/nnnawi', icon: 'github' },
-	],
-	meta: [
-		{ label: 'Based in', value: 'Paris, France' },
-		{ label: 'Focus', value: 'Computer vision · Machine learning' },
-		{ label: 'Education', value: 'MSc Computer Science, Télécom SudParis' },
-		{ label: 'Languages', value: 'French (native) · English (fluent)' },
-	],
+
+const email = 'iwan@ibnoulouafi.com';
+
+const icons: Record<string, { filled: boolean; paths: string[] }> = {
+	mail: {
+		filled: false,
+		paths: [
+			'M3.35 3.25h9.3a1.6 1.6 0 0 1 1.6 1.6v6.3a1.6 1.6 0 0 1-1.6 1.6h-9.3a1.6 1.6 0 0 1-1.6-1.6v-6.3a1.6 1.6 0 0 1 1.6-1.6Z',
+			'm2.4 4.4 5.6 4 5.6-4',
+		],
+	},
+	linkedin: {
+		filled: true,
+		paths: [
+			'M3.1 6.2h2.3V14H3.1V6.2Zm1.15-3.6a1.35 1.35 0 1 1 0 2.7 1.35 1.35 0 0 1 0-2.7ZM7 6.2h2.2v1.06h.03c.31-.58 1.06-1.2 2.18-1.2 2.33 0 2.76 1.5 2.76 3.46V14h-2.3v-3.98c0-.95-.02-2.17-1.34-2.17-1.34 0-1.54 1.03-1.54 2.1V14H7V6.2Z',
+		],
+	},
+	github: {
+		filled: true,
+		paths: [
+			'M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z',
+		],
+	},
 };
 
-const intro = {
-	label: 'Profile',
-	title: 'Engineering as a way of looking at things',
-	body: [
-		'Two years of French preparatory class, then five at Télécom SudParis for an MSc in computer science specialised in computer vision and machine learning. Alongside the degree I have been freelancing since 2022 — full-stack work for French SMEs, OCR and document-processing pipelines, and AI automation for teams that needed the whole thing built rather than advised on.',
-		'The other half of that decade was spent in video production, editing and directing for some of the largest French YouTube channels. Cutting for a living is what turned me into a tool builder: the fastest way out of a repetitive pass was always to automate it, which is how derushing scripts, Premiere and After Effects plugins, and eventually a local anonymisation pipeline came to exist.',
-		'What carries across both is a preference for work that stays visible end to end — parsing, model, shader, interface — and for shipping the thing rather than stopping at the prototype.',
-	],
-};
+const contacts = [
+	{ label: email, href: `mailto:${email}`, icon: 'mail' },
+	{ label: 'LinkedIn', href: 'https://www.linkedin.com/in/iwan-ibnoulouafi/', icon: 'linkedin' },
+	{ label: 'GitHub', href: 'https://github.com/nnnawi', icon: 'github' },
+];
 
-const experience = [
-	{
-		period: 'Summer 2025',
-		duration: '6 months',
-		role: 'Software Engineer Intern',
-		org: 'Brio',
-		place: 'Paris, France',
-		points: [
-			'Owned an end-to-end resume analyser from prototype to production in a team of five — document parsing, OCR, and orchestrated LLM / rule-based scoring. 20,000+ analyses run.',
-			'Led a full UX/UI redesign of the interview product’s overview and extended the client-facing back office — data, access control and dashboards — as the user base grew.',
-		],
-	},
-	{
-		period: '2022 — Today',
-		duration: '4 years',
-		role: 'Software & Web Developer',
-		org: 'Freelance',
-		place: 'Paris, France',
-		points: [
-			'Shipped 10+ full-stack projects for French SMEs, spanning SEO-optimised websites (UI/UX, hosting, security) and AI automation tools including OCR pipelines and document-processing systems.',
-		],
-	},
-	{
-		period: 'Summer 2022',
-		duration: '3 months',
-		role: 'Software Engineer Intern',
-		org: 'Infogene',
-		place: 'Paris, France',
-		points: [
-			'Built a Flutter/Dart mobile app for L’Oréal employees to manage sales and stock requests, serving a target population of 500+ users.',
-		],
-	},
-	{
-		period: '2021 — 2025',
-		duration: '4 years',
-		role: 'Video Production',
-		org: 'Freelance',
-		place: 'Paris, France',
-		points: [
-			'Cut editorial turnaround by 15–30% for top-10 French YouTube channels (5M+ subscribers) with custom Premiere and After Effects tooling automating derushing, indexing and ingest.',
-			'Delivered end-to-end production — editing, motion graphics, camera operation and direction — on content reaching 10M+ views.',
-		],
-	},
+// Off-site links open in a new tab; mailto: stays where it is.
+const external = (href: string) =>
+	href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+
+const lead = 'I build interactive systems for complex computational and creative workflows.';
+
+const intro = [
+	'My work spans real-time graphics, computer vision and interaction design, focused on making technically complex systems easier to explore, control and understand through intuitive manipulation and visual feedback.',
+	'I have built and sold interactive visualization and generative tools such as Bowde and MorphoX, and developed software distributed through freelance and independent work.',
+	'The recurring problem is the mismatch between what a system can do and the structure it exposes. I work on closing that gap between intent and execution, designing interfaces that make structure legible and decisions faster — expanding creative possibilities rather than reducing complexity.',
+	'Alongside engineering, a decade across video production, motion design, VFX, generative visuals and creative coding — including motion-graphics systems and production workflows for large-scale media — continues to shape how I think about interaction, aesthetics and creative flow.',
 ];
 
 const education = [
 	{
 		period: '2021 — 2025',
-		duration: 'MSc',
-		role: 'MSc in Computer Science',
-		org: 'Télécom SudParis',
-		place: 'Polytechnic Institute of Paris',
-		points: ['Specialisation in computer vision and machine learning.'],
+		role: 'Télécom SudParis',
+		org: 'Institut Polytechnique de Paris · University',
+		points: ['MSc in Computer Science, specialization in Computer Vision & Machine Learning.'],
 	},
 	{
 		period: '2019 — 2021',
-		duration: 'CPGE',
-		role: 'Preparatory class for the Grandes Écoles',
-		org: 'Lycée Marcelin Berthelot',
-		place: 'Saint-Maur-des-Fossés, France',
+		role: 'Lycée Marcelin Berthelot',
+		org: 'Preparatory class for the Grandes écoles',
 		points: [
-			'Two-year selective program in mathematics, physics and engineering, leading to the national competitive entrance examinations.',
+			'Two-year selective program in mathematics, physics and engineering leading to national competitive entrance examinations.',
 		],
 	},
 ];
 
-// Grouped from the stacks the projects on this site were actually built with.
-const toolbox = [
-	{ label: 'Languages', items: ['TypeScript', 'Python', 'C++', 'Dart', 'WGSL'] },
+const experience = [
 	{
-		label: 'Vision & ML',
-		items: ['PyTorch', 'ONNX', 'TensorFlow Lite', 'YOLO', 'Quantization', 'Pruning'],
+		period: 'Summer 2025 · 6 months',
+		role: 'Software Engineer Intern',
+		org: 'Brio · Paris, France',
+		points: [
+			'Owned an end-to-end resume analyser from prototype to production in a team of five: document parsing, OCR, orchestrated LLM / rule-based scoring; 20,000+ analyses run.',
+			'Led a full UX/UI redesign of the interview product’s overview and extended the client-facing back office (data, access control and dashboards), as the user base grew.',
+		],
 	},
-	{ label: 'Graphics & GPU', items: ['WebGPU', 'CUDA', 'Metal', 'After Effects SDK', 'UXP'] },
-	{ label: 'Application', items: ['Angular', 'Astro', 'Electron', 'Flutter', 'NXP i.MX 8M Plus'] },
+	{
+		period: '2022 — Today · 4 years',
+		role: 'Software & Web Developer',
+		org: 'Freelance · Paris, France',
+		points: [
+			'Shipped 10+ full-stack projects for French SMEs, spanning SEO-optimized websites (UI/UX, hosting, security) and AI automation tools including OCR pipelines and document-processing systems.',
+		],
+	},
+	{
+		period: 'Summer 2022 · 3 months',
+		role: 'Software Engineer Intern',
+		org: 'Infogene · Paris, France',
+		points: [
+			'Built a Flutter/Dart mobile app for L’Oréal employees to manage sales and stock requests, serving a target population of 500+ users.',
+		],
+	},
+	{
+		period: '2021 — 2025 · 4 years',
+		role: 'Video Production',
+		org: 'Freelance · Paris, France',
+		points: [
+			'Cut editorial turnaround 15–30% for top-10 French YouTube channels (5M+ subs) with custom Premiere and After Effects tooling automating derushing, indexing and ingest.',
+			'Delivered end-to-end production: editing, motion graphics, camera operation and direction, on content reaching 10M+ views.',
+		],
+	},
 ];
 
-const aside = [
-	{ label: 'Extracurricular', value: 'Piano (15 years), Sailing, Electronic circuit design' },
-	{ label: 'Working languages', value: 'French (native), English (fluent)' },
+const interests = ['Piano · 15 years', 'Sailing', 'Electronic circuit design'];
+const languages = 'French (native) · English (fluent)';
+
+const sections = [
+	{ id: 'education', title: 'Education', items: education },
+	{ id: 'experience', title: 'Experience', items: experience },
 ];
 ---
 
@@ -123,199 +120,134 @@ const aside = [
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content={profile.tagline} />
+		<meta name="description" content={lead} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Instrument+Serif:ital@0;1&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Geist+Pixel&family=Inter:wght@100..900&display=swap"
 		/>
 		<title>About — Iwan</title>
 	</head>
 	<body>
 		<Nav active="/about" />
 
-		<main>
-			<header class="about-header">
-				<p class="section__label">About me</p>
-				<h1 class="about-title">
-					Iwan <span class="about-title__last">Ibnoulouafi</span>
-				</h1>
-				<p class="about-tagline">
-					Computer vision and machine learning engineer based in Paris. I build software that sits
-					between an algorithm and the person using it — GPU pipelines, video tooling, and
-					interfaces that turn a method into something you can <em class="t-flourish"
-						>watch respond</em
-					>.
-				</p>
+		<main class="about">
+			<div class="wrap layout">
+				<aside class="identity">
+					<h1 class="name reveal">
+						<span class="name__first">Iwan</span>
+						<span class="name__last pixel">Ibnoulouafi</span>
+					</h1>
 
-				<ul class="contact">
-					{
-						profile.contacts.map((item) => (
-							<li>
-								<a
-									class="contact__link"
-									href={item.href}
-									target={item.href.startsWith('http') ? '_blank' : undefined}
-									rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-								>
-									<svg
-										class="contact__icon"
-										viewBox="0 0 16 16"
-										aria-hidden="true"
-										fill={item.icon === 'github' || item.icon === 'linkedin' ? 'currentColor' : 'none'}
-										stroke={item.icon === 'github' || item.icon === 'linkedin' ? 'none' : 'currentColor'}
-										stroke-width="1.3"
-									>
-										{item.icon === 'mail' && (
-											<Fragment>
-												<rect x="1.75" y="3.25" width="12.5" height="9.5" rx="1.6" />
-												<path d="m2.4 4.4 5.6 4 5.6-4" />
-											</Fragment>
-										)}
-										{item.icon === 'phone' && (
-											<path d="M3.2 2.1h2.3l1.1 2.8-1.4 1a8.4 8.4 0 0 0 3.9 3.9l1-1.4 2.8 1.1v2.3a1.3 1.3 0 0 1-1.4 1.3A11.4 11.4 0 0 1 1.9 3.5 1.3 1.3 0 0 1 3.2 2.1Z" />
-										)}
-										{item.icon === 'linkedin' && (
-											<path d="M3.1 6.2h2.3V14H3.1V6.2Zm1.15-3.6a1.35 1.35 0 1 1 0 2.7 1.35 1.35 0 0 1 0-2.7ZM7 6.2h2.2v1.06h.03c.31-.58 1.06-1.2 2.18-1.2 2.33 0 2.76 1.5 2.76 3.46V14h-2.3v-3.98c0-.95-.02-2.17-1.34-2.17-1.34 0-1.54 1.03-1.54 2.1V14H7V6.2Z" />
-										)}
-										{item.icon === 'github' && (
-											<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
-										)}
-									</svg>
-									{item.label}
-								</a>
-							</li>
-						))
-					}
-				</ul>
+					<ul class="pills reveal" style="--d: 100ms">
+						{
+							contacts.map((item) => (
+								<li>
+									<a class="pill" href={item.href} {...external(item.href)}>
+										<svg
+											class="pill__icon"
+											viewBox="0 0 16 16"
+											aria-hidden="true"
+											fill={icons[item.icon].filled ? 'currentColor' : 'none'}
+											stroke={icons[item.icon].filled ? 'none' : 'currentColor'}
+											stroke-width="1.3"
+										>
+											{icons[item.icon].paths.map((d) => (
+												<path d={d} />
+											))}
+										</svg>
+										{item.label}
+									</a>
+								</li>
+							))
+						}
+					</ul>
 
-				<dl class="about-meta">
-					{
-						profile.meta.map((item) => (
-							<div class="about-meta__row">
-								<dt class="about-meta__label">{item.label}</dt>
-								<dd class="about-meta__value">{item.value}</dd>
-							</div>
-						))
-					}
-				</dl>
-			</header>
-
-			<div class="prose">
-				<section class="prose__section">
-					<p class="section__label">{intro.label}</p>
-					<div class="prose__body">
-						<h2 class="prose__heading">{intro.title}</h2>
-						{intro.body.map((paragraph) => <p class="prose__paragraph">{paragraph}</p>)}
+					<div class="facts reveal" style="--d: 180ms">
+						<div>
+							<p class="label">Languages</p>
+							<p class="facts__value">{languages}</p>
+						</div>
+						<div>
+							<p class="label">Off screen</p>
+							<ul class="chips">
+								{interests.map((item) => <li class="chip">{item}</li>)}
+							</ul>
+						</div>
 					</div>
-				</section>
+				</aside>
+
+				<div class="main">
+					<section class="intro">
+						<p class="intro__lead reveal">{lead}</p>
+						{intro.map((paragraph) => <p class="intro__text reveal">{paragraph}</p>)}
+					</section>
+
+					{
+						sections.map((section) => (
+							<section class="chapter" aria-labelledby={section.id}>
+								<h2 class="chapter__title" id={section.id}>
+									{section.title}
+								</h2>
+								<div class="rail">
+									{section.items.map((item) => (
+										<article class="entry reveal">
+											<p class="entry__period pixel">{item.period}</p>
+											<h3 class="entry__role">{item.role}</h3>
+											<p class="entry__org">{item.org}</p>
+											<ul class="points">
+												{item.points.map((point) => (
+													<li class="points__item">
+														<span class="points__dot" aria-hidden="true" />
+														<span>{point}</span>
+													</li>
+												))}
+											</ul>
+										</article>
+									))}
+								</div>
+							</section>
+						))
+					}
+
+					<section class="cta reveal">
+						<p class="cta__title">
+							Next chapter <span class="pixel">to be written.</span>
+						</p>
+						<a class="btn" href={`mailto:${email}`}>Get in touch</a>
+					</section>
+				</div>
 			</div>
 
-			<section class="entries" aria-labelledby="experience-heading">
-				<h2 class="section__label section__label--heading" id="experience-heading">Experience</h2>
-				<ol class="entry-list">
-					{
-						experience.map((item) => (
-							<li class="entry">
-								<div class="entry__aside">
-									<p class="entry__period">{item.period}</p>
-									<p class="entry__duration">{item.duration}</p>
-								</div>
-								<div class="entry__body">
-									<h3 class="entry__role">{item.role}</h3>
-									<p class="entry__org">
-										{item.org}
-										<span class="entry__place"> — {item.place}</span>
-									</p>
-									<ul class="entry__points">
-										{item.points.map((point) => (
-											<li class="entry__point">
-												<span class="entry__bullet" aria-hidden="true" />
-												<span>{point}</span>
-											</li>
-										))}
-									</ul>
-								</div>
-							</li>
-						))
-					}
-				</ol>
-			</section>
-
-			<section class="entries" aria-labelledby="education-heading">
-				<h2 class="section__label section__label--heading" id="education-heading">Education</h2>
-				<ol class="entry-list">
-					{
-						education.map((item) => (
-							<li class="entry">
-								<div class="entry__aside">
-									<p class="entry__period">{item.period}</p>
-									<p class="entry__duration">{item.duration}</p>
-								</div>
-								<div class="entry__body">
-									<h3 class="entry__role">{item.role}</h3>
-									<p class="entry__org">
-										{item.org}
-										<span class="entry__place"> — {item.place}</span>
-									</p>
-									<ul class="entry__points">
-										{item.points.map((point) => (
-											<li class="entry__point">
-												<span class="entry__bullet" aria-hidden="true" />
-												<span>{point}</span>
-											</li>
-										))}
-									</ul>
-								</div>
-							</li>
-						))
-					}
-				</ol>
-			</section>
-
-			<section class="entries" aria-labelledby="toolbox-heading">
-				<h2 class="section__label section__label--heading" id="toolbox-heading">Toolbox</h2>
-				<div class="toolbox">
-					{
-						toolbox.map((group) => (
-							<div class="toolbox__group">
-								<p class="toolbox__label">{group.label}</p>
-								<ul class="toolbox__tags">
-									{group.items.map((tag) => (
-										<li class="toolbox__tag">{tag}</li>
-									))}
-								</ul>
-							</div>
-						))
-					}
-				</div>
-
-				<dl class="aside-list">
-					{
-						aside.map((item) => (
-							<div class="aside-list__row">
-								<dt class="aside-list__label">{item.label}</dt>
-								<dd class="aside-list__value">{item.value}</dd>
-							</div>
-						))
-					}
-				</dl>
-			</section>
-
-			<section class="cta">
-				<p class="cta__text">
-					The work itself lives on the <a class="cta__link" href="/projects">projects page</a>. For
-					anything else, the inbox is open.
-				</p>
-				<a class="cta__button" href="mailto:iwan@ibnoulouafi.com">Get in touch</a>
-			</section>
-
-			<footer class="site-footer">
-				<span>Iwan Ibnoulouafi</span>
-				<a href="mailto:iwan@ibnoulouafi.com">iwan@ibnoulouafi.com</a>
-			</footer>
+			<div class="wrap">
+				<footer class="site-footer">
+					<span>Iwan Ibnoulouafi</span>
+					<a href={`mailto:${email}`}>{email}</a>
+				</footer>
+			</div>
 		</main>
+
+		<script is:inline>
+			// Blocks rise into place as they enter the viewport.
+			if (
+				!window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+				'IntersectionObserver' in window
+			) {
+				document.documentElement.classList.add('reveal-ready');
+				const observer = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							if (!entry.isIntersecting) continue;
+							entry.target.classList.add('is-in');
+							observer.unobserve(entry.target);
+						}
+					},
+					{ threshold: 0.12, rootMargin: '0px 0px -6% 0px' }
+				);
+				for (const el of document.querySelectorAll('.reveal')) observer.observe(el);
+			}
+		</script>
 	</body>
 </html>
 
@@ -328,87 +260,101 @@ const aside = [
 		font-weight: 350;
 	}
 
-	main {
+	.about {
+		--fg: #e8eaf0;
+		--muted: rgba(232, 234, 240, 0.64);
+		--faint: rgba(232, 234, 240, 0.4);
+		--pixel: 'Geist Pixel', 'Geist Mono', ui-monospace, monospace;
+		/* Where the fixed nav ends, and where the page can start under it. */
+		--chrome-bottom: calc(clamp(1rem, 2.5vh, 1.75rem) + 3.2rem);
+
+		padding-block-start: calc(var(--chrome-bottom) + clamp(2rem, 6vh, 4rem));
+		overflow-x: clip;
+	}
+
+	.wrap {
 		max-inline-size: 1100px;
 		margin-inline: auto;
-		/* Extra top room so the fixed nav never sits on the page title. */
-		padding: clamp(5.5rem, 12vh, 8rem) clamp(1rem, 4vw, 2rem) clamp(1.5rem, 5vw, 4rem);
+		padding-inline: clamp(1rem, 4vw, 2rem);
 	}
 
-	/* Shared small-caps label used by every section on the page. */
-	.section__label {
-		margin: 0;
+	.pixel {
+		font-family: var(--pixel);
+		font-weight: 400;
+		/* A bitmap face needs air between glyphs, not the tightening a serif takes. */
+		letter-spacing: 0.01em;
+	}
+
+	.label {
+		margin: 0 0 0.6rem;
 		font-size: 0.72rem;
-		font-weight: 350;
 		letter-spacing: 0.09em;
 		text-transform: uppercase;
-		color: rgba(232, 234, 240, 0.38);
+		color: var(--faint);
 	}
 
-	.section__label--heading {
-		margin-block-end: clamp(1.25rem, 2.5vw, 1.75rem);
+	/* --- Layout ----------------------------------------------------------- */
+
+	.layout {
+		display: grid;
+		grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+		gap: clamp(2rem, 6vw, 5rem);
+		align-items: start;
 	}
 
-	/* --- Header ---------------------------------------------------------- */
-
-	.about-header {
-		margin-block-end: clamp(2rem, 5vw, 3rem);
-	}
-
-	.about-title {
-		margin: clamp(0.75rem, 1.5vw, 1.15rem) 0 0;
-		font-size: clamp(2.75rem, 9vw, 5.5rem);
-		font-weight: 350;
-		line-height: 0.98;
-		letter-spacing: -0.035em;
-	}
-
-	.about-title__last {
-		font-weight: 700;
-		letter-spacing: -0.045em;
-	}
-
-	.about-tagline {
-		margin: clamp(1rem, 2.5vw, 1.5rem) 0 0;
-		max-inline-size: 52ch;
-		font-size: clamp(1rem, 1.6vw, 1.2rem);
-		line-height: 1.45;
-		color: rgba(232, 234, 240, 0.62);
-		text-wrap: pretty;
-	}
-
-	/* The one serif flourish, borrowed from the landing headline. */
-	.t-flourish {
-		font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-		font-size: 1.12em;
-		font-style: italic;
-		font-weight: 400;
-		letter-spacing: -0.01em;
-		color: rgba(232, 234, 240, 0.85);
-	}
-
-	/* --- Contact pills --------------------------------------------------- */
-
-	.contact {
+	.identity {
+		position: sticky;
+		inset-block-start: calc(var(--chrome-bottom) + 1.5rem);
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.6rem;
-		margin: clamp(1.5rem, 3vw, 2rem) 0 0;
+		flex-direction: column;
+		gap: clamp(1.5rem, 3.5vh, 2.25rem);
+	}
+
+	.name {
+		display: flex;
+		flex-direction: column;
+		margin: 0;
+		font-size: clamp(2.75rem, 5.6vw, 4.85rem);
+		line-height: 0.9;
+		letter-spacing: -0.05em;
+	}
+
+	.name__first {
+		font-weight: 700;
+	}
+
+	.name__last {
+		/* Geist Pixel sets wider and taller than the sans, so it is scaled down to
+		   sit on the same optical line length as the first name above it. */
+		font-size: clamp(2.75rem, 5.6vw, 4.85rem);
+		letter-spacing: -0.005em;
+		color: var(--fg);
+	}
+
+	/* --- Contact pills ---------------------------------------------------- */
+
+	.pills {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.5rem;
+		margin: 0;
 		padding: 0;
 		list-style: none;
 		font-size: 0.85rem;
 	}
 
-	.contact__link {
+	.pill {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.55em;
-		padding: 0.55em 1em;
+		padding: 0.6em 1.05em;
 		border: 1px solid rgba(255, 255, 255, 0.12);
 		border-radius: 999px;
-		background: rgba(255, 255, 255, 0.03);
-		color: rgba(232, 234, 240, 0.82);
+		background: rgba(255, 255, 255, 0.035);
+		color: rgba(232, 234, 240, 0.85);
 		line-height: 1;
+		white-space: nowrap;
 		text-decoration: none;
 		transition:
 			color 160ms ease,
@@ -416,18 +362,13 @@ const aside = [
 			background-color 160ms ease;
 	}
 
-	.contact__link:hover {
-		color: #e8eaf0;
-		border-color: rgba(255, 255, 255, 0.28);
-		background: rgba(255, 255, 255, 0.07);
+	.pill:hover {
+		color: #fff;
+		border-color: rgba(255, 255, 255, 0.34);
+		background: rgba(255, 255, 255, 0.08);
 	}
 
-	.contact__link:focus-visible {
-		outline: 2px solid rgba(232, 234, 240, 0.75);
-		outline-offset: 3px;
-	}
-
-	.contact__icon {
+	.pill__icon {
 		flex: none;
 		inline-size: 1.05em;
 		block-size: 1.05em;
@@ -435,314 +376,233 @@ const aside = [
 		stroke-linejoin: round;
 	}
 
-	.about-meta {
-		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		gap: clamp(0.75rem, 1.5vw, 1.25rem);
-		margin: clamp(2rem, 5vw, 3.25rem) 0 0;
-		padding-block-start: 1.25rem;
-		border-block-start: 1px solid rgba(255, 255, 255, 0.09);
+	.pill:focus-visible,
+	.btn:focus-visible {
+		outline: 2px solid rgba(232, 234, 240, 0.75);
+		outline-offset: 3px;
 	}
 
-	.about-meta__row {
+	/* --- Facts ------------------------------------------------------------ */
+
+	.facts {
 		display: flex;
 		flex-direction: column;
-		gap: 0.4em;
+		gap: 1.25rem;
 	}
 
-	.about-meta__label {
-		font-size: 0.72rem;
-		letter-spacing: 0.09em;
-		text-transform: uppercase;
-		color: rgba(232, 234, 240, 0.38);
-	}
-
-	.about-meta__value {
+	.facts__value {
 		margin: 0;
-		font-size: 0.92rem;
-		line-height: 1.35;
-		color: rgba(232, 234, 240, 0.88);
-		text-wrap: pretty;
+		font-size: 0.95rem;
+		color: var(--fg);
 	}
 
-	/* --- Prose ----------------------------------------------------------- */
-
-	.prose {
-		margin-block: clamp(3rem, 8vw, 5.5rem);
-	}
-
-	.prose__section {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
-		gap: clamp(1rem, 3vw, 2rem);
-	}
-
-	.prose__body {
-		max-inline-size: 62ch;
-	}
-
-	.prose__heading {
-		margin: 0 0 0.9em;
-		font-size: clamp(1.35rem, 2.6vw, 1.85rem);
-		font-weight: 350;
-		line-height: 1.2;
-		letter-spacing: -0.02em;
-		text-wrap: balance;
-	}
-
-	.prose__paragraph {
-		margin: 0 0 1em;
-		font-size: clamp(0.95rem, 1.4vw, 1.05rem);
-		line-height: 1.6;
-		color: rgba(232, 234, 240, 0.68);
-		text-wrap: pretty;
-	}
-
-	.prose__paragraph:last-child {
-		margin-block-end: 0;
-	}
-
-	/* --- Timeline entries ------------------------------------------------ */
-
-	.entries {
-		margin-block-start: clamp(3rem, 8vw, 5.5rem);
-	}
-
-	.entry-list {
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
 		margin: 0;
 		padding: 0;
 		list-style: none;
 	}
 
+	.chip {
+		padding: 0.55em 1em;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.035);
+		font-size: 0.88rem;
+		line-height: 1;
+		color: rgba(232, 234, 240, 0.85);
+		white-space: nowrap;
+	}
+
+	/* --- Intro ------------------------------------------------------------ */
+
+	.intro__lead {
+		margin: 0 0 1.25rem;
+		font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+		line-height: 1.3;
+		letter-spacing: -0.03em;
+		text-wrap: balance;
+	}
+
+	.intro__text {
+		margin: 0 0 1em;
+		font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+		line-height: 1.65;
+		color: var(--muted);
+		text-wrap: pretty;
+	}
+
+	.intro__text:last-child {
+		margin-block-end: 0;
+	}
+
+	/* --- Chapters and rail ------------------------------------------------ */
+
+	.chapter {
+		margin-block-start: clamp(3.5rem, 8vw, 5.5rem);
+	}
+
+	.chapter__title {
+		margin: 0 0 clamp(1.25rem, 3vw, 1.75rem);
+		font-size: clamp(1.75rem, 3.4vw, 2.6rem);
+		font-weight: 350;
+		line-height: 1;
+		letter-spacing: -0.045em;
+	}
+
+	.rail {
+		--rail-x: 0.45rem;
+		--rail-pad: clamp(1.75rem, 4vw, 2.5rem);
+
+		position: relative;
+		padding-inline-start: var(--rail-pad);
+	}
+
+	/* The only line in this column: a beam fading out as the entries run down. */
+	.rail::before {
+		content: '';
+		position: absolute;
+		inset-block: 1.6rem 0.5rem;
+		inset-inline-start: var(--rail-x);
+		inline-size: 1px;
+		background: linear-gradient(
+			to bottom,
+			rgba(232, 234, 240, 0.55) 0%,
+			rgba(232, 234, 240, 0.3) 40%,
+			rgba(232, 234, 240, 0.22) 78%,
+			rgba(232, 234, 240, 0) 100%
+		);
+	}
+
 	.entry {
-		display: grid;
-		/* Same 1:3 rhythm as the prose sections — period on the left, role on the right. */
-		grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
-		gap: clamp(1rem, 3vw, 2rem);
-		padding-block: clamp(1.5rem, 3.5vw, 2.25rem);
-		border-block-start: 1px solid rgba(255, 255, 255, 0.09);
+		position: relative;
+		margin-block-end: 0.75rem;
+		padding: clamp(1.15rem, 2.5vw, 1.6rem);
+		border-radius: 18px;
+		background: rgba(255, 255, 255, 0.028);
+		transition: background-color 300ms ease;
 	}
 
-	.entry:last-child {
-		border-block-end: 1px solid rgba(255, 255, 255, 0.09);
+	.entry:hover {
+		background: rgba(255, 255, 255, 0.05);
 	}
 
-	.entry__aside {
-		display: flex;
-		flex-direction: column;
-		gap: 0.35em;
+	/* Node sitting on the rail, level with the entry's first line. */
+	.entry::before {
+		content: '';
+		position: absolute;
+		inset-block-start: 1.7rem;
+		inset-inline-start: calc(var(--rail-x) - var(--rail-pad) - 4.5px);
+		inline-size: 9px;
+		block-size: 9px;
+		border-radius: 50%;
+		background: var(--fg);
+		box-shadow:
+			-1.5px 0 0 rgba(255, 47, 77, 0.55),
+			1.5px 0 0 rgba(33, 228, 255, 0.5);
 	}
 
 	.entry__period {
 		margin: 0;
-		font-size: 0.85rem;
-		line-height: 1.3;
-		color: rgba(232, 234, 240, 0.72);
-	}
-
-	.entry__duration {
-		margin: 0;
-		font-size: 0.72rem;
-		letter-spacing: 0.09em;
-		text-transform: uppercase;
-		color: rgba(232, 234, 240, 0.38);
-	}
-
-	.entry__body {
-		max-inline-size: 62ch;
+		font-size: 1rem;
+		line-height: 1.1;
+		color: var(--faint);
 	}
 
 	.entry__role {
-		margin: 0;
-		font-size: clamp(1.1rem, 2vw, 1.35rem);
+		margin: 0.7rem 0 0;
+		font-size: clamp(1.2rem, 2vw, 1.45rem);
 		font-weight: 350;
-		line-height: 1.25;
-		letter-spacing: -0.02em;
+		line-height: 1.2;
+		letter-spacing: -0.03em;
 		text-wrap: balance;
 	}
 
 	.entry__org {
-		margin: 0.4em 0 0;
-		font-size: 0.92rem;
-		line-height: 1.35;
-		color: rgba(232, 234, 240, 0.72);
+		margin: 0.35em 0 0;
+		font-size: 0.9rem;
+		color: var(--faint);
 	}
 
-	.entry__place {
-		color: rgba(232, 234, 240, 0.4);
-	}
-
-	.entry__points {
+	.points {
 		display: flex;
 		flex-direction: column;
-		gap: 0.65em;
-		margin: clamp(0.9rem, 2vw, 1.15rem) 0 0;
+		gap: 0.6em;
+		margin: 1rem 0 0;
 		padding: 0;
 		list-style: none;
 	}
 
-	.entry__point {
+	.points__item {
 		display: flex;
 		align-items: flex-start;
 		gap: 0.75em;
-		font-size: clamp(0.92rem, 1.4vw, 1rem);
+		font-size: clamp(0.92rem, 1.3vw, 1rem);
 		line-height: 1.55;
-		color: rgba(232, 234, 240, 0.68);
+		color: var(--muted);
 		text-wrap: pretty;
 	}
 
-	.entry__bullet {
+	.points__dot {
 		flex: none;
 		inline-size: 5px;
 		block-size: 5px;
 		/* Optically centred on the first line of text. */
 		margin-block-start: 0.62em;
 		border-radius: 50%;
-		background: rgba(232, 234, 240, 0.35);
+		background: rgba(232, 234, 240, 0.45);
 	}
 
-	/* --- Toolbox --------------------------------------------------------- */
-
-	.toolbox {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		/* Each card keeps its own height rather than being stretched by the row. */
-		align-items: start;
-		gap: clamp(0.6rem, 1.5vw, 1rem);
-	}
-
-	.toolbox__group {
-		padding: clamp(1rem, 2.2vw, 1.35rem);
-		border: 1px solid rgba(255, 255, 255, 0.09);
-		border-radius: 14px;
-		background: rgba(255, 255, 255, 0.02);
-	}
-
-	.toolbox__label {
-		margin: 0 0 0.9em;
-		font-size: 0.72rem;
-		letter-spacing: 0.09em;
-		text-transform: uppercase;
-		color: rgba(232, 234, 240, 0.38);
-	}
-
-	.toolbox__tags {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.4rem;
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	.toolbox__tag {
-		padding: 0.4em 0.8em;
-		border: 1px solid rgba(255, 255, 255, 0.09);
-		border-radius: 999px;
-		background: rgba(255, 255, 255, 0.03);
-		font-size: 0.82rem;
-		line-height: 1;
-		color: rgba(232, 234, 240, 0.78);
-	}
-
-	.aside-list {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: clamp(0.75rem, 1.5vw, 1.25rem);
-		margin: clamp(1.75rem, 3.5vw, 2.5rem) 0 0;
-		padding-block-start: 1.25rem;
-		border-block-start: 1px solid rgba(255, 255, 255, 0.09);
-	}
-
-	.aside-list__row {
-		display: flex;
-		flex-direction: column;
-		gap: 0.4em;
-	}
-
-	.aside-list__label {
-		font-size: 0.72rem;
-		letter-spacing: 0.09em;
-		text-transform: uppercase;
-		color: rgba(232, 234, 240, 0.38);
-	}
-
-	.aside-list__value {
-		margin: 0;
-		font-size: 0.92rem;
-		line-height: 1.35;
-		color: rgba(232, 234, 240, 0.88);
-		text-wrap: pretty;
-	}
-
-	/* --- Closing note ---------------------------------------------------- */
+	/* --- Closing note ----------------------------------------------------- */
 
 	.cta {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: space-between;
-		gap: clamp(1rem, 3vw, 2rem);
-		margin-block-start: clamp(3rem, 8vw, 5.5rem);
-		padding: clamp(1.25rem, 3vw, 2rem);
-		border: 1px solid rgba(255, 255, 255, 0.09);
-		border-radius: 20px;
-		background: rgba(255, 255, 255, 0.02);
+		gap: 1.25rem;
+		margin-block-start: clamp(3rem, 7vw, 4.5rem);
+		padding-inline-start: clamp(1.75rem, 4vw, 2.5rem);
 	}
 
-	.cta__text {
+	.cta__title {
 		margin: 0;
-		max-inline-size: 48ch;
-		font-size: clamp(0.95rem, 1.4vw, 1.05rem);
-		line-height: 1.55;
-		color: rgba(232, 234, 240, 0.68);
-		text-wrap: pretty;
+		font-size: clamp(1.5rem, 3vw, 2.25rem);
+		letter-spacing: -0.035em;
 	}
 
-	.cta__link {
-		color: rgba(232, 234, 240, 0.88);
-		text-decoration: none;
-		border-block-end: 1px solid rgba(232, 234, 240, 0.28);
-		transition:
-			color 160ms ease,
-			border-color 160ms ease;
-	}
-
-	.cta__link:hover {
-		color: #e8eaf0;
-		border-color: rgba(232, 234, 240, 0.6);
-	}
-
-	.cta__button {
-		flex: none;
-		padding: 0.7em 1.35em;
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.8em 1.35em;
 		border-radius: 999px;
-		background: rgba(255, 255, 255, 0.92);
+		background: rgba(255, 255, 255, 0.94);
 		color: #05070c;
 		font-size: 0.9rem;
 		line-height: 1;
+		white-space: nowrap;
 		text-decoration: none;
-		transition: background-color 160ms ease;
+		transition:
+			background-color 160ms ease,
+			transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
-	.cta__button:hover {
+	.btn:hover {
 		background: #fff;
+		transform: translateY(-2px);
 	}
 
-	.cta__button:focus-visible {
-		outline: 2px solid rgba(232, 234, 240, 0.75);
-		outline-offset: 3px;
-	}
-
-	/* --- Footer ---------------------------------------------------------- */
+	/* --- Footer ----------------------------------------------------------- */
 
 	.site-footer {
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: space-between;
 		gap: 1rem;
-		margin-block-start: clamp(3rem, 8vw, 5.5rem);
-		padding-block-start: 1.25rem;
+		margin-block-start: clamp(4rem, 10vw, 7rem);
+		padding-block: 1.25rem clamp(1.5rem, 4vw, 2.5rem);
 		border-block-start: 1px solid rgba(255, 255, 255, 0.09);
 		font-size: 0.85rem;
 		color: rgba(232, 234, 240, 0.45);
@@ -758,49 +618,47 @@ const aside = [
 		color: rgba(232, 234, 240, 0.9);
 	}
 
-	/* --- Responsive ------------------------------------------------------ */
-
-	@media (max-width: 720px) {
-		.about-meta,
-		.aside-list {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 1.25rem;
-		}
-
-		.prose__section,
-		.entry {
-			grid-template-columns: minmax(0, 1fr);
-			gap: 0.75rem;
-		}
-
-		.entry__aside {
-			flex-direction: row;
-			align-items: baseline;
-			gap: 0.75em;
-		}
-
-		.toolbox {
-			grid-template-columns: minmax(0, 1fr);
-		}
-
-		.cta {
-			justify-content: flex-start;
-		}
+	/* Blocks rise into place once the script confirms motion is welcome. */
+	:global(html.reveal-ready) .reveal {
+		opacity: 0;
+		transform: translateY(18px);
+		transition:
+			opacity 800ms cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms),
+			transform 800ms cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms);
 	}
 
-	@media (max-width: 520px) {
-		.about-meta,
-		.aside-list {
+	:global(html.reveal-ready) .reveal.is-in {
+		opacity: 1;
+		transform: none;
+	}
+
+	/* --- Responsive ------------------------------------------------------- */
+
+	@media (max-width: 900px) {
+		.layout {
 			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.identity {
+			position: static;
+		}
+
+		.pills {
+			flex-direction: row;
+			flex-wrap: wrap;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.contact__link,
-		.cta__link,
-		.cta__button,
+		.pill,
+		.btn,
+		.entry,
 		.site-footer a {
 			transition: none;
+		}
+
+		.btn:hover {
+			transform: none;
 		}
 	}
 </style>

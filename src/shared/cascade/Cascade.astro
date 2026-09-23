@@ -20,7 +20,41 @@ const { items, duration = 42 } = Astro.props;
 
 // Every clip is 16:9 and is shown whole, so the collage gets its variety from
 // size alone: each tile keeps its own base width and the arc scales it from there.
-const widths = [12, 16, 10, 17, 13, 15, 11, 16];
+const widths = [20, 26, 16, 27, 21, 25, 18, 26];
+
+// The path the tiles travel: a lens-shaped sweep that comes in small at the top
+// right, swells out to the left, and leaves small again at the bottom right.
+// These numbers are the single source of truth — the `arc` keyframes below are
+// generated from them, and the turbulence script reads them off the DOM so it
+// can work out where a tile is without measuring it.
+const ARC = {
+	xBase: 48,
+	xSweep: 23,
+	yBase: -46,
+	ySpan: 82,
+	scaleBase: 0.11,
+	scaleSpan: 0.89,
+	scaleExp: 1.3,
+	// Depth is carried by opacity as well as size: a tile is nearly clear at the
+	// back of the sweep and never quite solid at the front, so one crossing in
+	// front of another blends into it instead of cutting it off.
+	fadeBase: 0.14,
+	fadeSpan: 0.81,
+	fadeExp: 0.8,
+	fadeEdge: 0.03,
+};
+
+const arc = (t: number) => {
+	const k = Math.sin(Math.PI * t);
+	const ramp = Math.min(1, t / ARC.fadeEdge, (1 - t) / ARC.fadeEdge);
+
+	return {
+		x: ARC.xBase - ARC.xSweep * k,
+		y: ARC.yBase + ARC.ySpan * t,
+		scale: ARC.scaleBase + ARC.scaleSpan * k ** ARC.scaleExp,
+		opacity: (ARC.fadeBase + ARC.fadeSpan * k ** ARC.fadeExp) * ramp,
+	};
+};
 
 // Two passes fill the arc: with one pass the tiles sit too far apart to read as
 // a cluster. Half a cycle separates a project from its twin, which keeps the
@@ -34,25 +68,16 @@ const tiles = [...items, ...items].map((item, index) => ({
 	width: widths[(index + Math.floor(index / items.length) * 3) % widths.length],
 }));
 
-// The path the tiles travel, matching the `arc` keyframes below: a lens-shaped
-// sweep that comes in small at the top right, swells out to the left, and
-// leaves small again at the bottom right.
-const arc = (t: number) => ({
-	x: 48 - 26 * Math.sin(Math.PI * t),
-	y: -46 + 82 * t,
-	scale: 0.11 + 0.89 * Math.sin(Math.PI * t) ** 1.3,
-});
-
 const round = (value: number) => Number(value.toFixed(3));
 ---
 
-<section class="cascade" aria-label="Selected projects">
+<section class="cascade" aria-label="Selected projects" data-arc={JSON.stringify(ARC)}>
 	{
 		tiles.map((tile) => {
 			// Where this tile sits in the cycle — its animation offset, and the
-			// still position it holds when motion is turned off.
+			// still frame it holds when motion is turned off.
 			const t = tile.index / tiles.length;
-			const { x, y, scale } = arc(t);
+			const { x, y, scale, opacity } = arc(t);
 
 			return (
 				<div
@@ -63,6 +88,7 @@ const round = (value: number) => Number(value.toFixed(3));
 						--still-x: ${round(x)}vw;
 						--still-y: ${round(y)}vh;
 						--still-scale: ${round(scale)};
+						--still-opacity: ${round(opacity)};
 						--still-z: ${Math.round(1 + 98 * scale)};
 					`}
 					aria-hidden={tile.duplicate ? 'true' : undefined}
@@ -107,13 +133,25 @@ const round = (value: number) => Number(value.toFixed(3));
 		will-change: transform, opacity;
 	}
 
-	/* Width only — the card inside holds the clip's own 16:9, uncropped. */
+	/* Width only — the card inside holds the clip's own 16:9, uncropped. The
+	   push variables are where the pointer shoves the tile off the path; they
+	   sit here rather than on the slot so they never fight the animation. */
 	.cascade__tile {
 		position: absolute;
 		inline-size: var(--width);
-		translate: -50% -50%;
+		translate: calc(-50% + var(--push-x, 0px)) calc(-50% + var(--push-y, 0px));
+		rotate: var(--push-rot, 0deg);
 		pointer-events: auto;
 		transition: opacity 320ms ease;
+	}
+
+	/* The tile under the pointer comes to the front of the stack, fully solid.
+	   Both values are keyframed, and an animation outranks any ordinary
+	   declaration — `!important` is the one thing that outranks it. */
+	.cascade__slot:hover,
+	.cascade__slot:focus-within {
+		z-index: 1000 !important;
+		opacity: 1 !important;
 	}
 
 	/* Hovering the cluster lifts one tile out of it and dims the rest. */
@@ -132,98 +170,98 @@ const round = (value: number) => Number(value.toFixed(3));
 			z-index: 12;
 		}
 		5% {
-			transform: translate3d(43.93vw, -41.9vh, 0) scale(0.19);
-			opacity: 1;
+			transform: translate3d(44.4vw, -41.9vh, 0) scale(0.19);
+			opacity: 0.324;
 			z-index: 20;
 		}
 		10% {
-			transform: translate3d(39.97vw, -37.8vh, 0) scale(0.303);
-			opacity: 1;
+			transform: translate3d(40.89vw, -37.8vh, 0) scale(0.303);
+			opacity: 0.457;
 			z-index: 31;
 		}
 		15% {
-			transform: translate3d(36.2vw, -33.7vh, 0) scale(0.429);
-			opacity: 1;
+			transform: translate3d(37.56vw, -33.7vh, 0) scale(0.429);
+			opacity: 0.571;
 			z-index: 43;
 		}
 		20% {
-			transform: translate3d(32.72vw, -29.6vh, 0) scale(0.556);
-			opacity: 1;
+			transform: translate3d(34.48vw, -29.6vh, 0) scale(0.556);
+			opacity: 0.669;
 			z-index: 55;
 		}
 		25% {
-			transform: translate3d(29.62vw, -25.5vh, 0) scale(0.677);
-			opacity: 1;
+			transform: translate3d(31.74vw, -25.5vh, 0) scale(0.677);
+			opacity: 0.754;
 			z-index: 67;
 		}
 		30% {
-			transform: translate3d(26.97vw, -21.4vh, 0) scale(0.786);
-			opacity: 1;
+			transform: translate3d(29.39vw, -21.4vh, 0) scale(0.786);
+			opacity: 0.824;
 			z-index: 78;
 		}
 		35% {
-			transform: translate3d(24.83vw, -17.3vh, 0) scale(0.876);
-			opacity: 1;
+			transform: translate3d(27.51vw, -17.3vh, 0) scale(0.876);
+			opacity: 0.879;
 			z-index: 87;
 		}
 		40% {
-			transform: translate3d(23.27vw, -13.2vh, 0) scale(0.944);
-			opacity: 1;
+			transform: translate3d(26.13vw, -13.2vh, 0) scale(0.944);
+			opacity: 0.918;
 			z-index: 93;
 		}
 		45% {
-			transform: translate3d(22.32vw, -9.1vh, 0) scale(0.986);
-			opacity: 1;
+			transform: translate3d(25.28vw, -9.1vh, 0) scale(0.986);
+			opacity: 0.942;
 			z-index: 98;
 		}
 		50% {
-			transform: translate3d(22vw, -5vh, 0) scale(1);
-			opacity: 1;
+			transform: translate3d(25vw, -5vh, 0) scale(1);
+			opacity: 0.95;
 			z-index: 99;
 		}
 		55% {
-			transform: translate3d(22.32vw, -0.9vh, 0) scale(0.986);
-			opacity: 1;
+			transform: translate3d(25.28vw, -0.9vh, 0) scale(0.986);
+			opacity: 0.942;
 			z-index: 98;
 		}
 		60% {
-			transform: translate3d(23.27vw, 3.2vh, 0) scale(0.944);
-			opacity: 1;
+			transform: translate3d(26.13vw, 3.2vh, 0) scale(0.944);
+			opacity: 0.918;
 			z-index: 93;
 		}
 		65% {
-			transform: translate3d(24.83vw, 7.3vh, 0) scale(0.876);
-			opacity: 1;
+			transform: translate3d(27.51vw, 7.3vh, 0) scale(0.876);
+			opacity: 0.879;
 			z-index: 87;
 		}
 		70% {
-			transform: translate3d(26.97vw, 11.4vh, 0) scale(0.786);
-			opacity: 1;
+			transform: translate3d(29.39vw, 11.4vh, 0) scale(0.786);
+			opacity: 0.824;
 			z-index: 78;
 		}
 		75% {
-			transform: translate3d(29.62vw, 15.5vh, 0) scale(0.677);
-			opacity: 1;
+			transform: translate3d(31.74vw, 15.5vh, 0) scale(0.677);
+			opacity: 0.754;
 			z-index: 67;
 		}
 		80% {
-			transform: translate3d(32.72vw, 19.6vh, 0) scale(0.556);
-			opacity: 1;
+			transform: translate3d(34.48vw, 19.6vh, 0) scale(0.556);
+			opacity: 0.669;
 			z-index: 55;
 		}
 		85% {
-			transform: translate3d(36.2vw, 23.7vh, 0) scale(0.429);
-			opacity: 1;
+			transform: translate3d(37.56vw, 23.7vh, 0) scale(0.429);
+			opacity: 0.571;
 			z-index: 43;
 		}
 		90% {
-			transform: translate3d(39.97vw, 27.8vh, 0) scale(0.303);
-			opacity: 1;
+			transform: translate3d(40.89vw, 27.8vh, 0) scale(0.303);
+			opacity: 0.457;
 			z-index: 31;
 		}
 		95% {
-			transform: translate3d(43.93vw, 31.9vh, 0) scale(0.19);
-			opacity: 1;
+			transform: translate3d(44.4vw, 31.9vh, 0) scale(0.19);
+			opacity: 0.324;
 			z-index: 20;
 		}
 		100% {
@@ -275,11 +313,12 @@ const round = (value: number) => Number(value.toFixed(3));
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		/* No travel: every tile holds the spot its offset would have put it in,
+		/* No travel: every tile holds the frame its offset would have put it in,
 		   which keeps the same cluster without anything moving. */
 		.cascade__slot {
 			animation: none;
 			transform: translate3d(var(--still-x), var(--still-y), 0) scale(var(--still-scale));
+			opacity: var(--still-opacity);
 			z-index: var(--still-z);
 		}
 
@@ -291,6 +330,16 @@ const round = (value: number) => Number(value.toFixed(3));
 </style>
 
 <script>
+	interface ArcShape {
+		xBase: number;
+		xSweep: number;
+		yBase: number;
+		ySpan: number;
+		scaleBase: number;
+		scaleSpan: number;
+		scaleExp: number;
+	}
+
 	const cascade = document.querySelector<HTMLElement>('.cascade');
 	const readout = document.querySelector<HTMLElement>('[data-cascade-readout]');
 
@@ -325,5 +374,167 @@ const round = (value: number) => Number(value.toFixed(3));
 		});
 
 		cascade.addEventListener('focusout', clear);
+	}
+
+	/* ------------------------------------------------------------ front tile */
+
+	// Names the project currently at the peak of the arc, for anything on the
+	// page that wants to follow along. It is written to `data-front` (for
+	// whoever arrives late) and announced as a `cascade:front` event.
+	if (cascade) {
+		const slots = [...cascade.querySelectorAll<HTMLElement>('.cascade__slot')];
+
+		const report = () => {
+			let front: HTMLElement | undefined;
+			let closest = Infinity;
+
+			for (const slot of slots) {
+				const progress = slot.getAnimations()[0]?.effect?.getComputedTiming().progress;
+				if (progress == null) continue;
+
+				const gap = Math.abs(progress - 0.5);
+				if (gap < closest) {
+					closest = gap;
+					front = slot;
+				}
+			}
+
+			const title = front?.querySelector<HTMLElement>('.cascade__tile')?.dataset.title;
+			if (!title || title === cascade.dataset.front) return;
+
+			cascade.dataset.front = title;
+			document.dispatchEvent(new CustomEvent('cascade:front', { detail: { title } }));
+		};
+
+		report();
+		setInterval(report, 250);
+	}
+
+	/* ------------------------------------------------------------- turbulence */
+
+	// The pointer pushes tiles off the path: they part around it on the way past
+	// and drift back once it has gone. The wake is strongest a little way out
+	// from the cursor and dies to nothing right under it, so the tile you are
+	// reaching for settles instead of fleeing the click.
+	const canDisturb =
+		window.matchMedia('(hover: hover)').matches &&
+		!window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+	if (cascade && canDisturb) {
+		const shape: ArcShape = JSON.parse(cascade.dataset.arc ?? '{}');
+
+		const tiles = [...cascade.querySelectorAll<HTMLElement>('.cascade__slot')].map(
+			(slot, index) => ({
+				slot,
+				tile: slot.querySelector<HTMLElement>('.cascade__tile')!,
+				// An uneven response per tile is what reads as turbulence rather
+				// than a tidy force field: one weight, one direction of curl.
+				weight: 0.7 + ((index * 37) % 11) / 11,
+				curl: index % 2 === 0 ? 1 : -1,
+				x: 0,
+				y: 0,
+				rotation: 0,
+			}),
+		);
+
+		const REACH = 0.4; // of the smaller viewport edge
+		const SHOVE = 58; // px at the peak of the wake
+		const EASE = 0.085; // how fast a tile chases its target
+		const SETTLED = 0.4; // px below which the drift back is over
+
+		let pointerX = 0;
+		let pointerY = 0;
+		let pointerInside = false;
+		let frame = 0;
+
+		const step = () => {
+			frame = 0;
+
+			const width = window.innerWidth;
+			const height = window.innerHeight;
+			const reach = Math.min(width, height) * REACH;
+			let moving = false;
+
+			for (const entry of tiles) {
+				// The slot's position comes from the arc rather than a measurement:
+				// reading it back off the layout every frame would force a reflow.
+				const timing = entry.slot.getAnimations()[0]?.effect?.getComputedTiming();
+				const progress = timing?.progress ?? 0;
+				const swell = Math.sin(Math.PI * progress);
+
+				const centreX = ((shape.xBase - shape.xSweep * swell) / 100) * width;
+				const centreY = height / 2 + ((shape.yBase + shape.ySpan * progress) / 100) * height;
+				const scale = shape.scaleBase + shape.scaleSpan * swell ** shape.scaleExp;
+
+				let targetX = 0;
+				let targetY = 0;
+
+				// The wake is measured from the tile's centre, so a big tile hovered
+				// near its edge would still be shoved — and slide out from under the
+				// cursor. The one being pointed at holds still instead.
+				if (pointerInside && !entry.tile.matches(':hover')) {
+					const awayX = centreX - pointerX;
+					const awayY = centreY - pointerY;
+					const distance = Math.hypot(awayX, awayY) || 1;
+					const reachRatio = distance / reach;
+
+					if (reachRatio < 1) {
+						// Zero at the cursor, full just outside it, gone by the edge
+						// of the reach.
+						const falloff = (1 - reachRatio) ** 2 * Math.min(1, reachRatio / 0.18);
+						const push = SHOVE * falloff * (0.45 + 0.55 * scale) * entry.weight;
+
+						// A sideways component alongside the shove, so tiles swirl
+						// past the cursor instead of sliding straight out from it.
+						targetX = (awayX / distance) * push - (awayY / distance) * push * 0.45 * entry.curl;
+						targetY = (awayY / distance) * push + (awayX / distance) * push * 0.45 * entry.curl;
+					}
+				}
+
+				// The tile lives inside the scaled slot, so a push measured on
+				// screen has to be divided back out to land where it should.
+				const inverse = 1 / Math.max(scale, 0.1);
+				entry.x += (targetX * inverse - entry.x) * EASE;
+				entry.y += (targetY * inverse - entry.y) * EASE;
+				entry.rotation += (targetX * 0.09 * entry.curl - entry.rotation) * EASE;
+
+				const travel = Math.abs(entry.x) + Math.abs(entry.y);
+				if (travel > SETTLED) moving = true;
+
+				entry.tile.style.setProperty('--push-x', `${entry.x.toFixed(1)}px`);
+				entry.tile.style.setProperty('--push-y', `${entry.y.toFixed(1)}px`);
+				entry.tile.style.setProperty('--push-rot', `${entry.rotation.toFixed(2)}deg`);
+			}
+
+			// Idle once the pointer has left and the last tile has drifted home,
+			// so the page is not running a frame loop over a still picture.
+			if (pointerInside || moving) frame = requestAnimationFrame(step);
+		};
+
+		const wake = () => {
+			if (!frame) frame = requestAnimationFrame(step);
+		};
+
+		window.addEventListener(
+			'pointermove',
+			(event) => {
+				if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
+				pointerX = event.clientX;
+				pointerY = event.clientY;
+				pointerInside = true;
+				wake();
+			},
+			{ passive: true },
+		);
+
+		document.addEventListener('pointerleave', () => {
+			pointerInside = false;
+			wake();
+		});
+
+		window.addEventListener('blur', () => {
+			pointerInside = false;
+			wake();
+		});
 	}
 </script>
