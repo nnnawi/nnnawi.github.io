@@ -1,0 +1,329 @@
+---
+import BentoCard from '../bento-card/BentoCard.astro';
+
+export interface CascadeItem {
+	/** Project name, shown in the readout while the tile is hovered. */
+	title: string;
+	/** Path/URL of the looping clip that fills the tile. */
+	video: string;
+	/** When set, the tile becomes a link to this destination. */
+	href?: string;
+}
+
+interface Props {
+	items: CascadeItem[];
+	/** Seconds for one tile to travel the whole arc. */
+	duration?: number;
+}
+
+const { items, duration = 42 } = Astro.props;
+
+// Every clip is 16:9 and is shown whole, so the collage gets its variety from
+// size alone: each tile keeps its own base width and the arc scales it from there.
+const widths = [12, 16, 10, 17, 13, 15, 11, 16];
+
+// Two passes fill the arc: with one pass the tiles sit too far apart to read as
+// a cluster. Half a cycle separates a project from its twin, which keeps the
+// pair at opposite ends of the arc — one tiny at the top, one tiny at the bottom.
+const tiles = [...items, ...items].map((item, index) => ({
+	...item,
+	index,
+	// The second pass is decoration over clips the first pass already links to.
+	duplicate: index >= items.length,
+	// Offsetting the second pass keeps a project from drawing at the same size twice.
+	width: widths[(index + Math.floor(index / items.length) * 3) % widths.length],
+}));
+
+// The path the tiles travel, matching the `arc` keyframes below: a lens-shaped
+// sweep that comes in small at the top right, swells out to the left, and
+// leaves small again at the bottom right.
+const arc = (t: number) => ({
+	x: 48 - 26 * Math.sin(Math.PI * t),
+	y: -46 + 82 * t,
+	scale: 0.11 + 0.89 * Math.sin(Math.PI * t) ** 1.3,
+});
+
+const round = (value: number) => Number(value.toFixed(3));
+---
+
+<section class="cascade" aria-label="Selected projects">
+	{
+		tiles.map((tile) => {
+			// Where this tile sits in the cycle — its animation offset, and the
+			// still position it holds when motion is turned off.
+			const t = tile.index / tiles.length;
+			const { x, y, scale } = arc(t);
+
+			return (
+				<div
+					class="cascade__slot"
+					style={`
+						--delay: ${round(-t * duration)}s;
+						--width: ${tile.width}vw;
+						--still-x: ${round(x)}vw;
+						--still-y: ${round(y)}vh;
+						--still-scale: ${round(scale)};
+						--still-z: ${Math.round(1 + 98 * scale)};
+					`}
+					aria-hidden={tile.duplicate ? 'true' : undefined}
+				>
+					<div class="cascade__tile" data-title={tile.title}>
+						<BentoCard
+							title={tile.title}
+							video={tile.video}
+							href={tile.href}
+							radius="10px"
+							hideTitle
+							tabindex={tile.duplicate ? -1 : undefined}
+						/>
+					</div>
+				</div>
+			);
+		})
+	}
+</section>
+
+<p class="readout" data-cascade-readout aria-hidden="true"></p>
+
+<style define:vars={{ cascadeDuration: `${duration}s` }}>
+	.cascade {
+		position: absolute;
+		z-index: 0;
+		inset: 0;
+		/* Keeps the tiles' own z-indexes from ever climbing over the headline. */
+		isolation: isolate;
+		overflow: hidden;
+		pointer-events: none;
+	}
+
+	/* The slot carries the journey; the tile inside it only centres itself on
+	   the slot's point, so the tile's own size never distorts the path. */
+	.cascade__slot {
+		position: absolute;
+		inset-block-start: 50%;
+		inset-inline-start: 0;
+		animation: arc var(--cascadeDuration) linear infinite;
+		animation-delay: var(--delay);
+		will-change: transform, opacity;
+	}
+
+	/* Width only — the card inside holds the clip's own 16:9, uncropped. */
+	.cascade__tile {
+		position: absolute;
+		inline-size: var(--width);
+		translate: -50% -50%;
+		pointer-events: auto;
+		transition: opacity 320ms ease;
+	}
+
+	/* Hovering the cluster lifts one tile out of it and dims the rest. */
+	.cascade:hover .cascade__tile {
+		opacity: 0.28;
+	}
+
+	.cascade .cascade__tile:hover {
+		opacity: 1;
+	}
+
+	@keyframes arc {
+		0% {
+			transform: translate3d(48vw, -46vh, 0) scale(0.11);
+			opacity: 0;
+			z-index: 12;
+		}
+		5% {
+			transform: translate3d(43.93vw, -41.9vh, 0) scale(0.19);
+			opacity: 1;
+			z-index: 20;
+		}
+		10% {
+			transform: translate3d(39.97vw, -37.8vh, 0) scale(0.303);
+			opacity: 1;
+			z-index: 31;
+		}
+		15% {
+			transform: translate3d(36.2vw, -33.7vh, 0) scale(0.429);
+			opacity: 1;
+			z-index: 43;
+		}
+		20% {
+			transform: translate3d(32.72vw, -29.6vh, 0) scale(0.556);
+			opacity: 1;
+			z-index: 55;
+		}
+		25% {
+			transform: translate3d(29.62vw, -25.5vh, 0) scale(0.677);
+			opacity: 1;
+			z-index: 67;
+		}
+		30% {
+			transform: translate3d(26.97vw, -21.4vh, 0) scale(0.786);
+			opacity: 1;
+			z-index: 78;
+		}
+		35% {
+			transform: translate3d(24.83vw, -17.3vh, 0) scale(0.876);
+			opacity: 1;
+			z-index: 87;
+		}
+		40% {
+			transform: translate3d(23.27vw, -13.2vh, 0) scale(0.944);
+			opacity: 1;
+			z-index: 93;
+		}
+		45% {
+			transform: translate3d(22.32vw, -9.1vh, 0) scale(0.986);
+			opacity: 1;
+			z-index: 98;
+		}
+		50% {
+			transform: translate3d(22vw, -5vh, 0) scale(1);
+			opacity: 1;
+			z-index: 99;
+		}
+		55% {
+			transform: translate3d(22.32vw, -0.9vh, 0) scale(0.986);
+			opacity: 1;
+			z-index: 98;
+		}
+		60% {
+			transform: translate3d(23.27vw, 3.2vh, 0) scale(0.944);
+			opacity: 1;
+			z-index: 93;
+		}
+		65% {
+			transform: translate3d(24.83vw, 7.3vh, 0) scale(0.876);
+			opacity: 1;
+			z-index: 87;
+		}
+		70% {
+			transform: translate3d(26.97vw, 11.4vh, 0) scale(0.786);
+			opacity: 1;
+			z-index: 78;
+		}
+		75% {
+			transform: translate3d(29.62vw, 15.5vh, 0) scale(0.677);
+			opacity: 1;
+			z-index: 67;
+		}
+		80% {
+			transform: translate3d(32.72vw, 19.6vh, 0) scale(0.556);
+			opacity: 1;
+			z-index: 55;
+		}
+		85% {
+			transform: translate3d(36.2vw, 23.7vh, 0) scale(0.429);
+			opacity: 1;
+			z-index: 43;
+		}
+		90% {
+			transform: translate3d(39.97vw, 27.8vh, 0) scale(0.303);
+			opacity: 1;
+			z-index: 31;
+		}
+		95% {
+			transform: translate3d(43.93vw, 31.9vh, 0) scale(0.19);
+			opacity: 1;
+			z-index: 20;
+		}
+		100% {
+			transform: translate3d(48vw, 36vh, 0) scale(0.11);
+			opacity: 0;
+			z-index: 12;
+		}
+	}
+
+	/* ---------------------------------------------------------------- readout */
+
+	/* The card already carries the project name for assistive tech; this is the
+	   sighted counterpart, kept at a readable size whatever the tile's scale. */
+	.readout {
+		position: absolute;
+		z-index: 2;
+		inset-block-end: clamp(1.5rem, 4vh, 2.75rem);
+		inset-inline-start: clamp(1.75rem, 6vw, 7rem);
+		margin: 0;
+		min-block-size: 1em;
+		color: rgba(232, 234, 240, 0.72);
+		font-size: 0.8rem;
+		font-weight: 400;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 260ms ease;
+	}
+
+	.readout:not(:empty) {
+		opacity: 1;
+	}
+
+	@media (max-width: 900px) {
+		/* On a narrow screen the arc runs behind the headline, so it steps back
+		   to a texture and stops competing for the pointer. */
+		.cascade {
+			opacity: 0.32;
+		}
+
+		.cascade__tile {
+			pointer-events: none;
+		}
+
+		.readout {
+			display: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		/* No travel: every tile holds the spot its offset would have put it in,
+		   which keeps the same cluster without anything moving. */
+		.cascade__slot {
+			animation: none;
+			transform: translate3d(var(--still-x), var(--still-y), 0) scale(var(--still-scale));
+			z-index: var(--still-z);
+		}
+
+		.cascade__tile,
+		.readout {
+			transition: none;
+		}
+	}
+</style>
+
+<script>
+	const cascade = document.querySelector<HTMLElement>('.cascade');
+	const readout = document.querySelector<HTMLElement>('[data-cascade-readout]');
+
+	if (cascade && readout) {
+		// `updatePlaybackRate` retimes the arc in place, so easing it down on
+		// hover never makes a tile jump away from under the pointer.
+		const setRate = (rate: number) => {
+			for (const slot of cascade.querySelectorAll<HTMLElement>('.cascade__slot')) {
+				for (const animation of slot.getAnimations()) {
+					animation.updatePlaybackRate(rate);
+				}
+			}
+		};
+
+		const show = (event: Event) => {
+			const tile = (event.target as HTMLElement).closest<HTMLElement>('.cascade__tile');
+			readout.textContent = tile?.dataset.title ?? '';
+		};
+
+		const clear = () => {
+			setRate(1);
+			readout.textContent = '';
+		};
+
+		cascade.addEventListener('pointerenter', () => setRate(0.12));
+		cascade.addEventListener('pointerover', show);
+		cascade.addEventListener('pointerleave', clear);
+
+		cascade.addEventListener('focusin', (event) => {
+			setRate(0.12);
+			show(event);
+		});
+
+		cascade.addEventListener('focusout', clear);
+	}
+</script>

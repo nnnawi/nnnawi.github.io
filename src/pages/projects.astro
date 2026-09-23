@@ -1,0 +1,120 @@
+---
+import BentoCard from '../shared/bento-card/BentoCard.astro';
+import Nav from '../shared/nav/Nav.astro';
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content="Projects by Iwan Ibnoulouafi." />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+		/>
+		<title>Projects — Iwan</title>
+	</head>
+	<body>
+		<Nav active="/projects" />
+
+		<main>
+			<div class="bento-grid">
+				<BentoCard
+					title="Vectorfield Pathfinding"
+					description="An interactive deep dive into crowd navigation by flow field."
+					video="/project_animation/VFP_animation.mp4"
+					href="/vectorfield-pathfinding"
+					class="span-2"
+				/>
+				<BentoCard
+					title="MorphoX"
+					description="GPU-accelerated computer vision sandbox."
+					video="/project_animation/MorphoX_animation.mp4"
+					href="/morphox"
+					class="span-2"
+				/>
+				<BentoCard
+					title="Dither Plugin"
+					description="Professional grade dithering plugin for AE"
+					video="/project_animation/DitherPlugin5_animation.mp4"
+					href="/dither-plugin"
+					class="span-2"
+				/>
+				<BentoCard
+					title="SirAMP"
+					description="100% Handcrafted portable bass-amp."
+					video="/project_animation/SIRAMP_animation.mp4"
+					class="span-2"
+				/>
+				<BentoCard
+					title="Bowde"
+					description="An interactive control-theory plotter."
+					video="/project_animation/BOWDE_animation.mp4"
+					href="/bowde"
+					class="span-2"
+				/>
+				<BentoCard
+					title="Image2Complex"
+					description="A Visualizer for complex functions through images."
+					video="/project_animation/Image2Complex_animation.mp4"
+					href="https://nnnawi.github.io/Image2complex/"
+					class="span-2"
+				/>
+				<BentoCard
+					title="Privacy Plugin"
+					description="Automatic PII anonymisation inside Premiere Pro."
+					video="/project_animation/PPlugin3_animation.mp4"
+					href="/privacy-plugin"
+					class="span-2"
+				/>
+				<BentoCard
+					title="YOLO on NPU"
+					description="Compressing a detector to run on embedded hardware."
+					video="/project_animation/NPU2_animation.mp4"
+					href="/yolo-npu"
+					class="span-2"
+				/>
+			</div>
+		</main>
+	</body>
+</html>
+
+<style>
+	:global(body) {
+		margin: 0;
+		background: #05070c;
+		color: #e8eaf0;
+		font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+		font-weight: 350;
+	}
+
+	main {
+		max-inline-size: 1100px;
+		margin-inline: auto;
+		/* Extra top room so the fixed nav never sits on the first row of cards. */
+		padding: clamp(5.5rem, 12vh, 8rem) clamp(1rem, 4vw, 2rem) clamp(1.5rem, 5vw, 4rem);
+	}
+
+	.bento-grid {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		/* Cards keep their own 16:9 height instead of being stretched by the row. */
+		align-items: start;
+		gap: clamp(0.75rem, 1.5vw, 1.25rem);
+	}
+
+	.bento-grid > .span-2 {
+		grid-column: span 2;
+	}
+
+	@media (max-width: 720px) {
+		.bento-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+</style>

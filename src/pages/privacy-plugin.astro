@@ -1,0 +1,1170 @@
+---
+// ---------------------------------------------------------------------------
+// Project template — everything a project needs lives in this block.
+// Copy this file, swap the data, keep the markup.
+// ---------------------------------------------------------------------------
+const project = {
+	title: 'Privacy Plugin',
+	tagline: 'A Premiere Pro plugin that finds the private things in a shot — faces, addresses, screens, a room you would rather not identify — and keeps them covered for the whole cut. You toggle a class, not a mask.',
+	meta: [
+		{ label: 'Discipline', value: 'Computer vision · Video post-production' },
+		{ label: 'Stack', value: 'UXP, Python, YOLO, ByteTrack, EdgeTAM, CoreML / ONNX Runtime' },
+		{ label: 'Year', value: '2026' },
+		{ label: 'Role', value: 'Self initiated' },
+	],
+	hero: '/project_animation/PPlugin_animation.mp4',
+	// Work in progress. Drop the key once the project ships.
+	status: 'In development',
+	// Repository. `private: true` swaps the link for a locked badge plus an access
+	// request, and `url` is then ignored. Drop the whole key to hide the row.
+	repo: {
+		url: null,
+		private: true,
+		contact: 'iwan@ibnoulouafi.com',
+	},
+	sections: [
+		{
+			label: 'Overview',
+			title: 'The hard part of anonymising footage is not the blur',
+			body: [
+				'Every editing suite can already hide something. Draw a mask, turn on tracking, fix the frames where the tracker slipped, repeat for the next occurrence. That part has been solved for twenty years.',
+				'What is not solved is the accounting. The question on a long edit is never how to blur a face, it is whether every face was blurred — including the one visible for eleven frames behind a shot you cut three days ago.',
+				'So the plugin works one level up. You switch on the categories you never want to see, and everything in them is covered wherever it appears, across a shot or the whole sequence. It sits in the effect stack like anything else in Premiere.',
+			],
+		},
+		{
+			label: 'Approach',
+			title: 'One fine-tuned detector, an OCR pass, and a click for the rest',
+			body: [
+				'Premiere\u2019s extension runtime cannot host PyTorch, so the plugin is split in two: a UXP panel that is pure interface, and a local Python sidecar that runs every model. The panel hands over clip paths and in/out points, the sidecar reads the source media straight from disk.',
+				'Detection is graded. Most of the classes come from a single YOLO model, fine-tuned on a dataset built for exactly the things the plugin covers — faces, house numbers, laptop screens, phone screens, and so on. Text is the exception, because it is a different problem: it goes through an OCR pass, filtered by regex and NER so addresses and card numbers are hidden while the rest of the signs in the shot are left alone. Anything outside both is clicked once and tracked from there by EdgeTAM, which is the expensive path and therefore the one you have to ask for.',
+				'None of it runs on every frame. The input is downscaled first, the detectors fire every second or third frame, and ByteTrack carries the boxes across every frame in between. It is tuned to over-cover: a missed face is a privacy failure, an extra covered frame is a cosmetic one.',
+			],
+		},
+	],
+	// Privacy classes, rendered as a signal chain.
+	classes: [
+		{ name: 'Faces', detail: 'Every face in frame, with an embedding allowlist so your own is never covered.' },
+		{ name: 'Phone numbers', detail: 'Recognised on screen, on paper, on a shop front.' },
+		{ name: 'Addresses', detail: 'Street signs, letters, delivery labels, anything that places you.' },
+		{ name: 'Emails, cards, badges', detail: 'Filtered out of recognised text rather than blurring every sign in the shot.' },
+		{ name: 'Licence plates', detail: 'Held through partial occlusion by the tracker.' },
+		{ name: 'Laptop and TV screens', detail: 'The whole panel, not the readable part of it.' },
+		{ name: 'Nudity', detail: 'Covered as a class, at the same scope as the rest.' },
+		{ name: 'Sensitive backgrounds', detail: 'A room or a location you would rather not have identified.' },
+		{ name: 'Anything else', detail: 'Click it once and it is tracked everywhere it appears.' },
+	],
+	// Pipeline, rendered as a node graph. EdgeTAM carries its own tracker, so it
+	// skips ByteTrack and joins the others at the masking stage.
+	pipeline: {
+		source: { name: 'Source media', detail: 'Read from disk' },
+		downscale: { name: 'Downscale', detail: 'Working resolution' },
+		yolo: { tier: 'Classes', name: 'YOLO', detail: 'Fine-tuned classes, every 2\u20133 frames' },
+		ocr: { tier: 'Text', name: 'OCR', detail: 'Regex and NER filters' },
+		edgetam: { tier: 'Manual', name: 'EdgeTAM', detail: 'Click-to-track, own tracker' },
+		bytetrack: { name: 'ByteTrack', detail: 'Fills the frames in between' },
+		masks: { name: 'Masks', detail: 'Back to source resolution' },
+		effect: { name: 'Premiere effect', detail: 'Shot or sequence' },
+	},
+	// Bento media grid — `span` drives how many of the 4 columns a tile takes.
+	// Convention: clips live in /project_animation/PrivacyPlugin/.
+	media: [],
+};
+
+const pad = (index: number) => String(index + 1).padStart(2, '0');
+
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={project.tagline} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+		/>
+		<title>{project.title}</title>
+	</head>
+	<body>
+		<main>
+			<a class="back-link" href="/">
+				<span class="back-link__arrow" aria-hidden="true">←</span>
+				Back to all projects
+			</a>
+
+			<header class="project-header">
+				<h1 class="project-title">{project.title}</h1>
+				<p class="project-tagline">{project.tagline}</p>
+
+				<p class="repo">
+					{
+						project.repo &&
+							(project.repo.private ? (
+								<span class="repo__badge">
+									<svg
+										class="repo__icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.3"
+										aria-hidden="true"
+									>
+										<rect x="3.25" y="7" width="9.5" height="6.75" rx="1.6" />
+										<path d="M5.75 7V4.75a2.25 2.25 0 0 1 4.5 0V7" />
+									</svg>
+									Private repository
+								</span>
+							) : (
+								<a
+									class="repo__link"
+									href={project.repo.url}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<svg class="repo__icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+										<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+									</svg>
+									View source on GitHub
+								</a>
+							))
+					}
+
+					{
+						project.repo?.contact && (
+							<a
+								class="repo__request"
+								href={`mailto:${project.repo.contact}?subject=${encodeURIComponent(
+									`${project.title} — source access`
+								)}`}
+							>
+								Request access
+							</a>
+						)
+					}
+
+					{
+						project.status && (
+							<span class="repo__badge repo__badge--status">
+								<span class="repo__dot" aria-hidden="true" />
+								{project.status}
+							</span>
+						)
+					}
+				</p>
+
+				<dl class="project-meta">
+					{
+						project.meta.map((item) => (
+							<div class="project-meta__row">
+								<dt class="project-meta__label">{item.label}</dt>
+								<dd class="project-meta__value">{item.value}</dd>
+							</div>
+						))
+					}
+				</dl>
+			</header>
+
+			<figure class="hero">
+				<video
+					class="hero__video"
+					src={project.hero}
+					autoplay
+					muted
+					loop
+					playsinline
+					preload="metadata"
+					tabindex="-1"
+					aria-hidden="true"
+					data-project-video></video>
+			</figure>
+
+			{
+				project.status && (
+					<p class="notice">
+						This project is still being built. The pipeline below is the design it is being built
+						against, and the parts of it that run today are not yet a plugin you could install.
+					</p>
+				)
+			}
+
+			<div class="prose">
+				{
+					project.sections.map((section) => (
+						<section class="prose__section">
+							<p class="prose__label">{section.label}</p>
+							<div class="prose__body">
+								<h2 class="prose__heading">{section.title}</h2>
+								{section.body.map((paragraph) => (
+									<p class="prose__paragraph">{paragraph}</p>
+								))}
+							</div>
+						</section>
+					))
+				}
+			</div>
+
+			{
+				project.classes.length > 0 && (
+					<section class="classes" aria-label="Privacy classes">
+						<p class="classes__label">What it covers</p>
+						<ol class="classes__list">
+							{project.classes.map((item, index) => (
+								<li class="classes__item">
+									<span class="classes__node" aria-hidden="true" />
+									<div class="classes__text">
+										<span class="classes__name">
+											{item.name}
+											<span class="classes__tick" aria-hidden="true">
+												{pad(index)}
+											</span>
+										</span>
+										<span class="classes__detail">{item.detail}</span>
+									</div>
+								</li>
+							))}
+						</ol>
+					</section>
+				)
+			}
+
+			<section class="flow" aria-label="Pipeline">
+				<p class="flow__label">Pipeline</p>
+				<div class="flow__graph">
+					<div class="flow__node flow__node--src">
+						<span class="flow__name">{project.pipeline.source.name}</span>
+						<span class="flow__detail">{project.pipeline.source.detail}</span>
+					</div>
+
+					<span class="flow__k flow__k--in" aria-hidden="true" />
+
+					<div class="flow__node flow__node--downscale">
+						<span class="flow__name">{project.pipeline.downscale.name}</span>
+						<span class="flow__detail">{project.pipeline.downscale.detail}</span>
+					</div>
+
+					{/* Fan-out: one line in, three detectors out. */}
+					<span class="flow__k flow__k--fan" aria-hidden="true">
+						<span class="flow__bar" />
+						<span class="flow__leg flow__leg--up" />
+						<span class="flow__leg flow__leg--down" />
+					</span>
+
+					{
+						[project.pipeline.yolo, project.pipeline.ocr, project.pipeline.edgetam].map(
+							(node, i) => (
+								<div class:list={['flow__node', 'flow__node--branch', `flow__node--b${i + 1}`]}>
+									<span class="flow__tier">{node.tier}</span>
+									<span class="flow__name">{node.name}</span>
+									<span class="flow__detail">{node.detail}</span>
+								</div>
+							)
+						)
+					}
+
+					{/* YOLO and OCR merge into the tracker. */}
+					<span class="flow__k flow__k--join" aria-hidden="true">
+						<span class="flow__stub" />
+						<span class="flow__bar" />
+					</span>
+
+					<div class="flow__node flow__node--bytetrack">
+						<span class="flow__name">{project.pipeline.bytetrack.name}</span>
+						<span class="flow__detail">{project.pipeline.bytetrack.detail}</span>
+					</div>
+
+					{/* EdgeTAM runs past the tracker and rejoins at the masks. */}
+					<span class="flow__k flow__k--bypass" aria-hidden="true" />
+
+					<span class="flow__k flow__k--merge" aria-hidden="true">
+						<span class="flow__stub" />
+						<span class="flow__bar" />
+					</span>
+
+					<div class="flow__node flow__node--masks">
+						<span class="flow__name">{project.pipeline.masks.name}</span>
+						<span class="flow__detail">{project.pipeline.masks.detail}</span>
+					</div>
+
+					<span class="flow__k flow__k--out" aria-hidden="true" />
+
+					<div class="flow__node flow__node--effect">
+						<span class="flow__name">{project.pipeline.effect.name}</span>
+						<span class="flow__detail">{project.pipeline.effect.detail}</span>
+					</div>
+				</div>
+			</section>
+
+			{
+				project.media.length > 0 && (
+					<section class="gallery" aria-label="Project gallery">
+						<p class="gallery__label">Selected frames</p>
+						<div class="bento-grid">
+							{project.media.map((item) => (
+								<figure
+									class:list={['media-card', `span-${item.span}`]}
+									style={`--media-ratio: ${item.ratio}`}
+								>
+									<video
+										class="media-card__video"
+										src={item.video}
+										autoplay
+										muted
+										loop
+										playsinline
+										preload="metadata"
+										tabindex="-1"
+										aria-hidden="true"
+										data-project-video
+									/>
+									<div class="media-card__frost" aria-hidden="true" />
+									{item.caption && (
+										<figcaption class="media-card__caption">{item.caption}</figcaption>
+									)}
+								</figure>
+							))}
+						</div>
+					</section>
+				)
+			}
+
+			<footer class="site-footer">
+				<span>Iwan Ibnoulouafi</span>
+				<a href="mailto:iwan@ibnoulouafi.com">iwan@ibnoulouafi.com</a>
+			</footer>
+		</main>
+	</body>
+</html>
+
+<style>
+	:global(body) {
+		margin: 0;
+		background: #05070c;
+		color: #e8eaf0;
+		font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+		font-weight: 350;
+	}
+
+	main {
+		max-inline-size: 1100px;
+		margin-inline: auto;
+		padding: clamp(1.5rem, 5vw, 4rem) clamp(1rem, 4vw, 2rem);
+	}
+
+	/* --- Back link ------------------------------------------------------- */
+
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5em;
+		color: rgba(232, 234, 240, 0.55);
+		font-size: 0.85rem;
+		letter-spacing: 0.01em;
+		text-decoration: none;
+		transition: color 160ms ease;
+	}
+
+	.back-link:hover {
+		color: rgba(232, 234, 240, 0.9);
+	}
+
+	.back-link__arrow {
+		display: inline-block;
+		transition: transform 160ms ease;
+	}
+
+	.back-link:hover .back-link__arrow {
+		transform: translateX(-3px);
+	}
+
+	/* --- Header ---------------------------------------------------------- */
+
+	.project-header {
+		margin-block: clamp(2.5rem, 7vw, 5rem) clamp(1.5rem, 4vw, 2.5rem);
+	}
+
+	.project-title {
+		margin: 0;
+		font-size: clamp(2.75rem, 9vw, 5.5rem);
+		font-weight: 350;
+		line-height: 0.98;
+		letter-spacing: -0.035em;
+	}
+
+	.project-tagline {
+		margin: clamp(1rem, 2.5vw, 1.5rem) 0 0;
+		max-inline-size: 46ch;
+		font-size: clamp(1rem, 1.6vw, 1.2rem);
+		line-height: 1.45;
+		color: rgba(232, 234, 240, 0.62);
+		text-wrap: pretty;
+	}
+
+	/* --- Repository ------------------------------------------------------ */
+
+	.repo {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem;
+		margin: clamp(1.25rem, 2.5vw, 1.75rem) 0 0;
+		font-size: 0.85rem;
+	}
+
+	.repo__link,
+	.repo__badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55em;
+		padding: 0.5em 0.95em;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.03);
+		line-height: 1;
+		text-decoration: none;
+	}
+
+	.repo__link {
+		color: rgba(232, 234, 240, 0.82);
+		transition:
+			color 160ms ease,
+			border-color 160ms ease,
+			background-color 160ms ease;
+	}
+
+	.repo__link:hover {
+		color: #e8eaf0;
+		border-color: rgba(255, 255, 255, 0.28);
+		background: rgba(255, 255, 255, 0.07);
+	}
+
+	.repo__badge {
+		color: rgba(232, 234, 240, 0.5);
+	}
+
+	/* The work-in-progress marker: same pill, a live dot instead of a lock. */
+	.repo__dot {
+		flex: none;
+		inline-size: 0.45em;
+		block-size: 0.45em;
+		border-radius: 999px;
+		background: rgba(232, 234, 240, 0.55);
+		box-shadow: 0 0 0 3px rgba(232, 234, 240, 0.08);
+	}
+
+	.repo__icon {
+		flex: none;
+		inline-size: 1.05em;
+		block-size: 1.05em;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.repo__request {
+		padding-block-end: 0.15em;
+		border-block-end: 1px solid rgba(232, 234, 240, 0.22);
+		color: rgba(232, 234, 240, 0.5);
+		text-decoration: none;
+		transition:
+			color 160ms ease,
+			border-color 160ms ease;
+	}
+
+	.repo__request:hover {
+		color: rgba(232, 234, 240, 0.9);
+		border-color: rgba(232, 234, 240, 0.55);
+	}
+
+	.project-meta {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: clamp(0.75rem, 1.5vw, 1.25rem);
+		margin: clamp(2rem, 5vw, 3.25rem) 0 0;
+		padding-block-start: 1.25rem;
+		border-block-start: 1px solid rgba(255, 255, 255, 0.09);
+	}
+
+	.project-meta__row {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4em;
+	}
+
+	.project-meta__label {
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.project-meta__value {
+		margin: 0;
+		font-size: 0.92rem;
+		line-height: 1.35;
+		color: rgba(232, 234, 240, 0.88);
+		text-wrap: pretty;
+	}
+
+	/* --- Hero ------------------------------------------------------------ */
+
+	.hero {
+		position: relative;
+		margin: 0;
+		aspect-ratio: 21 / 9;
+		overflow: hidden;
+		isolation: isolate;
+		border-radius: 20px;
+		background-color: #0a0c11;
+		box-shadow:
+			0 1px 2px rgba(5, 7, 12, 0.28),
+			0 30px 60px -30px rgba(5, 7, 12, 0.8);
+	}
+
+	.hero__video {
+		position: absolute;
+		inset: 0;
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+		transform: scale(1.015);
+	}
+
+	/* Same liquid-glass edge treatment as the bento cards on the index page. */
+	.hero::after,
+	.media-card::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 4;
+		pointer-events: none;
+		border-radius: inherit;
+		padding: 1px;
+		opacity: 40%;
+		background: linear-gradient(
+			150deg,
+			rgba(255, 255, 255, 0.75) 0%,
+			rgba(255, 255, 255, 0.22) 18%,
+			rgba(255, 255, 255, 0.04) 42%,
+			rgba(255, 255, 255, 0.1) 70%,
+			rgba(255, 255, 255, 0.45) 100%
+		);
+		mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		mask-composite: exclude;
+		-webkit-mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+	}
+
+	.hero::before,
+	.media-card::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 2;
+		pointer-events: none;
+		border-radius: inherit;
+		background:
+			linear-gradient(
+				145deg,
+				rgba(255, 255, 255, 0.16) 0%,
+				rgba(255, 255, 255, 0.05) 22%,
+				rgba(255, 255, 255, 0) 46%
+			),
+			radial-gradient(
+				120% 80% at 85% 0%,
+				rgba(255, 255, 255, 0.12) 0%,
+				rgba(255, 255, 255, 0) 55%
+			);
+		mix-blend-mode: screen;
+	}
+
+	/* --- Work-in-progress notice ----------------------------------------- */
+
+	.notice {
+		display: block;
+		max-inline-size: 62ch;
+		margin: clamp(1.5rem, 3vw, 2.25rem) 0 0;
+		padding: clamp(0.9rem, 2vw, 1.15rem) clamp(1rem, 2.5vw, 1.35rem);
+		border: 1px solid rgba(255, 255, 255, 0.09);
+		border-radius: 14px;
+		background: rgba(255, 255, 255, 0.02);
+		font-size: clamp(0.88rem, 1.35vw, 0.95rem);
+		line-height: 1.5;
+		color: rgba(232, 234, 240, 0.6);
+		text-wrap: pretty;
+	}
+
+	/* --- Prose ----------------------------------------------------------- */
+
+	.prose {
+		display: flex;
+		flex-direction: column;
+		gap: clamp(2.5rem, 6vw, 4rem);
+		margin-block: clamp(3rem, 8vw, 5.5rem);
+	}
+
+	.prose__section {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+		gap: clamp(1rem, 3vw, 2rem);
+	}
+
+	.prose__label {
+		margin: 0;
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.prose__body {
+		max-inline-size: 62ch;
+	}
+
+	.prose__heading {
+		margin: 0 0 0.9em;
+		font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+		font-weight: 350;
+		line-height: 1.2;
+		letter-spacing: -0.02em;
+		text-wrap: balance;
+	}
+
+	.prose__paragraph {
+		margin: 0 0 1em;
+		font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+		line-height: 1.6;
+		color: rgba(232, 234, 240, 0.68);
+		text-wrap: pretty;
+	}
+
+	.prose__paragraph:last-child {
+		margin-block-end: 0;
+	}
+
+	/* --- Privacy classes -------------------------------------------------- */
+
+	/* Same 1fr/3fr axis as .prose__section, so the list sits under the body copy
+	   instead of starting back at the page margin. */
+	.classes {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+		gap: clamp(1rem, 3vw, 2rem);
+		margin-block-start: clamp(3rem, 8vw, 5.5rem);
+	}
+
+	/* Same signal-chain treatment as the spec lists on the other projects. Note
+	   this one is a set, not a sequence — the spine is here for consistency, so
+	   the numbering is an index rather than an order. */
+	.classes__list {
+		/* --pad and the 0.75em half-line (line-height 1.5 / 2) are what keep the
+		   spine, the node and the first line of text on one axis. Change one of
+		   the three and the other two have to follow. */
+		--pad: clamp(0.85rem, 2vw, 1.1rem);
+		--node: 0.6rem;
+		display: flex;
+		flex-direction: column;
+		/* The negative top cancels the first item's leading pad, so the first
+		   class sits on the label's line the way .prose__heading does. */
+		margin: calc(var(--pad) * -1) 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.classes__item {
+		position: relative;
+		display: grid;
+		grid-template-columns: 1.5rem minmax(0, 1fr);
+		gap: clamp(0.85rem, 2vw, 1.4rem);
+		padding-block: var(--pad);
+		font-size: clamp(0.9rem, 1.4vw, 1rem);
+		line-height: 1.5;
+	}
+
+	/* One continuous spine, trimmed at the first and last stage so it starts and
+	   stops on a node instead of in mid-air. */
+	.classes__item::before {
+		content: '';
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: calc(0.75rem - 0.5px);
+		inline-size: 1px;
+		background: rgba(255, 255, 255, 0.13);
+	}
+
+	.classes__item:first-child::before {
+		inset-block-start: calc(var(--pad) + 0.75em);
+	}
+
+	.classes__item:last-child::before {
+		inset-block-end: calc(100% - var(--pad) - 0.75em);
+	}
+
+	.classes__node {
+		position: relative;
+		z-index: 1;
+		justify-self: center;
+		align-self: start;
+		margin-block-start: calc(0.75em - var(--node) / 2);
+		inline-size: var(--node);
+		block-size: var(--node);
+		border: 1px solid rgba(232, 234, 240, 0.4);
+		border-radius: 999px;
+		background: #05070c;
+		transition:
+			border-color 220ms ease,
+			background-color 220ms ease,
+			box-shadow 220ms ease;
+	}
+
+	.classes__item:hover .classes__node {
+		border-color: rgba(232, 234, 240, 0.95);
+		background: rgba(232, 234, 240, 0.95);
+		box-shadow: 0 0 0 4px rgba(232, 234, 240, 0.09);
+	}
+
+	.classes__text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3em;
+	}
+
+	.classes__name {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.7em;
+		color: rgba(232, 234, 240, 0.9);
+	}
+
+	.classes__tick {
+		font-size: 0.68rem;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.08em;
+		color: rgba(232, 234, 240, 0.28);
+		transition: color 220ms ease;
+	}
+
+	.classes__item:hover .classes__tick {
+		color: rgba(232, 234, 240, 0.55);
+	}
+
+	.classes__detail {
+		max-inline-size: 62ch;
+		color: rgba(232, 234, 240, 0.58);
+		text-wrap: pretty;
+	}
+
+	/* --- Pipeline graph --------------------------------------------------- */
+
+	/* A flow diagram in plain HTML rather than SVG, so the labels stay real text
+	   and stay legible when the graph is squeezed. Stacked top to bottom below
+	   1000px, left to right above it — six node columns need the width, so tablets
+	   in portrait keep the stack. */
+	.flow {
+		--line: rgba(232, 234, 240, 0.22);
+		--gap: 0.65rem;
+		margin-block-start: clamp(3rem, 8vw, 5.5rem);
+	}
+
+	.flow__graph {
+		display: flex;
+		flex-direction: column;
+		row-gap: var(--gap);
+	}
+
+	.flow__node {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2em;
+		max-inline-size: 24rem;
+		margin-inline: auto;
+		padding: clamp(0.8rem, 1.8vw, 1rem) clamp(0.9rem, 2vw, 1.15rem);
+		border: 1px solid rgba(255, 255, 255, 0.09);
+		border-radius: 14px;
+		background: rgba(255, 255, 255, 0.02);
+		text-align: center;
+	}
+
+	.flow__node--branch {
+		background: rgba(255, 255, 255, 0.04);
+	}
+
+	.flow__tier {
+		margin-block-end: 0.15em;
+		font-size: 0.68rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.35);
+	}
+
+	.flow__name {
+		font-size: clamp(0.88rem, 1.3vw, 0.98rem);
+		color: rgba(232, 234, 240, 0.88);
+	}
+
+	.flow__detail {
+		font-size: 0.78rem;
+		line-height: 1.35;
+		color: rgba(232, 234, 240, 0.5);
+		text-wrap: pretty;
+	}
+
+	/* Connectors. Stacked, each is a 1px line with a chevron at its foot; the
+	   segments inside only come into play once the graph turns horizontal. */
+	.flow__k {
+		position: relative;
+		display: block;
+		inline-size: 1px;
+		block-size: 1.4rem;
+		margin-inline: auto;
+		background: var(--line);
+	}
+
+	.flow__k::after {
+		content: '';
+		position: absolute;
+		inset-block-end: 0;
+		left: 50%;
+		inline-size: 5px;
+		block-size: 5px;
+		border-inline-end: 1px solid var(--line);
+		border-block-end: 1px solid var(--line);
+		transform: translate(-50%, 1px) rotate(45deg);
+	}
+
+	/* The bypass is a horizontal-only idea: stacked, EdgeTAM says it in words. */
+	.flow__bar,
+	.flow__leg,
+	.flow__stub,
+	.flow__k--bypass {
+		display: none;
+	}
+
+	@media (min-width: 1000px) {
+		/* Eleven columns: six for nodes, five for the connectors between them.
+		   Three equal rows, one per detector. */
+		.flow__graph {
+			display: grid;
+			grid-template-columns:
+				minmax(0, 1fr) 1.4rem minmax(0, 1fr) 1.75rem minmax(0, 1fr) 1.75rem
+				minmax(0, 1fr) 1.75rem minmax(0, 1fr) 1.4rem minmax(0, 1fr);
+			grid-template-rows: repeat(3, minmax(0, 1fr));
+			grid-template-areas:
+				'src k1 dsc k2 b1 k3  .   .   msk k5 pre'
+				'src k1 dsc k2 b2 k3  bt  mrg msk k5 pre'
+				'src k1 dsc k2 b3 byp byp mrg msk k5 pre';
+			column-gap: 0;
+		}
+
+		.flow__node {
+			max-inline-size: none;
+			margin-inline: 0;
+			padding: clamp(0.7rem, 1.2vw, 0.9rem) clamp(0.5rem, 0.9vw, 0.8rem);
+		}
+
+		/* Everything on the spine centres on the middle row. */
+		.flow__node--src,
+		.flow__node--downscale,
+		.flow__node--bytetrack,
+		.flow__node--masks,
+		.flow__node--effect {
+			align-self: center;
+		}
+
+		.flow__node--src { grid-area: src; }
+		.flow__node--downscale { grid-area: dsc; }
+		.flow__node--b1 { grid-area: b1; }
+		.flow__node--b2 { grid-area: b2; }
+		.flow__node--b3 { grid-area: b3; }
+		.flow__node--bytetrack { grid-area: bt; }
+		.flow__node--masks { grid-area: msk; }
+		.flow__node--effect { grid-area: pre; }
+
+		.flow__k--in { grid-area: k1; }
+		.flow__k--fan { grid-area: k2; }
+		.flow__k--join { grid-area: k3; }
+		.flow__k--bypass { grid-area: byp; }
+		.flow__k--merge { grid-area: mrg; }
+		.flow__k--out { grid-area: k5; }
+
+		/* The connector stops being a line and becomes a box to draw one in.
+		   --r1/--r3 are the outer row centres measured inside a full-height cell,
+		   --a/--b the two row centres inside a cell spanning two rows. */
+		.flow__k {
+			--r1: calc((100% - 2 * var(--gap)) / 6);
+			--r3: calc(100% - (100% - 2 * var(--gap)) / 6);
+			--a: calc((100% - var(--gap)) / 4);
+			--b: calc(100% - (100% - var(--gap)) / 4);
+			--y: 50%;
+			inline-size: auto;
+			block-size: auto;
+			margin-inline: 0;
+			background: none;
+		}
+
+		.flow__bar,
+		.flow__leg,
+		.flow__stub,
+		.flow__k--bypass {
+			display: block;
+		}
+
+		.flow__bar,
+		.flow__leg,
+		.flow__stub {
+			position: absolute;
+			background: var(--line);
+		}
+
+		/* The through-line every connector carries, at its own height. */
+		.flow__k::before {
+			content: '';
+			position: absolute;
+			inset-inline: 0;
+			top: var(--y);
+			block-size: 1px;
+			background: var(--line);
+		}
+
+		/* Chevrons turn to point along the flow. */
+		.flow__k::after,
+		.flow__leg::after {
+			content: '';
+			position: absolute;
+			inset-block-end: auto;
+			inset-inline-end: 0;
+			left: auto;
+			top: var(--y);
+			inline-size: 5px;
+			block-size: 5px;
+			border-block-end: none;
+			border-block-start: 1px solid var(--line);
+			border-inline-end: 1px solid var(--line);
+			transform: translate(1px, -50%) rotate(45deg);
+		}
+
+		/* Fan-out: in at the middle row, out to all three. */
+		.flow__k--fan .flow__bar {
+			left: 50%;
+			inline-size: 1px;
+			top: var(--r1);
+			bottom: var(--r1);
+		}
+
+		.flow__k--fan .flow__leg {
+			left: 50%;
+			right: 0;
+			block-size: 1px;
+		}
+
+		.flow__k--fan .flow__leg--up { top: var(--r1); }
+		.flow__k--fan .flow__leg--down { top: var(--r3); }
+		.flow__leg::after { --y: 50%; }
+
+		/* Two in, one out. The join runs through on its lower row (the tracker),
+		   the merge on its upper row (the masks). */
+		.flow__k--join { --y: var(--b); }
+		.flow__k--join .flow__stub { top: var(--a); }
+		.flow__k--merge { --y: var(--a); }
+		.flow__k--merge .flow__stub { top: var(--b); }
+
+		.flow__k--join .flow__stub,
+		.flow__k--merge .flow__stub {
+			left: 0;
+			inline-size: 50%;
+			block-size: 1px;
+		}
+
+		.flow__k--join .flow__bar,
+		.flow__k--merge .flow__bar {
+			left: 50%;
+			inline-size: 1px;
+			top: var(--a);
+			bottom: var(--a);
+		}
+
+		/* The bypass carries straight on under the tracker, so no arrowhead. */
+		.flow__k--bypass::after {
+			display: none;
+		}
+	}
+
+	/* --- Bento grid ------------------------------------------------------ */
+
+	.bento-grid {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		align-items: start;
+		gap: clamp(0.75rem, 1.5vw, 1.25rem);
+	}
+
+	.bento-grid > .span-2 {
+		grid-column: span 2;
+	}
+
+	.bento-grid > .span-4 {
+		grid-column: span 4;
+	}
+
+	.gallery {
+		margin-block-start: clamp(3rem, 8vw, 5.5rem);
+	}
+
+	.gallery__label,
+	.classes__label,
+	.flow__label {
+		margin: 0;
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.gallery__label,
+	.flow__label {
+		margin-block-end: clamp(1rem, 2vw, 1.5rem);
+	}
+
+	.media-card {
+		position: relative;
+		margin: 0;
+		aspect-ratio: var(--media-ratio, 16 / 9);
+		overflow: hidden;
+		isolation: isolate;
+		border-radius: 20px;
+		background-color: #0a0c11;
+		box-shadow:
+			0 1px 2px rgba(5, 7, 12, 0.28),
+			0 18px 40px -22px rgba(5, 7, 12, 0.7);
+		container-type: inline-size;
+	}
+
+	.media-card__video {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+		transform: scale(1.015);
+	}
+
+	.media-card__frost {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		backdrop-filter: blur(14px) saturate(130%);
+		-webkit-backdrop-filter: blur(14px) saturate(130%);
+		background: linear-gradient(
+			to top,
+			rgba(8, 10, 16, 0.55) 0%,
+			rgba(8, 10, 16, 0.22) 30%,
+			rgba(8, 10, 16, 0) 60%
+		);
+		mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 26%, transparent 58%);
+		-webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 26%, transparent 58%);
+	}
+
+	.media-card__caption {
+		position: absolute;
+		inset-block-end: 0;
+		inset-inline: 0;
+		z-index: 3;
+		padding: clamp(0.875rem, 4.5cqi, 1.5rem);
+		font-size: clamp(0.75rem, 2.2cqi, 0.9rem);
+		line-height: 1.35;
+		color: rgba(255, 255, 255, 0.72);
+		text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
+		text-wrap: pretty;
+	}
+
+	/* --- Footer ---------------------------------------------------------- */
+
+	.site-footer {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-block-start: clamp(3rem, 8vw, 5.5rem);
+		padding-block-start: 1.25rem;
+		border-block-start: 1px solid rgba(255, 255, 255, 0.09);
+		font-size: 0.85rem;
+		color: rgba(232, 234, 240, 0.45);
+	}
+
+	.site-footer a {
+		color: inherit;
+		text-decoration: none;
+		transition: color 160ms ease;
+	}
+
+	.site-footer a:hover {
+		color: rgba(232, 234, 240, 0.9);
+	}
+
+	/* --- Responsive ------------------------------------------------------ */
+
+	@media (max-width: 720px) {
+		.project-meta {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1.25rem;
+		}
+
+		.prose__section,
+		.classes {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 0.75rem;
+		}
+
+		.classes__list {
+			margin-block-start: 0;
+		}
+
+		.bento-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.bento-grid > .span-4 {
+			grid-column: span 2;
+		}
+
+		.hero {
+			aspect-ratio: 16 / 9;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.classes__node,
+		.classes__tick {
+			transition: none;
+		}
+
+		.hero__video,
+		.media-card__video {
+			transform: none;
+		}
+
+		.back-link__arrow {
+			transition: none;
+		}
+	}
+</style>
+
+<script>
+	// Autoplaying video is motion: honour the OS setting and show the first frame instead.
+	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		for (const video of document.querySelectorAll<HTMLVideoElement>('video[data-project-video]')) {
+			video.autoplay = false;
+			video.pause();
+		}
+	}
+</script>

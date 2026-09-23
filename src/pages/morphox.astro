@@ -15,6 +15,13 @@ const project = {
 		{ label: 'Role', value: 'Self initiated' },
 	],
 	hero: '/project_animation/MorphoX_main2_animation.mp4',
+	// Repository. `private: true` swaps the link for a locked badge plus an access
+	// request, and `url` is then ignored. Drop the whole key to hide the row.
+	repo: {
+		url: null,
+		private: true,
+		contact: 'iwan@ibnoulouafi.com',
+	},
 	sections: [
 		{
 			label: 'Overview',
@@ -22,7 +29,7 @@ const project = {
 			body: [
 				'Creative software like Photoshop has spent decades making image editing feel immediate, but it is built for creative work rather than computer vision. The tools that do cover computer vision are almost all code-first, which makes experimenting slow and keeps the effect of an algorithm one compile step away from the person trying to understand it. MorphoX sits between the two: the interaction model of creative software, the algorithms and theoretical depth of computer vision.',
 				'Pipelines are assembled by connecting effect nodes, each holding a computer vision algorithm with editable parameters and live feedback. Graphs, histograms, metrics, false-colour views and debugging panels sit alongside the canvas, so a simple filter and a multi-stage processing chain are built the same way: each step stays visible while you build it.',
-				'The point is the gap between understanding an algorithm and actually applying it. Seeing a transformation happen as a parameter moves builds intuition far faster than reading its definition.'
+				'The point is the gap between understanding an algorithm and actually applying it. Seeing a transformation happen as a parameter moves builds intuition far better than reading its definition.'
 			],
 		},
 		{
@@ -36,23 +43,9 @@ const project = {
 	],
 	// Bento media grid — `span` drives how many of the 4 columns a tile takes.
 	media: [
-		{ video: '/project_animation/MorphoX_animation.mp4', caption: 'Operator chain re-evaluating live', span: 2, ratio: '16 / 9' },
-		{ video: '/project_animation/Image2Complex_animation.mp4', caption: 'Kernel preview', span: 2, ratio: '16 / 9' },
-		{ video: '/project_animation/DitherPlugin2_animation.mp4', caption: 'Threshold sweep across a full sequence', span: 4, ratio: '21 / 9' },
-		{ video: '/project_animation/VFP_animation.mp4', caption: 'Buffer inspector', span: 2, ratio: '4 / 3' },
-		{ video: '/project_animation/PPlugin_animation.mp4', caption: 'Batch export', span: 2, ratio: '4 / 3' },
-	],
-	next: [
-		{
-			title: 'Vectorfield Pathfinding',
-			description: 'Crowd navigation driven by a flow field, computed on the GPU.',
-			video: '/project_animation/VFP_animation.mp4',
-		},
-		{
-			title: 'Dither Plugin',
-			description: 'Professional grade dithering plugin for AE',
-			video: '/project_animation/DitherPlugin4_animation.mp4',
-		},
+		{ video: '/project_animation/MorphoX/effect_lib.mp4', caption: '', span: 2, ratio: '16 / 9' },
+		{ video: '/project_animation/MorphoX/pipeline.mp4', caption: '', span: 2, ratio: '16 / 9' },
+		{ video: '/project_animation/MorphoX/effect_list.mp4', caption: '', span: 4, ratio: '21 / 9' },
 	],
 };
 ---
@@ -83,6 +76,52 @@ const project = {
 			<header class="project-header">
 				<h1 class="project-title">{project.title}</h1>
 				<p class="project-tagline">{project.tagline}</p>
+
+				{
+					project.repo &&
+						(project.repo.private ? (
+							<p class="repo">
+								<span class="repo__badge">
+									<svg
+										class="repo__icon"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.3"
+										aria-hidden="true"
+									>
+										<rect x="3.25" y="7" width="9.5" height="6.75" rx="1.6" />
+										<path d="M5.75 7V4.75a2.25 2.25 0 0 1 4.5 0V7" />
+									</svg>
+									Private repository
+								</span>
+								{project.repo.contact && (
+									<a
+										class="repo__request"
+										href={`mailto:${project.repo.contact}?subject=${encodeURIComponent(
+											`${project.title} — source access`
+										)}`}
+									>
+										Request access
+									</a>
+								)}
+							</p>
+						) : (
+							<p class="repo">
+								<a
+									class="repo__link"
+									href={project.repo.url}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<svg class="repo__icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+										<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+									</svg>
+									View source on GitHub
+								</a>
+							</p>
+						))
+				}
 
 				<dl class="project-meta">
 					{
@@ -152,22 +191,6 @@ const project = {
 									<figcaption class="media-card__caption">{item.caption}</figcaption>
 								)}
 							</figure>
-						))
-					}
-				</div>
-			</section>
-
-			<section class="next" aria-label="Other projects">
-				<p class="next__label">Next projects</p>
-				<div class="bento-grid">
-					{
-						project.next.map((item) => (
-							<BentoCard
-								title={item.title}
-								description={item.description}
-								video={item.video}
-								class="span-2"
-							/>
 						))
 					}
 				</div>
@@ -243,6 +266,71 @@ const project = {
 		line-height: 1.45;
 		color: rgba(232, 234, 240, 0.62);
 		text-wrap: pretty;
+	}
+
+	/* --- Repository ------------------------------------------------------ */
+
+	.repo {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem;
+		margin: clamp(1.25rem, 2.5vw, 1.75rem) 0 0;
+		font-size: 0.85rem;
+	}
+
+	.repo__link,
+	.repo__badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55em;
+		padding: 0.5em 0.95em;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.03);
+		line-height: 1;
+		text-decoration: none;
+	}
+
+	.repo__link {
+		color: rgba(232, 234, 240, 0.82);
+		transition:
+			color 160ms ease,
+			border-color 160ms ease,
+			background-color 160ms ease;
+	}
+
+	.repo__link:hover {
+		color: #e8eaf0;
+		border-color: rgba(255, 255, 255, 0.28);
+		background: rgba(255, 255, 255, 0.07);
+	}
+
+	.repo__badge {
+		color: rgba(232, 234, 240, 0.5);
+	}
+
+	.repo__icon {
+		flex: none;
+		inline-size: 1.05em;
+		block-size: 1.05em;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.repo__request {
+		padding-block-end: 0.15em;
+		border-block-end: 1px solid rgba(232, 234, 240, 0.22);
+		color: rgba(232, 234, 240, 0.5);
+		text-decoration: none;
+		transition:
+			color 160ms ease,
+			border-color 160ms ease;
+	}
+
+	.repo__request:hover {
+		color: rgba(232, 234, 240, 0.9);
+		border-color: rgba(232, 234, 240, 0.55);
 	}
 
 	.project-meta {
@@ -417,12 +505,70 @@ const project = {
 	}
 
 	.gallery__label,
+	.status__label,
 	.next__label {
 		margin: 0 0 clamp(1rem, 2vw, 1.5rem);
 		font-size: 0.72rem;
 		letter-spacing: 0.09em;
 		text-transform: uppercase;
 		color: rgba(232, 234, 240, 0.38);
+	}
+
+	/* --- State of the project -------------------------------------------- */
+
+	.status {
+		margin-block-start: clamp(3rem, 8vw, 5.5rem);
+	}
+
+	.status__list {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: clamp(0.6rem, 1.5vw, 1rem);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.status__item {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.75em;
+		padding: clamp(0.9rem, 2vw, 1.15rem) clamp(1rem, 2.5vw, 1.35rem);
+		border: 1px solid rgba(255, 255, 255, 0.09);
+		border-radius: 14px;
+		background: rgba(255, 255, 255, 0.02);
+		font-size: clamp(0.9rem, 1.4vw, 1rem);
+		line-height: 1.45;
+		color: rgba(232, 234, 240, 0.68);
+		text-wrap: pretty;
+	}
+
+	.status__marker {
+		flex: none;
+		display: grid;
+		place-items: center;
+		inline-size: 1.1em;
+		block-size: 1.1em;
+		margin-block-start: 0.16em;
+		border: 1px solid rgba(255, 255, 255, 0.26);
+		border-radius: 5px;
+		font-size: 0.72em;
+		line-height: 1;
+		color: #05070c;
+	}
+
+	.status__item.is-done {
+		color: rgba(232, 234, 240, 0.4);
+	}
+
+	.status__item.is-done .status__task {
+		text-decoration: line-through;
+		text-decoration-color: rgba(232, 234, 240, 0.3);
+	}
+
+	.status__item.is-done .status__marker {
+		border-color: transparent;
+		background: rgba(232, 234, 240, 0.85);
 	}
 
 	.next {
@@ -522,6 +668,10 @@ const project = {
 
 		.bento-grid {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.status__list {
+			grid-template-columns: minmax(0, 1fr);
 		}
 
 		.bento-grid > .span-4 {

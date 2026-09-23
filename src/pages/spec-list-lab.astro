@@ -1,0 +1,1001 @@
+---
+// ---------------------------------------------------------------------------
+// Design lab — five treatments for the "Specifications" list.
+// Throwaway page: pick a winner, move it into the project template, delete this.
+// Data is copied verbatim from dither-plugin.astro so the comparison is fair.
+// ---------------------------------------------------------------------------
+const features = [
+	{
+		label: 'Dithering methods',
+		value: 'Error diffusion, Ordered dithering, Halftoning and FM modulation. (30+ presets)',
+	},
+	{
+		label: 'Sampling',
+		value: 'Pixel scale, with bilinear or nearest-neighbour resampling.',
+	},
+	{
+		label: 'Channels',
+		value: 'Dither colour, alpha, or colour + alpha.',
+	},
+	{
+		label: 'Colour',
+		value: 'Full RGB or palette-quantised output. (20+ palettes & image-derived palette)',
+	},
+	{
+		label: 'Preprocessing',
+		value: 'Sharpen, Gaussian blur, noise, contrast, midtones and highlights, applied before quantisation.',
+	},
+	{
+		label: 'Postprocessing',
+		value: 'Pixel smoothing on the dithered result.',
+	},
+];
+
+const variants = [
+	{
+		id: 'datasheet',
+		name: 'Datasheet',
+		note: 'No boxes. Hairline rules, tabular index, a fixed label column — reads like the spec sheet on the back of a manual.',
+	},
+	{
+		id: 'chain',
+		name: 'Signal chain',
+		note: 'The list as a pipeline. One spine, one node per stage, in the order the pixels actually travel.',
+	},
+	{
+		id: 'manifest',
+		name: 'Leader manifest',
+		note: 'Monospaced, dot leaders, right-set values. Typographic rather than structural — closest to a printed index.',
+	},
+	{
+		id: 'editorial',
+		name: 'Editorial index',
+		note: 'Oversized outlined numerals carry the rhythm; the numeral fills on hover so the row lights up without a box.',
+	},
+	{
+		id: 'controls',
+		name: 'Effect controls',
+		note: 'A pastiche of the panel the plugin actually lives in: parameter names on the left, the selected one expanded on the right.',
+	},
+];
+
+const pad = (index: number) => String(index + 1).padStart(2, '0');
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="robots" content="noindex" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+		/>
+		<title>Spec list lab</title>
+	</head>
+	<body>
+		<main>
+			<a class="back-link" href="/">
+				<span class="back-link__arrow" aria-hidden="true">←</span>
+				Back to all projects
+			</a>
+
+			<header class="lab-header">
+				<h1 class="lab-title">Spec list lab</h1>
+				<p class="lab-tagline">
+					Five replacements for the bulleted specification list, all running on the Dither Plugin
+					parameters. Same data, same page width, same type scale — only the treatment changes.
+				</p>
+			</header>
+
+			<nav class="lab-nav" aria-label="Variants">
+				{
+					variants.map((variant, index) => (
+						<a class="lab-nav__link" href={`#${variant.id}`}>
+							<span class="lab-nav__index">{pad(index)}</span>
+							{variant.name}
+						</a>
+					))
+				}
+			</nav>
+
+			{/* ---------------------------------------------------------------- 01 */}
+			<section class="variant" id="datasheet">
+				<header class="variant__head">
+					<p class="variant__eyebrow">01 — Datasheet</p>
+					<p class="variant__note">{variants[0].note}</p>
+				</header>
+
+				<div class="specimen">
+					<p class="v1__label">Specifications</p>
+					<dl class="v1">
+						{
+							features.map((item, index) => (
+								<div class="v1__row">
+									<span class="v1__index" aria-hidden="true">
+										{pad(index)}
+									</span>
+									<dt class="v1__name">{item.label}</dt>
+									<dd class="v1__value">{item.value}</dd>
+								</div>
+							))
+						}
+					</dl>
+				</div>
+			</section>
+
+			{/* ---------------------------------------------------------------- 02 */}
+			<section class="variant" id="chain">
+				<header class="variant__head">
+					<p class="variant__eyebrow">02 — Signal chain</p>
+					<p class="variant__note">{variants[1].note}</p>
+				</header>
+
+				<div class="specimen">
+					<p class="v2__label">Signal path</p>
+					<ol class="v2">
+						{
+							features.map((item, index) => (
+								<li class="v2__stage">
+									<span class="v2__node" aria-hidden="true" />
+									<div class="v2__text">
+										<span class="v2__name">
+											{item.label}
+											<span class="v2__tick" aria-hidden="true">
+												{pad(index)}
+											</span>
+										</span>
+										<span class="v2__value">{item.value}</span>
+									</div>
+								</li>
+							))
+						}
+					</ol>
+				</div>
+			</section>
+
+			{/* ---------------------------------------------------------------- 03 */}
+			<section class="variant" id="manifest">
+				<header class="variant__head">
+					<p class="variant__eyebrow">03 — Leader manifest</p>
+					<p class="variant__note">{variants[2].note}</p>
+				</header>
+
+				<div class="specimen">
+					<p class="v3__label">
+						<span>Specifications</span>
+						<span class="v3__count">{features.length} parameters</span>
+					</p>
+					<ul class="v3">
+						{
+							features.map((item) => (
+								<li class="v3__row">
+									<span class="v3__name">{item.label}</span>
+									<span class="v3__leader" aria-hidden="true" />
+									<span class="v3__value">{item.value}</span>
+								</li>
+							))
+						}
+					</ul>
+				</div>
+			</section>
+
+			{/* ---------------------------------------------------------------- 04 */}
+			<section class="variant" id="editorial">
+				<header class="variant__head">
+					<p class="variant__eyebrow">04 — Editorial index</p>
+					<p class="variant__note">{variants[3].note}</p>
+				</header>
+
+				<div class="specimen">
+					<p class="v4__label">Specifications</p>
+					<ul class="v4">
+						{
+							features.map((item, index) => (
+								<li class="v4__row">
+									<span class="v4__index" aria-hidden="true">
+										{pad(index)}
+									</span>
+									<div class="v4__text">
+										<span class="v4__name">{item.label}</span>
+										<span class="v4__value">{item.value}</span>
+									</div>
+								</li>
+							))
+						}
+					</ul>
+				</div>
+			</section>
+
+			{/* ---------------------------------------------------------------- 05 */}
+			<section class="variant" id="controls">
+				<header class="variant__head">
+					<p class="variant__eyebrow">05 — Effect controls</p>
+					<p class="variant__note">{variants[4].note}</p>
+				</header>
+
+				<div class="specimen">
+					<div class="v5" data-controls>
+						<div class="v5__chrome">
+							<span class="v5__dots" aria-hidden="true"><i /><i /><i /></span>
+							<span class="v5__title">Effect Controls — Dither</span>
+						</div>
+						<div class="v5__body">
+							<div class="v5__list" role="tablist" aria-label="Plugin parameters">
+								{
+									features.map((item, index) => (
+										<button
+											class="v5__param"
+											type="button"
+											role="tab"
+											id={`v5-tab-${index}`}
+											aria-controls={`v5-panel-${index}`}
+											aria-selected={index === 0 ? 'true' : 'false'}
+											tabindex={index === 0 ? 0 : -1}
+											data-param
+										>
+											<span class="v5__twirl" aria-hidden="true">
+												<svg viewBox="0 0 8 8" fill="currentColor">
+													<path d="M2 0.5 L6.5 4 L2 7.5 Z" />
+												</svg>
+											</span>
+											{item.label}
+										</button>
+									))
+								}
+							</div>
+							<div class="v5__stage">
+								{
+									features.map((item, index) => (
+										<div
+											class="v5__panel"
+											role="tabpanel"
+											id={`v5-panel-${index}`}
+											aria-labelledby={`v5-tab-${index}`}
+											hidden={index !== 0}
+											data-panel
+										>
+											<span class="v5__panel-index" aria-hidden="true">
+												{pad(index)} / {pad(features.length - 1)}
+											</span>
+											<h3 class="v5__panel-name">{item.label}</h3>
+											<p class="v5__panel-value">{item.value}</p>
+										</div>
+									))
+								}
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<footer class="site-footer">
+				<span>Iwan Ibnoulouafi</span>
+				<a href="mailto:iwan@ibnoulouafi.com">iwan@ibnoulouafi.com</a>
+			</footer>
+		</main>
+	</body>
+</html>
+
+<style>
+	:global(body) {
+		margin: 0;
+		background: #05070c;
+		color: #e8eaf0;
+		font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+		font-weight: 350;
+	}
+
+	main {
+		max-inline-size: 1100px;
+		margin-inline: auto;
+		padding: clamp(1.5rem, 5vw, 4rem) clamp(1rem, 4vw, 2rem);
+	}
+
+	/* --- Page chrome (lab only, not part of any proposal) ----------------- */
+
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5em;
+		color: rgba(232, 234, 240, 0.55);
+		font-size: 0.85rem;
+		text-decoration: none;
+		transition: color 160ms ease;
+	}
+
+	.back-link:hover {
+		color: rgba(232, 234, 240, 0.9);
+	}
+
+	.back-link__arrow {
+		display: inline-block;
+		transition: transform 160ms ease;
+	}
+
+	.back-link:hover .back-link__arrow {
+		transform: translateX(-3px);
+	}
+
+	.lab-header {
+		margin-block: clamp(2.5rem, 7vw, 5rem) clamp(1.5rem, 4vw, 2.5rem);
+	}
+
+	.lab-title {
+		margin: 0;
+		font-size: clamp(2.75rem, 9vw, 5.5rem);
+		font-weight: 350;
+		line-height: 0.98;
+		letter-spacing: -0.035em;
+	}
+
+	.lab-tagline {
+		margin: clamp(1rem, 2.5vw, 1.5rem) 0 0;
+		max-inline-size: 52ch;
+		font-size: clamp(1rem, 1.6vw, 1.15rem);
+		line-height: 1.45;
+		color: rgba(232, 234, 240, 0.62);
+		text-wrap: pretty;
+	}
+
+	.lab-nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		padding-block-start: 1.5rem;
+		border-block-start: 1px solid rgba(255, 255, 255, 0.09);
+	}
+
+	.lab-nav__link {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.6em;
+		padding: 0.5em 0.95em;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 999px;
+		color: rgba(232, 234, 240, 0.72);
+		font-size: 0.85rem;
+		text-decoration: none;
+		transition:
+			color 160ms ease,
+			border-color 160ms ease,
+			background-color 160ms ease;
+	}
+
+	.lab-nav__link:hover {
+		color: #e8eaf0;
+		border-color: rgba(255, 255, 255, 0.28);
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.lab-nav__index {
+		color: rgba(232, 234, 240, 0.35);
+		font-variant-numeric: tabular-nums;
+		font-size: 0.75rem;
+	}
+
+	.variant {
+		margin-block-start: clamp(4rem, 11vw, 8rem);
+		scroll-margin-block-start: 2rem;
+	}
+
+	.variant__head {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+		gap: clamp(1rem, 3vw, 2rem);
+		padding-block-end: clamp(1.75rem, 4vw, 2.75rem);
+	}
+
+	.variant__eyebrow {
+		margin: 0;
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.variant__note {
+		margin: 0;
+		max-inline-size: 58ch;
+		font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+		line-height: 1.55;
+		color: rgba(232, 234, 240, 0.68);
+		text-wrap: pretty;
+	}
+
+	/* The specimen frame is deliberately neutral so it does not flatter any
+	   one variant. It is lab furniture — it does not ship. */
+	.specimen {
+		padding: clamp(1.5rem, 4vw, 2.75rem);
+		border: 1px dashed rgba(255, 255, 255, 0.08);
+		border-radius: 20px;
+	}
+
+	.site-footer {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.75rem;
+		margin-block-start: clamp(4rem, 10vw, 7rem);
+		padding-block-start: 1.25rem;
+		border-block-start: 1px solid rgba(255, 255, 255, 0.09);
+		font-size: 0.82rem;
+		color: rgba(232, 234, 240, 0.45);
+	}
+
+	.site-footer a {
+		color: inherit;
+		text-decoration: none;
+		transition: color 160ms ease;
+	}
+
+	.site-footer a:hover {
+		color: rgba(232, 234, 240, 0.9);
+	}
+
+	/* ===================================================================== */
+	/* 01 — Datasheet                                                        */
+	/* ===================================================================== */
+
+	.v1__label {
+		margin: 0 0 clamp(1rem, 2vw, 1.5rem);
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.v1 {
+		margin: 0;
+		border-block-start: 1px solid rgba(255, 255, 255, 0.14);
+	}
+
+	.v1__row {
+		position: relative;
+		display: grid;
+		grid-template-columns: 2.5ch minmax(0, 15ch) minmax(0, 1fr);
+		gap: clamp(1rem, 3vw, 2.5rem);
+		align-items: baseline;
+		padding-block: clamp(0.95rem, 2vw, 1.25rem);
+		border-block-end: 1px solid rgba(255, 255, 255, 0.08);
+		font-size: clamp(0.9rem, 1.4vw, 1rem);
+		line-height: 1.45;
+		transition: border-color 200ms ease;
+	}
+
+	/* Bleeds past the padding so the hover wash reads as a full-width band. */
+	.v1__row::before {
+		content: '';
+		position: absolute;
+		inset-block: 0;
+		inset-inline: calc(clamp(1.5rem, 4vw, 2.75rem) * -1);
+		background: linear-gradient(
+			90deg,
+			rgba(255, 255, 255, 0.055),
+			rgba(255, 255, 255, 0) 65%
+		);
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 200ms ease;
+	}
+
+	.v1__row:hover::before {
+		opacity: 1;
+	}
+
+	.v1__row:hover {
+		border-block-end-color: rgba(255, 255, 255, 0.2);
+	}
+
+	.v1__index {
+		font-size: 0.72rem;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.04em;
+		color: rgba(232, 234, 240, 0.28);
+		transition: color 200ms ease;
+	}
+
+	.v1__row:hover .v1__index {
+		color: rgba(232, 234, 240, 0.7);
+	}
+
+	.v1__name {
+		margin: 0;
+		color: rgba(232, 234, 240, 0.9);
+		letter-spacing: -0.005em;
+		text-wrap: balance;
+	}
+
+	.v1__value {
+		margin: 0;
+		color: rgba(232, 234, 240, 0.6);
+		text-wrap: pretty;
+	}
+
+	/* ===================================================================== */
+	/* 02 — Signal chain                                                     */
+	/* ===================================================================== */
+
+	.v2__label {
+		margin: 0 0 clamp(1rem, 2vw, 1.5rem);
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.v2 {
+		display: flex;
+		flex-direction: column;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.v2__stage {
+		/* --pad and the 0.75em half-line (line-height 1.5 / 2) are what keep the
+		   spine, the node and the first line of text on one axis. Change one of
+		   the three and the other two have to follow. */
+		--pad: clamp(0.85rem, 2vw, 1.1rem);
+		--node: 0.6rem;
+		position: relative;
+		display: grid;
+		grid-template-columns: 1.5rem minmax(0, 1fr);
+		gap: clamp(0.85rem, 2vw, 1.4rem);
+		padding-block: var(--pad);
+		font-size: clamp(0.9rem, 1.4vw, 1rem);
+		line-height: 1.5;
+	}
+
+	/* The spine: one continuous line, trimmed at the first and last stage so it
+	   starts and stops on a node instead of in mid-air. */
+	.v2__stage::before {
+		content: '';
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: calc(0.75rem - 0.5px);
+		inline-size: 1px;
+		background: rgba(255, 255, 255, 0.13);
+	}
+
+	.v2__stage:first-child::before {
+		inset-block-start: calc(var(--pad) + 0.75em);
+	}
+
+	.v2__stage:last-child::before {
+		inset-block-end: calc(100% - var(--pad) - 0.75em);
+	}
+
+	.v2__node {
+		position: relative;
+		z-index: 1;
+		justify-self: center;
+		align-self: start;
+		margin-block-start: calc(0.75em - var(--node) / 2);
+		inline-size: var(--node);
+		block-size: var(--node);
+		border: 1px solid rgba(232, 234, 240, 0.4);
+		border-radius: 999px;
+		background: #05070c;
+		transition:
+			border-color 220ms ease,
+			background-color 220ms ease,
+			box-shadow 220ms ease;
+	}
+
+	.v2__stage:hover .v2__node {
+		border-color: rgba(232, 234, 240, 0.95);
+		background: rgba(232, 234, 240, 0.95);
+		box-shadow: 0 0 0 4px rgba(232, 234, 240, 0.09);
+	}
+
+	.v2__text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3em;
+	}
+
+	.v2__name {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.7em;
+		color: rgba(232, 234, 240, 0.9);
+	}
+
+	.v2__tick {
+		font-size: 0.68rem;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.08em;
+		color: rgba(232, 234, 240, 0.28);
+		transition: color 220ms ease;
+	}
+
+	.v2__stage:hover .v2__tick {
+		color: rgba(232, 234, 240, 0.55);
+	}
+
+	.v2__value {
+		max-inline-size: 62ch;
+		color: rgba(232, 234, 240, 0.58);
+		text-wrap: pretty;
+	}
+
+	/* ===================================================================== */
+	/* 03 — Leader manifest                                                  */
+	/* ===================================================================== */
+
+	.v3__label {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 1rem;
+		margin: 0 0 clamp(1rem, 2vw, 1.5rem);
+		padding-block-end: 0.9rem;
+		border-block-end: 1px solid rgba(255, 255, 255, 0.14);
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.v3__count {
+		font-variant-numeric: tabular-nums;
+		color: rgba(232, 234, 240, 0.26);
+	}
+
+	.v3 {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+		font-size: clamp(0.82rem, 1.15vw, 0.9rem);
+	}
+
+	.v3__row {
+		display: grid;
+		grid-template-columns: max-content minmax(1.5rem, 1fr) minmax(0, 38ch);
+		align-items: baseline;
+		gap: 0 0.75rem;
+		padding-block: 0.7rem;
+	}
+
+	.v3__name {
+		margin: 0;
+		color: rgba(232, 234, 240, 0.92);
+		letter-spacing: -0.01em;
+		white-space: nowrap;
+	}
+
+	/* Dot leader, nudged up to sit on the baseline rather than under it. */
+	.v3__leader {
+		align-self: center;
+		block-size: 0;
+		border-block-end: 1px dotted rgba(232, 234, 240, 0.22);
+		transform: translateY(0.1em);
+		transition: border-color 200ms ease;
+	}
+
+	.v3__row:hover .v3__leader {
+		border-block-end-color: rgba(232, 234, 240, 0.45);
+	}
+
+	.v3__value {
+		margin: 0;
+		color: rgba(232, 234, 240, 0.58);
+		line-height: 1.55;
+		text-wrap: pretty;
+		transition: color 200ms ease;
+	}
+
+	.v3__row:hover .v3__value {
+		color: rgba(232, 234, 240, 0.85);
+	}
+
+	/* ===================================================================== */
+	/* 04 — Editorial index                                                  */
+	/* ===================================================================== */
+
+	.v4__label {
+		margin: 0 0 clamp(1.25rem, 2.5vw, 2rem);
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.v4 {
+		display: flex;
+		flex-direction: column;
+		gap: clamp(1.25rem, 3vw, 2.25rem);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.v4__row {
+		display: grid;
+		grid-template-columns: max-content minmax(0, 1fr);
+		gap: clamp(1rem, 3vw, 2.25rem);
+		align-items: start;
+	}
+
+	.v4__index {
+		font-size: clamp(2.4rem, 6vw, 3.6rem);
+		font-weight: 350;
+		line-height: 0.82;
+		letter-spacing: -0.04em;
+		font-variant-numeric: tabular-nums;
+		color: transparent;
+		-webkit-text-stroke: 1px rgba(232, 234, 240, 0.3);
+		transition:
+			color 260ms ease,
+			-webkit-text-stroke-color 260ms ease;
+	}
+
+	.v4__row:hover .v4__index {
+		color: rgba(232, 234, 240, 0.92);
+		-webkit-text-stroke-color: transparent;
+	}
+
+	.v4__text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.45em;
+		padding-block-start: 0.2em;
+		max-inline-size: 58ch;
+	}
+
+	.v4__name {
+		font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+		letter-spacing: -0.02em;
+		color: rgba(232, 234, 240, 0.95);
+	}
+
+	.v4__value {
+		font-size: clamp(0.9rem, 1.4vw, 1rem);
+		line-height: 1.55;
+		color: rgba(232, 234, 240, 0.58);
+		text-wrap: pretty;
+	}
+
+	/* ===================================================================== */
+	/* 05 — Effect controls                                                  */
+	/* ===================================================================== */
+
+	.v5 {
+		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 14px;
+		background: rgba(255, 255, 255, 0.02);
+	}
+
+	.v5__chrome {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.7rem 0.95rem;
+		border-block-end: 1px solid rgba(255, 255, 255, 0.09);
+		background: rgba(255, 255, 255, 0.025);
+	}
+
+	.v5__dots {
+		display: inline-flex;
+		gap: 0.3rem;
+	}
+
+	.v5__dots i {
+		inline-size: 0.42rem;
+		block-size: 0.42rem;
+		border-radius: 999px;
+		background: rgba(232, 234, 240, 0.18);
+	}
+
+	.v5__title {
+		font-size: 0.72rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.v5__body {
+		display: grid;
+		grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+	}
+
+	.v5__list {
+		display: flex;
+		flex-direction: column;
+		padding: 0.5rem;
+		border-inline-end: 1px solid rgba(255, 255, 255, 0.09);
+	}
+
+	.v5__param {
+		display: flex;
+		align-items: center;
+		gap: 0.55em;
+		padding: 0.6rem 0.7rem;
+		border: 0;
+		border-radius: 8px;
+		background: transparent;
+		color: rgba(232, 234, 240, 0.62);
+		font: inherit;
+		font-size: 0.9rem;
+		text-align: start;
+		cursor: pointer;
+		transition:
+			color 160ms ease,
+			background-color 160ms ease;
+	}
+
+	.v5__param:hover {
+		color: rgba(232, 234, 240, 0.9);
+		background: rgba(255, 255, 255, 0.04);
+	}
+
+	.v5__param[aria-selected='true'] {
+		color: #e8eaf0;
+		background: rgba(255, 255, 255, 0.07);
+	}
+
+	.v5__param:focus-visible {
+		outline: 1px solid rgba(232, 234, 240, 0.55);
+		outline-offset: 1px;
+	}
+
+	.v5__twirl {
+		display: inline-flex;
+		flex: none;
+		inline-size: 0.5rem;
+		color: rgba(232, 234, 240, 0.35);
+		transition:
+			transform 200ms ease,
+			color 200ms ease;
+	}
+
+	.v5__param[aria-selected='true'] .v5__twirl {
+		transform: rotate(90deg);
+		color: rgba(232, 234, 240, 0.75);
+	}
+
+	.v5__stage {
+		display: grid;
+		padding: clamp(1.25rem, 3vw, 2rem);
+	}
+
+	.v5__panel {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		max-inline-size: 46ch;
+		animation: v5-fade 220ms ease;
+	}
+
+	.v5__panel[hidden] {
+		display: none;
+	}
+
+	.v5__panel-index {
+		font-size: 0.68rem;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.09em;
+		color: rgba(232, 234, 240, 0.3);
+	}
+
+	.v5__panel-name {
+		margin: 0;
+		font-size: clamp(1.1rem, 2vw, 1.45rem);
+		font-weight: 350;
+		letter-spacing: -0.022em;
+		color: #e8eaf0;
+	}
+
+	.v5__panel-value {
+		margin: 0;
+		font-size: clamp(0.92rem, 1.4vw, 1.02rem);
+		line-height: 1.55;
+		color: rgba(232, 234, 240, 0.62);
+		text-wrap: pretty;
+	}
+
+	@keyframes v5-fade {
+		from {
+			opacity: 0;
+			transform: translateY(4px);
+		}
+	}
+
+	/* --- Responsive ------------------------------------------------------ */
+
+	@media (max-width: 720px) {
+		.variant__head {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 0.75rem;
+		}
+
+		.v1__row {
+			grid-template-columns: 2.5ch minmax(0, 1fr);
+			gap: 0.35rem 1rem;
+		}
+
+		.v1__value {
+			grid-column: 2;
+		}
+
+		.v3__row {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 0.35rem;
+		}
+
+		.v3__leader {
+			display: none;
+		}
+
+		.v3__name {
+			white-space: normal;
+		}
+
+		.v4__row {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 0.5rem;
+		}
+
+		.v5__body {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.v5__list {
+			flex-direction: row;
+			overflow-x: auto;
+			border-inline-end: 0;
+			border-block-end: 1px solid rgba(255, 255, 255, 0.09);
+		}
+
+		.v5__param {
+			white-space: nowrap;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.v5__panel {
+			animation: none;
+		}
+
+		.back-link__arrow {
+			transition: none;
+		}
+	}
+</style>
+
+<script>
+	// Variant 05 only: a roving-tabindex tab list, so the panel is reachable by
+	// keyboard as well as pointer.
+	for (const root of document.querySelectorAll<HTMLElement>('[data-controls]')) {
+		const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-param]')];
+		const panels = [...root.querySelectorAll<HTMLElement>('[data-panel]')];
+
+		const select = (index: number, focus = false) => {
+			tabs.forEach((tab, i) => {
+				tab.setAttribute('aria-selected', String(i === index));
+				tab.tabIndex = i === index ? 0 : -1;
+			});
+			panels.forEach((panel, i) => {
+				panel.hidden = i !== index;
+			});
+			if (focus) tabs[index].focus();
+		};
+
+		tabs.forEach((tab, index) => {
+			tab.addEventListener('click', () => select(index));
+			tab.addEventListener('keydown', (event) => {
+				const step = event.key === 'ArrowDown' || event.key === 'ArrowRight' ? 1 : event.key === 'ArrowUp' || event.key === 'ArrowLeft' ? -1 : 0;
+				if (!step) return;
+				event.preventDefault();
+				select((index + step + tabs.length) % tabs.length, true);
+			});
+		});
+	}
+</script>

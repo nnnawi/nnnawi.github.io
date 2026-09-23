@@ -16,6 +16,8 @@ interface Props extends HTMLAttributes<'article'> {
 	ratio?: string;
 	/** Corner radius. Defaults to a medium-small radius. */
 	radius?: string;
+	/** Drops the caption from view. The title stays in the DOM for assistive tech. */
+	hideTitle?: boolean;
 }
 
 const {
@@ -26,6 +28,7 @@ const {
 	poster,
 	ratio = '16 / 9',
 	radius,
+	hideTitle = false,
 	class: className,
 	style,
 	...rest
@@ -63,9 +66,10 @@ const cardStyle = [
 		data-bento-video
 	></video>
 
-	<div class="bento-card__frost" aria-hidden="true"></div>
+	{/* The frost only exists to keep the caption readable, so it goes with it. */}
+	{!hideTitle && <div class="bento-card__frost" aria-hidden="true" />}
 
-	<div class="bento-card__content">
+	<div class:list={['bento-card__content', hideTitle && 'bento-card__content--hidden']}>
 		<h3 class="bento-card__title">{title}</h3>
 		{description && <p class="bento-card__description">{description}</p>}
 		<slot />
@@ -205,6 +209,16 @@ const cardStyle = [
 		flex-direction: column;
 		gap: 0.2em;
 		padding: clamp(0.875rem, 4.5cqi, 1.5rem);
+	}
+
+	/* Out of sight, still announced — a link needs a name. */
+	.bento-card__content--hidden {
+		inline-size: 1px;
+		block-size: 1px;
+		padding: 0;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
 	}
 
 	.bento-card__title {
