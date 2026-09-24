@@ -163,6 +163,7 @@ const round = (value: number) => Number(value.toFixed(3));
 		opacity: 1;
 	}
 
+
 	@keyframes arc {
 		0% {
 			transform: translate3d(48vw, -46vh, 0) scale(0.11);
@@ -374,40 +375,6 @@ const round = (value: number) => Number(value.toFixed(3));
 		});
 
 		cascade.addEventListener('focusout', clear);
-	}
-
-	/* ------------------------------------------------------------ front tile */
-
-	// Names the project currently at the peak of the arc, for anything on the
-	// page that wants to follow along. It is written to `data-front` (for
-	// whoever arrives late) and announced as a `cascade:front` event.
-	if (cascade) {
-		const slots = [...cascade.querySelectorAll<HTMLElement>('.cascade__slot')];
-
-		const report = () => {
-			let front: HTMLElement | undefined;
-			let closest = Infinity;
-
-			for (const slot of slots) {
-				const progress = slot.getAnimations()[0]?.effect?.getComputedTiming().progress;
-				if (progress == null) continue;
-
-				const gap = Math.abs(progress - 0.5);
-				if (gap < closest) {
-					closest = gap;
-					front = slot;
-				}
-			}
-
-			const title = front?.querySelector<HTMLElement>('.cascade__tile')?.dataset.title;
-			if (!title || title === cascade.dataset.front) return;
-
-			cascade.dataset.front = title;
-			document.dispatchEvent(new CustomEvent('cascade:front', { detail: { title } }));
-		};
-
-		report();
-		setInterval(report, 250);
 	}
 
 	/* ------------------------------------------------------------- turbulence */

@@ -2,92 +2,32 @@
 import Cascade from '../shared/cascade/Cascade.astro';
 import Nav from '../shared/nav/Nav.astro';
 
-// ---------------------------------------------------------------------------
-// TEMPORARY — five studies for the headline on the right. The switcher under
-// the nav swaps between them (?v=<id> links straight to one, keys 1–5 too).
-// Once one is chosen, delete the other variants, the switcher, its script and
-// its styles.
-// ---------------------------------------------------------------------------
-
-// The clips that drift through the cascade behind the headline. `line` is what
-// the Roll variant says about each one while it is at the front of the arc.
+// The clips that drift through the cascade behind the headline.
 const projects = [
-	{
-		title: 'MorphoX',
-		video: '/project_animation/MorphoX_animation.mp4',
-		href: '/morphox',
-		line: 'GPU vision sandboxes',
-	},
+	{ title: 'MorphoX', video: '/project_animation/MorphoX_animation.mp4', href: '/morphox' },
 	{
 		title: 'Vectorfield Pathfinding',
 		video: '/project_animation/VFP_animation.mp4',
 		href: '/vectorfield-pathfinding',
-		line: 'crowds that find their way',
 	},
 	{
 		title: 'Dither Plugin',
 		video: '/project_animation/DitherPlugin5_animation.mp4',
 		href: '/dither-plugin',
-		line: 'dithering for After Effects',
 	},
 	{
 		title: 'Privacy Plugin',
 		video: '/project_animation/PPlugin3_animation.mp4',
 		href: '/privacy-plugin',
-		line: 'faces that blur themselves',
 	},
-	{
-		title: 'YOLO on NPU',
-		video: '/project_animation/NPU2_animation.mp4',
-		href: '/yolo-npu',
-		line: 'detectors that fit on a chip',
-	},
-	{
-		title: 'Bowde',
-		video: '/project_animation/BOWDE_animation.mp4',
-		href: '/bowde',
-		line: 'control theory, made playable',
-	},
+	{ title: 'YOLO on NPU', video: '/project_animation/NPU2_animation.mp4', href: '/yolo-npu' },
+	{ title: 'Bowde', video: '/project_animation/BOWDE_animation.mp4', href: '/bowde' },
 	{
 		title: 'Image2Complex',
 		video: '/project_animation/Image2Complex_animation.mp4',
 		href: 'https://nnnawi.github.io/Image2complex/',
-		line: 'complex functions from photos',
 	},
-	{
-		title: 'SirAMP',
-		video: '/project_animation/SIRAMP_animation.mp4',
-		href: undefined,
-		line: 'bass amps, by hand',
-	},
-];
-
-const variants = [
-	{ id: 'masthead', name: 'Masthead' },
-	{ id: 'statement', name: 'Statement' },
-	{ id: 'roll', name: 'Roll' },
-	{ id: 'spotlight', name: 'Spotlight' },
-	{ id: 'spec', name: 'Spec sheet' },
-];
-
-const pad = (n: number) => String(n).padStart(2, '0');
-const count = pad(projects.length);
-const year = new Date().getFullYear();
-
-// Roll: project title → what it says, plus its place in the list.
-const roll = Object.fromEntries(
-	projects.map((project, index) => [project.title, { line: project.line, index: pad(index + 1) }]),
-);
-
-// Spec sheet: each value is typed out, so it needs its own length in characters.
-const spec = [
-	{ key: 'name', value: 'Iwan Ibnoulouafi' },
-	{ key: 'role', value: 'Creative engineer' },
-	{ key: 'field', value: 'Computer vision · ML · GPU' },
-	{ key: 'trained', value: 'MSc, Télécom SudParis' },
-	{ key: 'based', value: 'Paris, FR' },
-	{ key: 'status', value: 'Freelance since 2022' },
-	{ key: 'works', value: `${count} projects, on the left` },
+	{ title: 'SirAMP', video: '/project_animation/SIRAMP_animation.mp4', href: undefined },
 ];
 ---
 
@@ -106,191 +46,34 @@ const spec = [
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Instrument+Serif:ital@0;1&display=swap"
 		/>
 		<title>Iwan — Creative engineer</title>
 	</head>
 	<body>
 		<Nav active="/" />
 
-		<!-- TEMPORARY: headline switcher -->
-		<div class="switcher">
-			<div class="switcher__list" role="group" aria-label="Headline variant">
-				{
-					variants.map((variant, index) => (
-						<button
-							class="switcher__btn"
-							type="button"
-							data-switch={variant.id}
-							aria-pressed={index === 0 ? 'true' : 'false'}
-						>
-							<span class="switcher__num">{index + 1}</span>
-							<span class="switcher__name">{variant.name}</span>
-						</button>
-					))
-				}
-			</div>
-		</div>
-
 		<main class="stage">
 			<Cascade items={projects} />
 
-			<!-- ============================================================ 1 · Masthead -->
-			<!-- A magazine cover: the name as a masthead, ruled off above and below,
-			     with the issue line on top and the particulars underneath. -->
-			<div class="hero mh" data-variant="masthead">
-				<div class="mh__frame">
-					<p class="mh__issue">
-						<span>Selected works</span>
-						<span>Paris — {year}</span>
-					</p>
-					<h1 class="mh__mark">
-						Iwan<span class="mh__count" aria-label={`, ${projects.length} projects`}>({count})</span>
-					</h1>
-					<dl class="mh__facts">
-						<div>
-							<dt>Practice</dt>
-							<dd>Creative engineering</dd>
-						</div>
-						<div>
-							<dt>Focus</dt>
-							<dd>Computer vision, GPU &amp; tools</dd>
-						</div>
-						<div>
-							<dt>Since</dt>
-							<dd>Freelance, 2022</dd>
-						</div>
-					</dl>
-				</div>
-			</div>
-
-			<!-- ============================================================ 2 · Statement -->
 			<!-- No wordmark: a sentence carries the page, with the serif picking out
 			     the two halves of the story. -->
-			<div class="hero st" data-variant="statement" hidden>
-				<div class="st__body">
-					<p class="st__kicker">
-						<span class="st__name">Iwan Ibnoulouafi</span>
+			<div class="hero">
+				<div class="hero__body">
+					<p class="hero__kicker">
+						<span class="hero__name">Iwan Ibnoulouafi</span>
 						<span>Creative engineer, Paris</span>
 					</p>
-					<h1 class="st__line">
+					<h1 class="hero__line">
 						Engineer by training, <em>editor</em> by trade — I build the <em>tools</em> I wished
 						I&nbsp;had.
 					</h1>
-					<a class="st__cta" href="/projects">
-						See the work <span class="st__arrow" aria-hidden="true">→</span>
+					<a class="hero__cta" href="/projects">
+						See the work <span class="hero__arrow" aria-hidden="true">→</span>
 					</a>
 				</div>
 			</div>
-
-			<!-- ============================================================ 3 · Roll -->
-			<!-- The line under the name follows the arc: whichever project is at the
-			     front, the sentence finishes with what it is. -->
-			<div class="hero rl" data-variant="roll" hidden>
-				<div class="rl__body" data-roll={JSON.stringify(roll)}>
-					<h1 class="rl__mark">Iwan</h1>
-					<p class="rl__line" aria-hidden="true">
-						<span class="rl__lead">makes</span>
-						<span class="rl__slot" data-roll-slot>
-							<span class="rl__phrase">{projects[0].line}</span>
-						</span>
-					</p>
-					<p class="rl__meta" aria-hidden="true">
-						<span data-roll-index>01</span> / {count}
-						<span class="rl__dash">—</span>
-						<span data-roll-title>{projects[0].title}</span>
-					</p>
-					<p class="sr-only">
-						Iwan makes software, plugins and instruments — {projects.length} projects shown on the
-						left.
-					</p>
-				</div>
-			</div>
-
-			<!-- ============================================================ 4 · Spotlight -->
-			<!-- The name is drawn in outline and filled only where a soft light falls
-			     on it. The light follows the pointer, and wanders on its own when the
-			     pointer is elsewhere. -->
-			<div class="hero sp" data-variant="spotlight" hidden>
-				<div class="sp__body">
-					<h1 class="sp__mark" data-spot>
-						<span class="sp__outline">Iwan</span>
-						<span class="sp__fill" aria-hidden="true">Iwan</span>
-					</h1>
-					<p class="sp__copy">
-						I build thoughtful software where art, technology and curiosity meet — from GPU
-						sandboxes to editing tools that get out of the way.
-					</p>
-				</div>
-			</div>
-
-			<!-- ============================================================ 5 · Spec sheet -->
-			<!-- The engineer's version: the name at a blinking prompt, the particulars
-			     typed out underneath like a readout. -->
-			<div class="hero sc" data-variant="spec" hidden>
-				<div class="sc__body">
-					<h1 class="sc__mark">Iwan<span class="sc__caret" aria-hidden="true"></span></h1>
-					<dl class="sc__sheet">
-						{
-							spec.map((row, index) => (
-								<div class="sc__row" style={`--i: ${index}; --len: ${[...row.value].length}`}>
-									<dt>{row.key}</dt>
-									<dd>
-										<span class="sc__value">{row.value}</span>
-									</dd>
-								</div>
-							))
-						}
-					</dl>
-				</div>
-			</div>
 		</main>
-
-		<!-- TEMPORARY: headline switcher -->
-		<script is:inline>
-			(() => {
-				const root = document.documentElement;
-				const buttons = [...document.querySelectorAll('[data-switch]')];
-				const variants = [...document.querySelectorAll('[data-variant]')];
-				const ids = buttons.map((b) => b.dataset.switch);
-
-				const show = (id) => {
-					for (const variant of variants) {
-						variant.hidden = variant.dataset.variant !== id;
-					}
-					for (const button of buttons) {
-						button.setAttribute('aria-pressed', String(button.dataset.switch === id));
-					}
-					root.dataset.homeVariant = id;
-					document.dispatchEvent(new CustomEvent('home:variant', { detail: { id } }));
-					const url = new URL(location.href);
-					url.searchParams.set('v', id);
-					history.replaceState(null, '', url);
-					try {
-						localStorage.setItem('home-variant', id);
-					} catch {}
-				};
-
-				let initial = new URL(location.href).searchParams.get('v');
-				if (!ids.includes(initial)) {
-					try {
-						initial = localStorage.getItem('home-variant');
-					} catch {}
-				}
-				show(ids.includes(initial) ? initial : ids[0]);
-
-				for (const button of buttons) {
-					button.addEventListener('click', () => show(button.dataset.switch));
-				}
-
-				// Number keys 1–5 jump between variants.
-				document.addEventListener('keydown', (event) => {
-					if (event.metaKey || event.ctrlKey || event.altKey) return;
-					const index = Number(event.key) - 1;
-					if (Number.isInteger(index) && ids[index]) show(ids[index]);
-				});
-			})();
-		</script>
 	</body>
 </html>
 
@@ -304,14 +87,9 @@ const spec = [
 
 	:global(body) {
 		--ink: #f2f3f5;
-		--muted: rgba(242, 243, 245, 0.62);
 		--faint: rgba(242, 243, 245, 0.38);
 		--rule: rgba(242, 243, 245, 0.18);
 		--serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-		--mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
-		--gutter: clamp(1.5rem, 5vw, 6rem);
-		/* The same size across every variant that sets the name as a wordmark. */
-		--mark: clamp(4.5rem, 17vw, 19rem);
 
 		margin: 0;
 		background: #000;
@@ -327,17 +105,8 @@ const spec = [
 		overflow: hidden;
 	}
 
-	.sr-only {
-		position: absolute;
-		inline-size: 1px;
-		block-size: 1px;
-		overflow: hidden;
-		clip-path: inset(50%);
-		white-space: nowrap;
-	}
-
-	/* Every variant sits in the same cell, on the right half, and runs to the
-	   gutter. The cascade owns the left half. */
+	/* The headline sits on the right half and runs to the gutter. The cascade
+	   owns the left half. */
 	.hero {
 		position: relative;
 		z-index: 1;
@@ -346,106 +115,37 @@ const spec = [
 		display: grid;
 		justify-items: end;
 		padding-block: clamp(4.5rem, 10vh, 7rem) clamp(2rem, 6vh, 4rem);
-		padding-inline-end: var(--gutter);
+		padding-inline-end: clamp(1.5rem, 5vw, 6rem);
 		pointer-events: none;
 	}
 
-	.hero[hidden] {
-		display: none !important;
-	}
-
-	/* ============================================================ 1 · Masthead */
-
-	/* Sized to the wordmark, so the rules above and below run exactly its width. */
-	.mh__frame {
-		display: grid;
-		inline-size: max-content;
-	}
-
-	.mh__issue {
-		display: flex;
-		gap: 1.5rem;
-		justify-content: space-between;
-		margin: 0 0 clamp(0.8rem, 2vh, 1.4rem);
-		padding-block-end: 0.7rem;
-		border-block-end: 1px solid var(--rule);
-		color: var(--muted);
-		font-size: 0.72rem;
-		font-weight: 450;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-	}
-
-	.mh__mark {
-		margin: 0 -0.04em 0 -0.05em;
-		font-size: var(--mark);
-		font-weight: 500;
-		line-height: 0.8;
-		letter-spacing: -0.05em;
-		text-transform: uppercase;
-		white-space: nowrap;
-	}
-
-	/* The issue count, set like a footnote marker against the cap line. */
-	.mh__count {
-		margin-inline-start: 0.08em;
-		color: var(--faint);
-		font-size: 0.1em;
-		font-weight: 400;
-		letter-spacing: 0.02em;
-		vertical-align: 6.2em;
-	}
-
-	.mh__facts {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 1.5rem;
-		margin: clamp(1.1rem, 2.6vh, 1.8rem) 0 0;
-		padding-block-start: 0.85rem;
-		border-block-start: 1px solid var(--rule);
-	}
-
-	.mh__facts dt {
-		margin-block-end: 0.3rem;
-		color: var(--faint);
-		font-size: 0.68rem;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-	}
-
-	.mh__facts dd {
-		margin: 0;
-		color: var(--ink);
-		font-size: clamp(0.8rem, 0.95vw, 0.95rem);
-		font-weight: 400;
-		line-height: 1.35;
-	}
-
-	/* ============================================================ 2 · Statement */
-
-	.st__body {
+	.hero__body {
 		display: grid;
 		justify-items: start;
 		gap: clamp(1.2rem, 3vh, 2rem);
 		max-inline-size: min(44vw, 46rem);
 	}
 
-	.st__kicker {
+	.hero__kicker {
 		display: flex;
-		gap: 0.9rem;
+		flex-wrap: wrap;
+		gap: 0.35rem 1rem;
 		align-items: baseline;
 		margin: 0;
 		color: var(--faint);
-		font-size: 0.78rem;
+		font-size: 0.82rem;
 		letter-spacing: 0.02em;
 	}
 
-	.st__name {
+	/* The signature: well above the small print, well below the headline. */
+	.hero__name {
 		color: var(--ink);
+		font-size: clamp(1.15rem, 1.65vw, 1.7rem);
 		font-weight: 500;
+		letter-spacing: -0.02em;
 	}
 
-	.st__line {
+	.hero__line {
 		margin: 0;
 		font-size: clamp(2rem, 4.1vw, 4.8rem);
 		font-weight: 400;
@@ -454,7 +154,7 @@ const spec = [
 		text-wrap: balance;
 	}
 
-	.st__line em {
+	.hero__line em {
 		font-family: var(--serif);
 		font-size: 1.1em;
 		font-style: italic;
@@ -462,7 +162,7 @@ const spec = [
 		letter-spacing: -0.01em;
 	}
 
-	.st__cta {
+	.hero__cta {
 		display: inline-flex;
 		gap: 0.5rem;
 		align-items: center;
@@ -475,313 +175,22 @@ const spec = [
 		transition: border-color 200ms ease;
 	}
 
-	.st__cta:hover {
+	.hero__cta:hover {
 		border-color: var(--ink);
 	}
 
-	.st__cta:focus-visible {
+	.hero__cta:focus-visible {
 		outline: 2px solid rgba(242, 243, 245, 0.75);
 		outline-offset: 4px;
 	}
 
-	.st__arrow {
+	.hero__arrow {
 		transition: translate 200ms ease;
 	}
 
-	.st__cta:hover .st__arrow {
+	.hero__cta:hover .hero__arrow {
 		translate: 0.25rem 0;
 	}
-
-	/* ============================================================ 3 · Roll */
-
-	.rl__body {
-		display: grid;
-		justify-items: start;
-		inline-size: max-content;
-	}
-
-	.rl__mark {
-		margin: 0 -0.04em 0 -0.05em;
-		font-size: var(--mark);
-		font-weight: 500;
-		line-height: 0.8;
-		letter-spacing: -0.05em;
-		text-transform: uppercase;
-		white-space: nowrap;
-	}
-
-	.rl__line {
-		display: flex;
-		gap: 0.35em;
-		align-items: baseline;
-		margin: clamp(1rem, 2.6vh, 1.8rem) 0 0;
-		font-size: clamp(1.4rem, 2.5vw, 2.9rem);
-		line-height: 1.1;
-		white-space: nowrap;
-	}
-
-	.rl__lead {
-		color: var(--faint);
-		font-weight: 400;
-		letter-spacing: -0.03em;
-	}
-
-	/* The outgoing and incoming phrases share one cell; the clip is what makes
-	   them read as a drum turning rather than two lines overlapping. */
-	.rl__slot {
-		display: inline-grid;
-		overflow: clip;
-		overflow-clip-margin: 0.12em;
-		padding-block: 0.08em;
-	}
-
-	/* The script builds each new phrase itself, and elements made at runtime
-	   carry no scope attribute — so these rules reach them globally. */
-	.rl__slot :global(.rl__phrase) {
-		grid-area: 1 / 1;
-		font-family: var(--serif);
-		font-size: 1.12em;
-		font-style: italic;
-		letter-spacing: -0.01em;
-		transition:
-			translate 620ms cubic-bezier(0.22, 1, 0.36, 1),
-			opacity 620ms cubic-bezier(0.22, 1, 0.36, 1);
-	}
-
-	.rl__slot :global(.rl__phrase[data-state='enter']) {
-		translate: 0 105%;
-		opacity: 0;
-	}
-
-	.rl__slot :global(.rl__phrase[data-state='leave']) {
-		translate: 0 -105%;
-		opacity: 0;
-	}
-
-	.rl__meta {
-		margin: 0.9rem 0 0;
-		color: var(--faint);
-		font-family: var(--mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.04em;
-		font-variant-numeric: tabular-nums;
-	}
-
-	.rl__dash {
-		margin-inline: 0.4em;
-	}
-
-	/* ============================================================ 4 · Spotlight */
-
-	.sp__body {
-		display: grid;
-		justify-items: end;
-	}
-
-	.sp__mark {
-		--spot-x: 50%;
-		--spot-y: 50%;
-		--spot-r: 18vw;
-
-		display: grid;
-		margin: 0 -0.04em 0 0;
-		font-size: var(--mark);
-		font-weight: 500;
-		line-height: 0.8;
-		letter-spacing: -0.05em;
-		text-transform: uppercase;
-		white-space: nowrap;
-	}
-
-	.sp__outline,
-	.sp__fill {
-		grid-area: 1 / 1;
-	}
-
-	.sp__outline {
-		color: transparent;
-		-webkit-text-stroke: max(1px, 0.005em) rgba(242, 243, 245, 0.42);
-	}
-
-	/* The light: a solid copy of the word, shown only inside a soft circle. */
-	.sp__fill {
-		color: var(--ink);
-		mask-image: radial-gradient(
-			circle var(--spot-r) at var(--spot-x) var(--spot-y),
-			#000 0%,
-			rgba(0, 0, 0, 0.85) 30%,
-			transparent 100%
-		);
-		-webkit-mask-image: radial-gradient(
-			circle var(--spot-r) at var(--spot-x) var(--spot-y),
-			#000 0%,
-			rgba(0, 0, 0, 0.85) 30%,
-			transparent 100%
-		);
-	}
-
-	.sp__copy {
-		max-inline-size: 24ch;
-		margin: clamp(0.9rem, 2.2vh, 1.6rem) clamp(0rem, 14vw, 13rem) 0 0;
-		color: rgba(242, 243, 245, 0.82);
-		font-size: clamp(0.78rem, 0.95vw, 0.95rem);
-		font-weight: 400;
-		line-height: 1.45;
-		text-wrap: pretty;
-	}
-
-	/* ============================================================ 5 · Spec sheet */
-
-	.sc__body {
-		display: grid;
-		inline-size: max-content;
-		font-family: var(--mono);
-	}
-
-	.sc__mark {
-		display: flex;
-		align-items: flex-end;
-		margin: 0 0 0 -0.06em;
-		font-family: var(--mono);
-		font-size: clamp(4rem, 14.5vw, 16rem);
-		font-weight: 700;
-		line-height: 0.8;
-		letter-spacing: -0.07em;
-		text-transform: uppercase;
-	}
-
-	/* A block cursor, cap-height tall, blinking hard like a terminal's. */
-	.sc__caret {
-		display: inline-block;
-		inline-size: 0.32em;
-		block-size: 0.72em;
-		margin-inline-start: 0.1em;
-		background: var(--ink);
-		animation: caret 1.05s steps(1) infinite;
-	}
-
-	@keyframes caret {
-		50% {
-			opacity: 0;
-		}
-	}
-
-	.sc__sheet {
-		display: grid;
-		margin: clamp(1.2rem, 3vh, 2rem) 0 0;
-		border-block-start: 1px solid var(--rule);
-	}
-
-	.sc__row {
-		display: grid;
-		grid-template-columns: 10ch 1fr;
-		padding-block: 0.42rem;
-		border-block-end: 1px dashed rgba(242, 243, 245, 0.1);
-		font-size: clamp(0.72rem, 0.85vw, 0.85rem);
-		line-height: 1.3;
-	}
-
-	.sc__row dt {
-		color: var(--faint);
-	}
-
-	.sc__row dt::after {
-		content: ':';
-	}
-
-	.sc__row dd {
-		margin: 0;
-		color: var(--ink);
-	}
-
-	/* Typed in one character at a time, a row after the other. Monospace makes
-	   every step of the clip exactly one character wide. It replays whenever the
-	   variant is shown again, because the element comes back from `display: none`. */
-	.sc__value {
-		display: inline-block;
-		white-space: nowrap;
-		animation: type calc(var(--len) * 24ms) steps(var(--len)) calc(350ms + var(--i) * 210ms) both;
-	}
-
-	@keyframes type {
-		from {
-			clip-path: inset(0 100% 0 0);
-		}
-		to {
-			clip-path: inset(0 0 0 0);
-		}
-	}
-
-	/* ============================================================ switcher (TEMPORARY) */
-
-	.switcher {
-		position: fixed;
-		z-index: 19;
-		inset-block-start: calc(clamp(1rem, 2.5vh, 1.75rem) + 3.4rem);
-		inset-inline: 0;
-		display: flex;
-		justify-content: center;
-		pointer-events: none;
-	}
-
-	.switcher__list {
-		display: flex;
-		gap: 0.15rem;
-		padding: 0.25rem;
-		pointer-events: auto;
-		border-radius: 999px;
-		background: rgba(18, 21, 29, 0.5);
-		backdrop-filter: blur(18px) saturate(150%);
-		-webkit-backdrop-filter: blur(18px) saturate(150%);
-		box-shadow:
-			0 1px 2px rgba(5, 7, 12, 0.35),
-			0 20px 44px -26px rgba(0, 0, 0, 0.9),
-			inset 0 1px 0 rgba(255, 255, 255, 0.07);
-	}
-
-	.switcher__btn {
-		display: inline-flex;
-		align-items: baseline;
-		gap: 0.45em;
-		padding: 0.42rem 0.8rem;
-		border: 0;
-		border-radius: 999px;
-		background: transparent;
-		color: rgba(232, 234, 240, 0.58);
-		font: inherit;
-		font-size: 0.75rem;
-		line-height: 1.2;
-		cursor: pointer;
-		transition:
-			color 160ms ease,
-			background-color 160ms ease,
-			box-shadow 160ms ease;
-	}
-
-	.switcher__btn:hover {
-		color: #fff;
-		background: rgba(255, 255, 255, 0.06);
-	}
-
-	.switcher__btn:focus-visible {
-		outline: 2px solid rgba(232, 234, 240, 0.75);
-		outline-offset: 2px;
-	}
-
-	.switcher__num {
-		font-family: var(--serif);
-		font-size: 1.1em;
-		font-style: italic;
-		color: #8b9dff;
-	}
-
-	.switcher__btn[aria-pressed='true'] {
-		color: #fff;
-		background: rgba(126, 148, 255, 0.18);
-		box-shadow: inset 0 0 0 1px rgba(126, 148, 255, 0.4);
-	}
-
-	/* ============================================================ narrow screens */
 
 	@media (max-width: 900px) {
 		/* There is no room for two columns, so the arc slides behind the type and
@@ -809,209 +218,24 @@ const spec = [
 			);
 		}
 
-		:global(body) {
-			--mark: min(20vw, 9rem);
-		}
-
-		.mh__facts {
-			grid-template-columns: minmax(0, 1fr);
-			gap: 0.7rem;
-		}
-
-		.st__body {
+		.hero__body {
 			justify-items: center;
 			max-inline-size: 36rem;
 		}
 
-		.st__line {
+		.hero__kicker {
+			justify-content: center;
+		}
+
+		.hero__line {
 			font-size: clamp(1.9rem, 8vw, 3.4rem);
-		}
-
-		.rl__body,
-		.sc__body {
-			justify-items: center;
-		}
-
-		.rl__line {
-			flex-direction: column;
-			align-items: center;
-			gap: 0.1em;
-			font-size: clamp(1.3rem, 6vw, 2.2rem);
-		}
-
-		.sp__copy {
-			max-inline-size: 30ch;
-			margin-inline: 0;
-		}
-
-		.sc__mark {
-			font-size: min(19vw, 8rem);
-		}
-
-		.sc__sheet {
-			text-align: start;
-		}
-	}
-
-	@media (max-width: 560px) {
-		.switcher__name {
-			display: none;
-		}
-
-		.switcher__btn {
-			padding-inline: 0.85rem;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.switcher__btn,
-		.st__cta,
-		.st__arrow,
-		.rl__slot :global(.rl__phrase) {
+		.hero__cta,
+		.hero__arrow {
 			transition: none;
-		}
-
-		.sc__caret,
-		.sc__value {
-			animation: none;
 		}
 	}
 </style>
-
-<script>
-	/* ------------------------------------------------------------ 3 · Roll */
-
-	// Finishes "Iwan makes …" with whichever project is at the front of the arc.
-	const rollBody = document.querySelector<HTMLElement>('[data-roll]');
-	const rollSlot = document.querySelector<HTMLElement>('[data-roll-slot]');
-	const rollIndex = document.querySelector<HTMLElement>('[data-roll-index]');
-	const rollTitle = document.querySelector<HTMLElement>('[data-roll-title]');
-
-	if (rollBody && rollSlot && rollIndex && rollTitle) {
-		const lines: Record<string, { line: string; index: string }> = JSON.parse(
-			rollBody.dataset.roll ?? '{}',
-		);
-		let current = rollTitle.textContent ?? '';
-
-		const turn = (title: string) => {
-			const entry = lines[title];
-			if (!entry || title === current) return;
-			current = title;
-
-			const outgoing = rollSlot.querySelector<HTMLElement>('.rl__phrase:not([data-state="leave"])');
-			const incoming = document.createElement('span');
-			incoming.className = 'rl__phrase';
-			incoming.textContent = entry.line;
-			incoming.dataset.state = 'enter';
-			rollSlot.append(incoming);
-
-			// One frame in the start position, so the transition has a from-state.
-			requestAnimationFrame(() => {
-				requestAnimationFrame(() => {
-					incoming.removeAttribute('data-state');
-					if (outgoing) {
-						outgoing.dataset.state = 'leave';
-						outgoing.addEventListener('transitionend', () => outgoing.remove(), { once: true });
-						// Reduced motion has no transition to end, so clear it anyway.
-						setTimeout(() => outgoing.remove(), 800);
-					}
-				});
-			});
-
-			rollIndex.textContent = entry.index;
-			rollTitle.textContent = title;
-		};
-
-		document.addEventListener('cascade:front', (event) => {
-			turn((event as CustomEvent<{ title: string }>).detail.title);
-		});
-
-		// The cascade may have named its front tile before this listener existed.
-		const front = document.querySelector<HTMLElement>('.cascade')?.dataset.front;
-		if (front) turn(front);
-	}
-
-	/* ------------------------------------------------------------ 4 · Spotlight */
-
-	// A light that follows the pointer across the outlined name. With no pointer
-	// over the page it wanders slowly on its own, so the word never sits dark.
-	const spot = document.querySelector<HTMLElement>('[data-spot]');
-	const spotVariant = spot?.closest<HTMLElement>('[data-variant]');
-
-	if (spot && spotVariant) {
-		const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-		let box = spot.getBoundingClientRect();
-		let pointer: { x: number; y: number } | null = null;
-		let x = box.width * 0.3;
-		let y = box.height * 0.5;
-		let frame = 0;
-		let started = performance.now();
-
-		const place = () => {
-			spot.style.setProperty('--spot-x', `${x.toFixed(1)}px`);
-			spot.style.setProperty('--spot-y', `${y.toFixed(1)}px`);
-			spot.style.setProperty('--spot-r', `${(box.height * 1.05).toFixed(1)}px`);
-		};
-
-		const step = (now: number) => {
-			frame = 0;
-			if (spotVariant.hidden) return;
-
-			let targetX: number;
-			let targetY: number;
-
-			if (pointer) {
-				targetX = pointer.x - box.left;
-				targetY = pointer.y - box.top;
-			} else {
-				// A slow figure-eight across the word.
-				const t = (now - started) / 1000;
-				targetX = box.width * (0.5 + 0.42 * Math.sin(t * 0.45));
-				targetY = box.height * (0.5 + 0.3 * Math.sin(t * 0.9));
-			}
-
-			x += (targetX - x) * 0.09;
-			y += (targetY - y) * 0.09;
-			place();
-
-			frame = requestAnimationFrame(step);
-		};
-
-		const start = () => {
-			box = spot.getBoundingClientRect();
-			if (still) {
-				// No wandering: the light rests on the first two letters.
-				x = box.width * 0.3;
-				y = box.height * 0.5;
-				place();
-				return;
-			}
-			if (!frame) frame = requestAnimationFrame(step);
-		};
-
-		window.addEventListener('resize', () => {
-			box = spot.getBoundingClientRect();
-		});
-
-		window.addEventListener(
-			'pointermove',
-			(event) => {
-				if (event.pointerType === 'touch') return;
-				pointer = { x: event.clientX, y: event.clientY };
-			},
-			{ passive: true },
-		);
-
-		document.addEventListener('pointerleave', () => {
-			pointer = null;
-			started = performance.now();
-		});
-
-		document.addEventListener('home:variant', (event) => {
-			if ((event as CustomEvent<{ id: string }>).detail.id === 'spotlight') start();
-		});
-
-		if (!spotVariant.hidden) start();
-	}
-</script>

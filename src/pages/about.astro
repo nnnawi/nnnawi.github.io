@@ -1,4 +1,5 @@
 ---
+import Aura from '../shared/aura/Aura.astro';
 import Nav from '../shared/nav/Nav.astro';
 
 // ---------------------------------------------------------------------------
@@ -130,6 +131,8 @@ const sections = [
 		<title>About — Iwan</title>
 	</head>
 	<body>
+		<Aura />
+
 		<Nav active="/about" />
 
 		<main class="about">
@@ -254,10 +257,32 @@ const sections = [
 <style>
 	:global(body) {
 		margin: 0;
-		background: #05070c;
+		background: #000;
 		color: #e8eaf0;
 		font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 		font-weight: 350;
+	}
+
+	/* --- Aura background -------------------------------------------------- */
+
+	/* Opacity of the dithered photo. Its dots are pure, full-strength colours,
+	   so this is what keeps them a texture under the muted copy rather than
+	   competing with it, lower still once the column fills the window and there
+	   is no empty gutter left. */
+	:global(body) {
+		--aura-intensity: 0.3;
+	}
+
+	@media (max-width: 1300px) {
+		:global(body) {
+			--aura-intensity: 0.26;
+		}
+	}
+
+	@media (max-width: 1000px) {
+		:global(body) {
+			--aura-intensity: 0.22;
+		}
 	}
 
 	.about {
