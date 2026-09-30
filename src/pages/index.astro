@@ -102,8 +102,14 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 								tools I&nbsp;wish I&nbsp;had.
 							</p>
 							<span class="hero__cta">
-								<span class="hero__cta-label">See what I’ve built</span>
-								<span class="hero__arrow">→</span>
+								<span class="hero__cta-face">
+									<span class="hero__cta-label">See what I’ve built</span>
+									<span class="hero__arrow">→</span>
+								</span>
+								<span class="hero__cta-face">
+									<span class="hero__cta-label">Click for project details</span>
+									<svg class="hero__click" viewBox="0 0 24 24"></svg>
+								</span>
 							</span>
 						</div>
 
@@ -120,7 +126,8 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 												class="retype__caret"
 											/></span
 										>
-										engineer building the tools I&nbsp;wish I&nbsp;had.<span
+										<span class="hero__engineer">engineer</span> building the tools I&nbsp;wish
+										I&nbsp;had.<span
 											class="hero__caret hero__caret--line"></span>
 									</span>
 								</span>
@@ -128,9 +135,29 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 
 							<!-- Moves to whichever layer is showing, so it always sits
 							     right under the text. -->
+							<!-- Both faces are laid out in the same spot, so the link keeps
+							     one size whichever is showing; only the visible one is read. -->
 							<a class="hero__cta" href="/projects" data-cta>
-								<span class="hero__cta-label">See what I’ve built</span>
-								<span class="hero__arrow" aria-hidden="true">→</span>
+								<span class="hero__cta-face hero__cta-face--sentence">
+									<span class="hero__cta-label">See what I’ve built</span>
+									<span class="hero__arrow" aria-hidden="true">→</span>
+								</span>
+								<span class="hero__cta-face hero__cta-face--project">
+									<span class="hero__cta-label">Click for project details</span>
+									<svg
+										class="hero__click"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.8"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										aria-hidden="true"
+									>
+										<path d="M9.5 9.5 20 13.8l-4.6 1.6-1.6 4.6z" />
+										<path d="M7.5 2.5 8.2 5.6M2.5 7.5l3.1.7M13.2 4.2l-2 2M4.2 13.2l2-2" />
+									</svg>
+								</span>
 							</a>
 						</div>
 
@@ -263,13 +290,19 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 	/* Words are wrapped by the script at runtime, hence :global. Each needs a
 	   box of its own to be pushed. */
 	.hero__visual :global(.w),
-	.retype {
+	.retype,
+	.hero__engineer {
 		display: inline-block;
 		white-space: nowrap;
 	}
 
 	.retype,
 	.hero__project-name {
+		color: var(--ink);
+		font-weight: 600;
+	}
+
+	.hero__engineer {
 		color: var(--ink);
 		font-weight: 600;
 	}
@@ -311,7 +344,8 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 		color: #000;
 	}
 
-	.hero__morph.is-selected .retype {
+	.hero__morph.is-selected .retype,
+	.hero__morph.is-selected .hero__engineer {
 		color: #000;
 	}
 
@@ -392,9 +426,8 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 	   smaller size, set straight under it. On hover it brightens and an
 	   underline draws in. */
 	.hero__cta {
-		display: inline-flex;
-		margin-block-start: 0.85em;
-		gap: 0.4em;
+		display: inline-grid;
+		margin-block-start: 1.20em;
 		align-items: baseline;
 		color: var(--muted);
 		font-size: clamp(1.2rem, 1.9vw, 2.1rem);
@@ -435,6 +468,43 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 		translate: 0.25em 0;
 	}
 
+	/* The two faces share one cell, lined up on their baseline. Changing
+	   face is a plain crossfade; the link itself never moves. */
+	.hero__cta-face {
+		display: inline-flex;
+		grid-area: 1 / 1;
+		gap: 0.4em;
+		align-items: baseline;
+		transition:
+			opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
+			visibility 0s linear 0s;
+	}
+
+	.hero__cta-face--project,
+	.show-project .hero__cta-face--sentence {
+		opacity: 0;
+		visibility: hidden;
+		transition-delay: 0s, 220ms;
+	}
+
+	.show-project .hero__cta-face--project {
+		opacity: 1;
+		visibility: visible;
+		transition-delay: 0s;
+	}
+
+	.hero__click {
+		align-self: center;
+		inline-size: 0.85em;
+		block-size: 0.85em;
+		transition: scale 240ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.hero__cta:hover .hero__click,
+	.hero__cta:focus-visible .hero__click {
+		scale: 1.12;
+	}
+
 	@media (max-width: 900px) {
 		/* There is no room for two columns, so the arc slides behind the type and
 		   the headline takes the middle of the screen. */
@@ -466,7 +536,8 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 		}
 
 		.hero__sizer,
-		.hero__layer {
+		.hero__layer,
+		.hero__cta {
 			justify-items: center;
 		}
 
@@ -477,8 +548,10 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 
 	@media (prefers-reduced-motion: reduce) {
 		.hero__cta,
+		.hero__cta-face,
 		.hero__cta-label,
-		.hero__arrow {
+		.hero__arrow,
+		.hero__click {
 			transition: none;
 		}
 
@@ -521,8 +594,8 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 		window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduce;
 
 	if (line && ink && canRepel) {
-		// Wrap each word of the sentence's own text in a span. The role is an
-		// element, not text, so it is left as it is.
+		// Wrap each word of the sentence's own text in a span. The role and
+		// "engineer" are elements already, so they are left as they are.
 		for (const node of [...ink.childNodes]) {
 			if (node.nodeType !== Node.TEXT_NODE) continue;
 			const fragment = document.createDocumentFragment();
@@ -540,7 +613,7 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 			node.replaceWith(fragment);
 		}
 
-		const targets = [...line.querySelectorAll<HTMLElement>('.w, [data-retype]')];
+		const targets = [...line.querySelectorAll<HTMLElement>('.w, [data-retype], .hero__engineer')];
 		const state = targets.map(() => ({ amount: 0, velocity: 0, dx: 0, dy: -1 }));
 
 		const REACH = 2.4; // em of the headline, from the cursor to where the push dies
@@ -663,7 +736,8 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 
 		// Whenever the text above it changes height (a layer swap, a role that
 		// takes another line), the link glides to its new place instead of
-		// jumping, starting from wherever it is on screen, even mid-glide.
+		// jumping, starting from wherever it is on screen, even mid-glide. It
+		// holds still for a beat first, so the text moves before the link does.
 		// Both layers start at the top of the block, so `offsetTop` compares
 		// across them.
 		if (!reduce) {
@@ -678,8 +752,10 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 				settled = target;
 				glide?.cancel();
 				glide = cta.animate([{ transform: `translateY(${offset}px)` }, { transform: 'none' }], {
-					duration: 1020,
-					easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+					duration: 850,
+					delay: 0,
+					fill: 'backwards',
+					easing: 'cubic-bezier(0.42, 1, 0.46, 1)',
 				});
 			}).observe(morph, {
 				subtree: true,

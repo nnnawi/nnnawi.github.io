@@ -20,7 +20,7 @@ const { items, duration = 42 } = Astro.props;
 
 // Every clip is 16:9 and is shown whole, so the collage gets its variety from
 // size alone: each tile keeps its own base width and the arc scales it from there.
-const widths = [20, 26, 16, 27, 21, 25, 18, 26];
+const widths = [20, 26, 19, 27, 21, 25, 22, 26];
 
 // The path the tiles travel: a lens-shaped sweep that comes in small at the top
 // right, swells out to the left, and leaves small again at the bottom right.
@@ -82,6 +82,7 @@ const round = (value: number) => Number(value.toFixed(3));
 			return (
 				<div
 					class="cascade__slot"
+					data-still={round(t)}
 					style={`
 						--delay: ${round(-t * duration)}s;
 						--width: ${tile.width}vw;
@@ -143,24 +144,27 @@ const round = (value: number) => Number(value.toFixed(3));
 		transition: opacity 320ms ease;
 	}
 
-	/* The tile under the pointer comes to the front of the stack, fully solid.
-	   Both values are keyframed, and an animation outranks any ordinary
+	/* Only a tile in the middle of the arc, where it is at its biggest, answers
+	   the pointer: it comes to the front of the stack, fully solid, and dims the
+	   rest. Both values are keyframed, and an animation outranks any ordinary
 	   declaration — `!important` is the one thing that outranks it. */
-	.cascade__slot:hover,
-	.cascade__slot:focus-within {
+	.cascade__slot.is-active {
 		z-index: 1000 !important;
 		opacity: 1 !important;
 	}
 
-	/* Hovering the cluster lifts one tile out of it and dims the rest. */
-	.cascade:hover .cascade__tile {
+	.cascade.has-active .cascade__tile {
 		opacity: 0.28;
 	}
 
-	.cascade .cascade__tile:hover {
+	.cascade .is-active .cascade__tile {
 		opacity: 1;
 	}
 
+	/* The others keep still under the pointer; they are still links. */
+	.cascade__slot:not(.is-active) :global(.bento-card--link:hover) {
+		transform: none;
+	}
 
 	@keyframes arc {
 		0% {
@@ -322,8 +326,8 @@ const round = (value: number) => Number(value.toFixed(3));
 			}
 		};
 
-		// Tells the page which project is under the pointer or focus, and null
-		// once there is none. The landing's hero retypes itself into the name.
+		// Tells the page which project is lit, and null once there is none. The
+		// landing's hero retypes itself into the name.
 		let current: string | null = null;
 
 		const announce = (title: string | null) => {
@@ -332,26 +336,68 @@ const round = (value: number) => Number(value.toFixed(3));
 			cascade.dispatchEvent(new CustomEvent('cascade:project', { detail: title, bubbles: true }));
 		};
 
-		const show = (event: Event) => {
-			const tile = (event.target as HTMLElement).closest<HTMLElement>('.cascade__tile');
-			announce(tile?.dataset.title ?? null);
+		// How far from the peak of the arc, as a share of the whole trip, a tile
+		// still counts as central. Only those light up and name themselves.
+		const CENTRE = 0.22;
+
+		const isCentral = (slot: HTMLElement) => {
+			const timing = slot.getAnimations()[0]?.effect?.getComputedTiming();
+			const progress = timing?.progress ?? Number(slot.dataset.still);
+			return Math.abs(progress - 0.5) <= CENTRE;
 		};
 
-		const clear = () => {
-			setRate(1);
-			announce(null);
+		let pointerInside = false;
+		// Keyboard focus picks a tile on purpose, so it lights up wherever it is.
+		let focused: HTMLElement | null = null;
+		let active: HTMLElement | null = null;
+
+		const update = () => {
+			const hovered = pointerInside
+				? cascade.querySelector<HTMLElement>('.cascade__slot:hover')
+				: null;
+			const next = focused ?? (hovered && isCentral(hovered) ? hovered : null);
+			if (next === active) return;
+			active?.classList.remove('is-active');
+			next?.classList.add('is-active');
+			cascade.classList.toggle('has-active', next !== null);
+			active = next;
+			// Slows the arc right down so the lit tile stays under the pointer.
+			setRate(next ? 0.52 : 1);
+			announce(next?.querySelector<HTMLElement>('.cascade__tile')?.dataset.title ?? null);
 		};
 
-		cascade.addEventListener('pointerenter', () => setRate(0.12));
-		cascade.addEventListener('pointerover', show);
-		cascade.addEventListener('pointerleave', clear);
+		// The tiles keep travelling under a still pointer, so while it is over
+		// them they are checked every frame: a tile lights up once it drifts
+		// into the middle under the pointer, and goes out once it drifts past.
+		let watching = 0;
 
-		cascade.addEventListener('focusin', (event) => {
-			setRate(0.12);
-			show(event);
+		const watch = () => {
+			update();
+			watching = pointerInside ? requestAnimationFrame(watch) : 0;
+		};
+
+		cascade.addEventListener('pointerover', () => {
+			pointerInside = true;
+			if (!watching) watch();
 		});
 
-		cascade.addEventListener('focusout', clear);
+		cascade.addEventListener('pointerleave', () => {
+			pointerInside = false;
+			update();
+		});
+
+		cascade.addEventListener('focusin', (event) => {
+			const target = event.target as HTMLElement;
+			focused = target.matches(':focus-visible')
+				? target.closest<HTMLElement>('.cascade__slot')
+				: null;
+			update();
+		});
+
+		cascade.addEventListener('focusout', () => {
+			focused = null;
+			update();
+		});
 	}
 
 	/* ------------------------------------------------------------- turbulence */
