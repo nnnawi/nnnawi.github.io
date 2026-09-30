@@ -57,8 +57,9 @@ const projects = [
 
 const descriptions = Object.fromEntries(projects.map((project) => [project.title, project.description]));
 
-// The role in the headline, retyped in turn.
-const roles = ['creative', 'computer vision', 'software'];
+// The role in the headline, retyped in turn. The first is the default: the
+// page opens on it, and the sentence always comes back with it.
+const roles = ['computer vision', 'creative', 'software'];
 const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 ---
 
@@ -93,43 +94,62 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 			<div class="hero">
 				<div class="hero__body">
 					<div class="hero__morph" data-morph={JSON.stringify(descriptions)}>
-						<!-- Holds the block at the sentence's tallest, so nothing below
-						     it moves while the layers are retyped. -->
-						<p class="hero__sizer" aria-hidden="true">
-							I’m Iwan, a&nbsp;<span class="retype">{longestRole}</span> engineer building the tools
-							I&nbsp;wish I&nbsp;had.
-						</p>
-
-						<h1 class="hero__line">
-							<span class="sr-only">
-								I’m Iwan, a creative, computer vision and software engineer building the tools I
-								wish I had.
-							</span>
-							<span class="hero__visual" aria-hidden="true" data-repel>
-								<span class="hero__ink">
-									I’m Iwan, a&nbsp;<span class="retype" data-retype={JSON.stringify(roles)}
-										><span class="retype__text">{roles[0]}</span><span class="retype__caret" /></span
-									>
-									engineer building the tools I&nbsp;wish I&nbsp;had.<span
-										class="hero__caret hero__caret--line"></span>
-								</span>
-							</span>
-						</h1>
-
-						<!-- The cards already name their project for assistive tech. -->
-						<div class="hero__project" aria-hidden="true">
-							<p class="hero__project-name">
-								<span class="hero__project-name-text"></span><span
-									class="hero__caret hero__caret--name"></span>
+						<!-- Holds the block at the sentence's tallest, link included, so
+						     the hero never recentres while the layers are retyped. -->
+						<div class="hero__sizer" aria-hidden="true">
+							<p>
+								I’m Iwan, a&nbsp;<span class="retype">{longestRole}</span> engineer building the
+								tools I&nbsp;wish I&nbsp;had.
 							</p>
-							<p class="hero__project-description"></p>
+							<span class="hero__cta">
+								<span class="hero__cta-label">See what I’ve built</span>
+								<span class="hero__arrow">→</span>
+							</span>
+						</div>
+
+						<div class="hero__layer hero__layer--sentence">
+							<h1 class="hero__line">
+								<span class="sr-only">
+									I’m Iwan, a creative, computer vision and software engineer building the tools
+									I wish I had.
+								</span>
+								<span class="hero__visual" aria-hidden="true" data-repel>
+									<span class="hero__ink">
+										I’m Iwan, a&nbsp;<span class="retype" data-retype={JSON.stringify(roles)}
+											><span class="retype__text">{roles[0]}</span><span
+												class="retype__caret"
+											/></span
+										>
+										engineer building the tools I&nbsp;wish I&nbsp;had.<span
+											class="hero__caret hero__caret--line"></span>
+									</span>
+								</span>
+							</h1>
+
+							<!-- Moves to whichever layer is showing, so it always sits
+							     right under the text. -->
+							<a class="hero__cta" href="/projects" data-cta>
+								<span class="hero__cta-label">See what I’ve built</span>
+								<span class="hero__arrow" aria-hidden="true">→</span>
+							</a>
+						</div>
+
+						<!-- Each line holds its full text from the start: what is written
+						     so far, the caret, then the rest, laid out but invisible. The
+						     lines never rewrap while they are being written. The cards
+						     already name their project for assistive tech. -->
+						<div class="hero__layer hero__project">
+							<p class="hero__project-name" aria-hidden="true">
+								<span class="hero__project-name-text"></span><span
+									class="hero__caret hero__caret--name"></span><span class="hero__ghost"></span>
+							</p>
+							<p class="hero__project-description" aria-hidden="true">
+								<span class="hero__project-description-text"></span><span
+									class="hero__caret hero__caret--description"></span><span class="hero__ghost"
+								></span>
+							</p>
 						</div>
 					</div>
-
-					<a class="hero__cta" href="/projects">
-						<span class="hero__cta-label">See what I’ve built</span>
-						<span class="hero__arrow" aria-hidden="true">→</span>
-					</a>
 				</div>
 			</div>
 		</main>
@@ -177,17 +197,17 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 	}
 
 	.hero__body {
-		display: grid;
-		justify-items: start;
-		gap: clamp(1.2rem, 3vh, 2rem);
 		max-inline-size: min(44vw, 46rem);
 	}
 
 	/* --- Headline and project layers -------------------------------------- */
 
 	/* The sentence and the project share one cell; the sizer sets its height.
-	   The sentence is dimmed so the role carries it. */
+	   The project layer is taken out of flow, so a taller project runs on
+	   below instead of recentring the hero. The sentence is dimmed so the role
+	   carries it. */
 	.hero__morph {
+		position: relative;
 		display: grid;
 		color: var(--muted);
 		font-size: clamp(2rem, 4.1vw, 4.8rem);
@@ -203,11 +223,32 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 		margin: 0;
 	}
 
+	.hero__sizer,
+	.hero__layer {
+		display: grid;
+		align-content: start;
+		justify-items: start;
+	}
+
 	.hero__sizer {
 		visibility: hidden;
 	}
 
+	.hero__sizer p {
+		margin: 0;
+	}
+
+	.hero__project {
+		position: absolute;
+		inset: 0 0 auto;
+	}
+
+	.hero__ghost {
+		visibility: hidden;
+	}
+
 	.hero__line {
+		margin: 0;
 		font: inherit;
 	}
 
@@ -232,7 +273,7 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 	}
 
 	.hero__project,
-	.hero__morph.show-project .hero__line {
+	.hero__morph.show-project .hero__layer--sentence {
 		visibility: hidden;
 	}
 
@@ -240,28 +281,18 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 		visibility: visible;
 	}
 
-	.hero__project-name {
+	/* The name in the role's white, the description beneath it at the same
+	   size in the sentence's grey — the same pairing as the headline. */
+	.hero__project-name,
+	.hero__project-description {
 		margin: 0;
 	}
 
+	/* Balancing would even the lines out by shortening them; the description
+	   fills each line to the full measure instead, only keeping a lone word
+	   off the last one. */
 	.hero__project-description {
-		max-inline-size: 26em;
-		margin: 0.9rem 0 0;
-		color: var(--muted);
-		font-size: clamp(1rem, 1.3vw, 1.3rem);
-		line-height: 1.4;
-		letter-spacing: -0.015em;
 		text-wrap: pretty;
-		opacity: 0;
-		translate: 0 0.4em;
-		transition:
-			opacity 360ms ease,
-			translate 480ms cubic-bezier(0.22, 1, 0.36, 1);
-	}
-
-	.hero__morph.show-description .hero__project-description {
-		opacity: 1;
-		translate: 0 0;
 	}
 
 	/* --- Retype ----------------------------------------------------------- */
@@ -270,7 +301,8 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 	   project's name, when a card is hovered. */
 	.retype.is-selected .retype__text,
 	.hero__morph.is-selected .hero__ink,
-	.hero__morph.is-selected .hero__project-name-text {
+	.hero__morph.is-selected .hero__project-name-text,
+	.hero__morph.is-selected .hero__project-description-text {
 		-webkit-box-decoration-break: clone;
 		box-decoration-break: clone;
 		background: var(--ink);
@@ -282,20 +314,38 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 	}
 
 	.retype__caret,
-	.hero__caret {
-		display: inline-block;
+	.hero__caret::after {
 		inline-size: max(2px, 0.05em);
-		block-size: 0.9em;
-		margin-inline-start: 0.05em;
-		vertical-align: -0.1em;
 		background: var(--ink);
 		animation: blink 1s steps(1) infinite;
 	}
 
-	/* Solid while typing, hidden while selected. */
+	.retype__caret {
+		display: inline-block;
+		block-size: 0.9em;
+		margin-inline-start: 0.05em;
+		vertical-align: -0.1em;
+	}
+
+	/* The carets that write mid-line take no width and are plain inline boxes,
+	   so they never push a word or open a line break where they sit. The bar
+	   is drawn over the text, from just under the baseline to cap height. */
+	.hero__caret {
+		position: relative;
+	}
+
+	.hero__caret::after {
+		content: '';
+		position: absolute;
+		inset-block: 0.17em 0.14em;
+		inset-inline-start: 0.04em;
+	}
+
+	/* Solid while writing, hidden while selected. */
 	.retype.is-typing .retype__caret,
-	.hero__morph.is-typing .hero__caret,
-	.hero__morph.is-typing-back .hero__caret {
+	.hero__morph.is-naming .hero__caret--name::after,
+	.hero__morph.is-describing .hero__caret--description::after,
+	.hero__morph.is-typing-back .hero__caret::after {
 		animation: none;
 	}
 
@@ -305,16 +355,18 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 		visibility: hidden;
 	}
 
-	/* One caret on screen at a time: the role's at rest, the line's end while
-	   the sentence is typed back, the name's while a project shows. */
+	/* The role's caret at rest, the line's end while the sentence is drawn
+	   back. A project is written by two carets at once, one on the name and
+	   one on the description; the description's stays once both are done. */
 	.hero__caret,
 	.hero__morph.is-typing-back .retype__caret {
 		display: none;
 	}
 
-	.hero__morph.show-project .hero__caret--name,
+	.hero__morph.is-naming .hero__caret--name,
+	.hero__morph.show-project .hero__caret--description,
 	.hero__morph.is-typing-back .hero__caret--line {
-		display: inline-block;
+		display: inline;
 	}
 
 	@keyframes blink {
@@ -335,9 +387,11 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 	/* --- CTA -------------------------------------------------------------- */
 
 	/* Reads as the sentence carrying on: the headline's face and grey at a
-	   smaller size. On hover it brightens and an underline draws in. */
+	   smaller size, set straight under it. On hover it brightens and an
+	   underline draws in. */
 	.hero__cta {
 		display: inline-flex;
+		margin-block-start: 0.85em;
 		gap: 0.4em;
 		align-items: baseline;
 		color: var(--muted);
@@ -346,7 +400,7 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 		letter-spacing: -0.035em;
 		text-decoration: none;
 		pointer-events: auto;
-		transition: color 240ms ease;
+		transition: color 240ms cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
 	.hero__cta:hover,
@@ -406,29 +460,28 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 		}
 
 		.hero__body {
-			justify-items: center;
 			max-inline-size: 36rem;
+		}
+
+		.hero__sizer,
+		.hero__layer {
+			justify-items: center;
 		}
 
 		.hero__morph {
 			font-size: clamp(1.9rem, 8vw, 3.4rem);
-		}
-
-		.hero__project-description {
-			margin-inline: auto;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.hero__cta,
 		.hero__cta-label,
-		.hero__arrow,
-		.hero__project-description {
+		.hero__arrow {
 			transition: none;
 		}
 
 		.retype__caret,
-		.hero__caret {
+		.hero__caret::after {
 			animation: none;
 		}
 	}
@@ -568,12 +621,22 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 
 	// Two things retype the headline, and never at once:
 	// - every few seconds the role is selected and the next one typed over it;
-	// - hovering a card selects the whole line and types the project's name in
-	//   its place, its description fading in beneath. Leaving selects the name
-	//   and types the sentence back.
+	// - hovering a card selects the whole line, then two carets write the
+	//   project's name and its description side by side. Leaving selects both
+	//   and draws the sentence back with the default role, and only then does
+	//   the role's clock start again, a full interval later.
 	// Each sequence takes a number from `run`; a newer one makes an older one
 	// stop at its next step. Reduced motion swaps the text outright.
-	const INTERVAL = 3000;
+	const INTERVAL = 4500;
+	const REDRAW = 1700; // ms to draw the whole sentence back
+	const NAME = { perChar: 90, min: 380, max: 2000 }; // ms to write a project's name
+	const DESCRIBE = { perChar: 40, min: 420, max: 20050 }; // ms to write its description
+
+	// Quick off the mark, settling gently at the end.
+	const easeOut = (t: number) => 1 - (1 - t) ** 3;
+
+	const durationFor = (text: string, { perChar, min, max }: typeof NAME) =>
+		Math.min(max, Math.max(min, text.length * perChar));
 	const morph = document.querySelector<HTMLElement>('[data-morph]');
 	const slot = document.querySelector<HTMLElement>('[data-retype]');
 
@@ -582,7 +645,18 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 		const descriptions: Record<string, string> = JSON.parse(morph.dataset.morph ?? '{}');
 		const roleText = slot.querySelector<HTMLElement>('.retype__text')!;
 		const nameText = morph.querySelector<HTMLElement>('.hero__project-name-text')!;
-		const description = morph.querySelector<HTMLElement>('.hero__project-description')!;
+		const descriptionText = morph.querySelector<HTMLElement>('.hero__project-description-text')!;
+		const [nameGhost, descriptionGhost] = morph.querySelectorAll<HTMLElement>('.hero__ghost');
+		const cta = morph.querySelector<HTMLElement>('[data-cta]')!;
+		const sentenceLayer = morph.querySelector<HTMLElement>('.hero__layer--sentence')!;
+		const projectLayer = morph.querySelector<HTMLElement>('.hero__project')!;
+
+		// Swaps the visible layer and takes the link along, so it stays right
+		// under whichever text is showing.
+		const showLayer = (project: boolean) => {
+			morph.classList.toggle('show-project', project);
+			(project ? projectLayer : sentenceLayer).append(cta);
+		};
 
 		let index = 0;
 		let run = 0;
@@ -601,6 +675,34 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 			slot.classList.remove('is-selected', 'is-typing');
 			morph.classList.remove('is-typing-back');
 		};
+
+		// Writes text out in one eased stroke, a frame at a time, across as many
+		// text nodes as it spans. A part with a `ghost` keeps the unwritten rest
+		// there, invisible, so its lines are laid out once and never rewrap.
+		// Resolves false if a newer sequence took over.
+		type Part = { node: Text; full: string; ghost?: Text };
+
+		const draw = (parts: Part[], duration: number, current: number) =>
+			new Promise<boolean>((resolve) => {
+				const total = parts.reduce((sum, part) => sum + part.full.length, 0);
+				const start = performance.now();
+				const frame = (now: number) => {
+					if (current !== run) return resolve(false);
+					const t = Math.min(1, (now - start) / duration);
+					let left = Math.round(easeOut(t) * total);
+					for (const { node, full, ghost } of parts) {
+						const count = Math.min(left, full.length);
+						if (node.data.length !== count) {
+							node.data = full.slice(0, count);
+							if (ghost) ghost.data = full.slice(count);
+						}
+						left -= count;
+					}
+					if (t < 1) requestAnimationFrame(frame);
+					else resolve(true);
+				};
+				requestAnimationFrame(frame);
+			});
 
 		const retypeRole = async (word: string) => {
 			const current = ++run;
@@ -621,74 +723,111 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 			slot.classList.remove('is-typing');
 		};
 
+		// The role's clock. It is stopped while a project shows and restarted
+		// once the sentence is fully back, so a role change never lands on top
+		// of the redraw.
+		let roleTimer = 0;
+
+		const scheduleRole = () => {
+			clearTimeout(roleTimer);
+			roleTimer = window.setTimeout(nextRole, INTERVAL);
+		};
+
+		const nextRole = () => {
+			if (shown) return;
+			if (!document.hidden) {
+				index = (index + 1) % roles.length;
+				retypeRole(roles[index]);
+			}
+			scheduleRole();
+		};
+
 		const showProject = async (title: string) => {
 			const current = ++run;
 			const fromName = morph.classList.contains('show-project');
+			const text = descriptions[title] ?? '';
+			clearTimeout(roleTimer);
 			shown = title;
 			restore();
-			morph.classList.remove('show-description', 'is-typing');
+			morph.classList.remove('is-naming', 'is-describing');
 
 			if (reduce) {
 				nameText.textContent = title;
-				description.textContent = descriptions[title] ?? '';
-				morph.classList.add('show-project', 'show-description');
+				descriptionText.textContent = text;
+				nameGhost.textContent = '';
+				descriptionGhost.textContent = '';
+				showLayer(true);
 				return;
 			}
 
-			// Select what is on screen: the sentence, or the last project's name.
+			// Select what is on screen: the sentence, or the last project.
 			morph.classList.add('is-selected');
 			await wait(fromName ? 260 : 380);
 			if (current !== run) return;
 			morph.classList.remove('is-selected');
-			nameText.textContent = '';
-			description.textContent = descriptions[title] ?? '';
-			morph.classList.add('show-project', 'is-typing');
-			for (const ch of title) {
-				await wait(40 + Math.random() * 50);
-				if (current !== run) return;
-				nameText.textContent += ch;
-			}
-			morph.classList.remove('is-typing');
-			morph.classList.add('show-description');
+
+			// Two carets, one per line, writing at the same time. Each line starts
+			// out whole but invisible, and is revealed rather than grown.
+			const lines = [
+				{ text: nameText, rest: nameGhost, full: title, timing: NAME, state: 'is-naming' },
+				{
+					text: descriptionText,
+					rest: descriptionGhost,
+					full: text,
+					timing: DESCRIBE,
+					state: 'is-describing',
+				},
+			].map((entry) => {
+				const ghost = document.createTextNode(entry.full);
+				const part: Part = { node: document.createTextNode(''), full: entry.full, ghost };
+				entry.text.replaceChildren(part.node);
+				entry.rest.replaceChildren(ghost);
+				return { ...entry, part };
+			});
+			morph.classList.add('is-naming', 'is-describing');
+			showLayer(true);
+
+			await Promise.all(
+				lines.map(({ part, timing, state }) =>
+					draw([part], durationFor(part.full, timing), current).then((done) => {
+						if (done) morph.classList.remove(state);
+					}),
+				),
+			);
 		};
 
 		const hideProject = async () => {
 			const current = ++run;
 			shown = null;
-			morph.classList.remove('show-description', 'is-typing');
+			// The sentence always comes back on the default role.
+			index = 0;
+			morph.classList.remove('is-naming', 'is-describing');
 
 			if (reduce || !morph.classList.contains('show-project')) {
 				restore();
-				morph.classList.remove('show-project', 'is-selected');
+				morph.classList.remove('is-selected');
+				showLayer(false);
+				scheduleRole();
 				return;
 			}
 
 			morph.classList.add('is-selected');
 			await wait(260);
 			if (current !== run) return;
-			morph.classList.remove('is-selected', 'show-project');
+			morph.classList.remove('is-selected');
+			showLayer(false);
 
-			// Type the sentence back, role included, two characters a tick.
+			// Draw the sentence back, role included, in one eased stroke.
 			restore();
 			const nodes = textNodes(ink).map((node) => ({ node, full: node.data }));
 			for (const { node } of nodes) node.data = '';
 			morph.classList.add('is-typing-back');
-			for (const { node, full } of nodes) {
-				for (let i = 0; i < full.length; i += 2) {
-					await wait(14);
-					if (current !== run) return;
-					node.data = full.slice(0, i + 2);
-				}
-			}
+			if (!(await draw(nodes, REDRAW, current))) return;
 			morph.classList.remove('is-typing-back');
+			scheduleRole();
 		};
 
-		setInterval(() => {
-			if (document.hidden || shown) return;
-			if (morph.matches('.show-project, .is-selected, .is-typing-back')) return;
-			index = (index + 1) % roles.length;
-			retypeRole(roles[index]);
-		}, INTERVAL);
+		scheduleRole();
 
 		// A short grace before typing the sentence back, so sliding from one card
 		// to the next goes straight from name to name.
