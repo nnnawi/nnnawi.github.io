@@ -2,33 +2,64 @@
 import Cascade from '../shared/cascade/Cascade.astro';
 import Nav from '../shared/nav/Nav.astro';
 
-// The clips that drift through the cascade behind the headline.
+// The clips that drift through the cascade behind the headline. Hovering one
+// retypes the headline into its title, with the description beneath.
 const projects = [
-	{ title: 'MorphoX', video: '/project_animation/MorphoX_animation.mp4', href: '/morphox' },
+	{
+		title: 'MorphoX',
+		description: 'A GPU-accelerated computer vision sandbox.',
+		video: '/project_animation/MorphoX_animation.mp4',
+		href: '/morphox',
+	},
 	{
 		title: 'Vectorfield Pathfinding',
+		description: 'An interactive deep dive into crowd navigation by flow field.',
 		video: '/project_animation/VFP_animation.mp4',
 		href: '/vectorfield-pathfinding',
 	},
 	{
 		title: 'Dither Plugin',
+		description: 'A professional-grade dithering plugin for After Effects.',
 		video: '/project_animation/DitherPlugin5_animation.mp4',
 		href: '/dither-plugin',
 	},
 	{
 		title: 'Privacy Plugin',
+		description: 'Automatic PII anonymisation inside Premiere Pro.',
 		video: '/project_animation/PPlugin3_animation.mp4',
 		href: '/privacy-plugin',
 	},
-	{ title: 'YOLO on NPU', video: '/project_animation/NPU2_animation.mp4', href: '/yolo-npu' },
-	{ title: 'Bowde', video: '/project_animation/BOWDE_animation.mp4', href: '/bowde' },
+	{
+		title: 'YOLO on NPU',
+		description: 'Compressing a detector to run on embedded hardware.',
+		video: '/project_animation/NPU2_animation.mp4',
+		href: '/yolo-npu',
+	},
+	{
+		title: 'Bowde',
+		description: 'An interactive control-theory plotter.',
+		video: '/project_animation/BOWDE_animation.mp4',
+		href: '/bowde',
+	},
 	{
 		title: 'Image2Complex',
+		description: 'A visualizer for complex functions through images.',
 		video: '/project_animation/Image2Complex_animation.mp4',
 		href: 'https://nnnawi.github.io/Image2complex/',
 	},
-	{ title: 'SirAMP', video: '/project_animation/SIRAMP_animation.mp4', href: undefined },
+	{
+		title: 'SirAMP',
+		description: 'A handcrafted portable bass amp.',
+		video: '/project_animation/SIRAMP_animation.mp4',
+		href: undefined,
+	},
 ];
+
+const descriptions = Object.fromEntries(projects.map((project) => [project.title, project.description]));
+
+// The role in the headline, retyped in turn.
+const roles = ['creative', 'computer vision', 'software'];
+const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 ---
 
 <html lang="en">
@@ -46,7 +77,7 @@ const projects = [
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Instrument+Serif:ital@0;1&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
 		/>
 		<title>Iwan — Creative engineer</title>
 	</head>
@@ -56,20 +87,48 @@ const projects = [
 		<main class="stage">
 			<Cascade items={projects} />
 
-			<!-- No wordmark: a sentence carries the page, with the serif picking out
-			     the two halves of the story. -->
+			<!-- No wordmark: a sentence carries the page. The role in it is retyped
+			     every few seconds, the words part around the cursor, and hovering a
+			     card retypes the whole line into that project. -->
 			<div class="hero">
 				<div class="hero__body">
-					<p class="hero__kicker">
-						<span class="hero__name">Iwan Ibnoulouafi</span>
-						<span>Creative engineer, Paris</span>
-					</p>
-					<h1 class="hero__line">
-						Engineer by training, <em>editor</em> by trade — I build the <em>tools</em> I wished
-						I&nbsp;had.
-					</h1>
+					<div class="hero__morph" data-morph={JSON.stringify(descriptions)}>
+						<!-- Holds the block at the sentence's tallest, so nothing below
+						     it moves while the layers are retyped. -->
+						<p class="hero__sizer" aria-hidden="true">
+							I’m Iwan, a&nbsp;<span class="retype">{longestRole}</span> engineer building the tools
+							I&nbsp;wish I&nbsp;had.
+						</p>
+
+						<h1 class="hero__line">
+							<span class="sr-only">
+								I’m Iwan, a creative, computer vision and software engineer building the tools I
+								wish I had.
+							</span>
+							<span class="hero__visual" aria-hidden="true" data-repel>
+								<span class="hero__ink">
+									I’m Iwan, a&nbsp;<span class="retype" data-retype={JSON.stringify(roles)}
+										><span class="retype__text">{roles[0]}</span><span class="retype__caret" /></span
+									>
+									engineer building the tools I&nbsp;wish I&nbsp;had.<span
+										class="hero__caret hero__caret--line"></span>
+								</span>
+							</span>
+						</h1>
+
+						<!-- The cards already name their project for assistive tech. -->
+						<div class="hero__project" aria-hidden="true">
+							<p class="hero__project-name">
+								<span class="hero__project-name-text"></span><span
+									class="hero__caret hero__caret--name"></span>
+							</p>
+							<p class="hero__project-description"></p>
+						</div>
+					</div>
+
 					<a class="hero__cta" href="/projects">
-						See the work <span class="hero__arrow" aria-hidden="true">→</span>
+						<span class="hero__cta-label">See what I’ve built</span>
+						<span class="hero__arrow" aria-hidden="true">→</span>
 					</a>
 				</div>
 			</div>
@@ -87,9 +146,7 @@ const projects = [
 
 	:global(body) {
 		--ink: #f2f3f5;
-		--faint: rgba(242, 243, 245, 0.38);
-		--rule: rgba(242, 243, 245, 0.18);
-		--serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+		--muted: rgba(242, 243, 245, 0.5);
 
 		margin: 0;
 		background: #000;
@@ -126,27 +183,13 @@ const projects = [
 		max-inline-size: min(44vw, 46rem);
 	}
 
-	.hero__kicker {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.35rem 1rem;
-		align-items: baseline;
-		margin: 0;
-		color: var(--faint);
-		font-size: 0.82rem;
-		letter-spacing: 0.02em;
-	}
+	/* --- Headline and project layers -------------------------------------- */
 
-	/* The signature: well above the small print, well below the headline. */
-	.hero__name {
-		color: var(--ink);
-		font-size: clamp(1.15rem, 1.65vw, 1.7rem);
-		font-weight: 500;
-		letter-spacing: -0.02em;
-	}
-
-	.hero__line {
-		margin: 0;
+	/* The sentence and the project share one cell; the sizer sets its height.
+	   The sentence is dimmed so the role carries it. */
+	.hero__morph {
+		display: grid;
+		color: var(--muted);
 		font-size: clamp(2rem, 4.1vw, 4.8rem);
 		font-weight: 400;
 		line-height: 1.02;
@@ -154,29 +197,172 @@ const projects = [
 		text-wrap: balance;
 	}
 
-	.hero__line em {
-		font-family: var(--serif);
-		font-size: 1.1em;
-		font-style: italic;
-		font-weight: 400;
-		letter-spacing: -0.01em;
+	.hero__morph > * {
+		grid-area: 1 / 1;
+		align-self: start;
+		margin: 0;
 	}
 
+	.hero__sizer {
+		visibility: hidden;
+	}
+
+	.hero__line {
+		font: inherit;
+	}
+
+	/* The offset parent for the word positions the repel script reads. */
+	.hero__visual {
+		display: block;
+		position: relative;
+	}
+
+	/* Words are wrapped by the script at runtime, hence :global. Each needs a
+	   box of its own to be pushed. */
+	.hero__visual :global(.w),
+	.retype {
+		display: inline-block;
+		white-space: nowrap;
+	}
+
+	.retype,
+	.hero__project-name {
+		color: var(--ink);
+		font-weight: 600;
+	}
+
+	.hero__project,
+	.hero__morph.show-project .hero__line {
+		visibility: hidden;
+	}
+
+	.hero__morph.show-project .hero__project {
+		visibility: visible;
+	}
+
+	.hero__project-name {
+		margin: 0;
+	}
+
+	.hero__project-description {
+		max-inline-size: 26em;
+		margin: 0.9rem 0 0;
+		color: var(--muted);
+		font-size: clamp(1rem, 1.3vw, 1.3rem);
+		line-height: 1.4;
+		letter-spacing: -0.015em;
+		text-wrap: pretty;
+		opacity: 0;
+		translate: 0 0.4em;
+		transition:
+			opacity 360ms ease,
+			translate 480ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.hero__morph.show-description .hero__project-description {
+		opacity: 1;
+		translate: 0 0;
+	}
+
+	/* --- Retype ----------------------------------------------------------- */
+
+	/* The role alone is selected when it changes; the whole line, or the
+	   project's name, when a card is hovered. */
+	.retype.is-selected .retype__text,
+	.hero__morph.is-selected .hero__ink,
+	.hero__morph.is-selected .hero__project-name-text {
+		-webkit-box-decoration-break: clone;
+		box-decoration-break: clone;
+		background: var(--ink);
+		color: #000;
+	}
+
+	.hero__morph.is-selected .retype {
+		color: #000;
+	}
+
+	.retype__caret,
+	.hero__caret {
+		display: inline-block;
+		inline-size: max(2px, 0.05em);
+		block-size: 0.9em;
+		margin-inline-start: 0.05em;
+		vertical-align: -0.1em;
+		background: var(--ink);
+		animation: blink 1s steps(1) infinite;
+	}
+
+	/* Solid while typing, hidden while selected. */
+	.retype.is-typing .retype__caret,
+	.hero__morph.is-typing .hero__caret,
+	.hero__morph.is-typing-back .hero__caret {
+		animation: none;
+	}
+
+	.retype.is-selected .retype__caret,
+	.hero__morph.is-selected .hero__caret,
+	.hero__morph.is-selected .retype__caret {
+		visibility: hidden;
+	}
+
+	/* One caret on screen at a time: the role's at rest, the line's end while
+	   the sentence is typed back, the name's while a project shows. */
+	.hero__caret,
+	.hero__morph.is-typing-back .retype__caret {
+		display: none;
+	}
+
+	.hero__morph.show-project .hero__caret--name,
+	.hero__morph.is-typing-back .hero__caret--line {
+		display: inline-block;
+	}
+
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+
+	.sr-only {
+		position: absolute;
+		inline-size: 1px;
+		block-size: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	/* --- CTA -------------------------------------------------------------- */
+
+	/* Reads as the sentence carrying on: the headline's face and grey at a
+	   smaller size. On hover it brightens and an underline draws in. */
 	.hero__cta {
 		display: inline-flex;
-		gap: 0.5rem;
-		align-items: center;
-		padding-block-end: 0.3rem;
-		border-block-end: 1px solid var(--rule);
-		color: var(--ink);
-		font-size: 0.9rem;
+		gap: 0.4em;
+		align-items: baseline;
+		color: var(--muted);
+		font-size: clamp(1.2rem, 1.9vw, 2.1rem);
+		font-weight: 400;
+		letter-spacing: -0.035em;
 		text-decoration: none;
 		pointer-events: auto;
-		transition: border-color 200ms ease;
+		transition: color 240ms ease;
 	}
 
-	.hero__cta:hover {
-		border-color: var(--ink);
+	.hero__cta:hover,
+	.hero__cta:focus-visible {
+		color: var(--ink);
+	}
+
+	.hero__cta-label {
+		padding-block-end: 0.08em;
+		background: linear-gradient(var(--ink), var(--ink)) no-repeat left bottom / 0% 1px;
+		transition: background-size 420ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.hero__cta:hover .hero__cta-label,
+	.hero__cta:focus-visible .hero__cta-label {
+		background-size: 100% 1px;
 	}
 
 	.hero__cta:focus-visible {
@@ -185,11 +371,12 @@ const projects = [
 	}
 
 	.hero__arrow {
-		transition: translate 200ms ease;
+		transition: translate 240ms cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
-	.hero__cta:hover .hero__arrow {
-		translate: 0.25rem 0;
+	.hero__cta:hover .hero__arrow,
+	.hero__cta:focus-visible .hero__arrow {
+		translate: 0.25em 0;
 	}
 
 	@media (max-width: 900px) {
@@ -223,19 +410,300 @@ const projects = [
 			max-inline-size: 36rem;
 		}
 
-		.hero__kicker {
-			justify-content: center;
+		.hero__morph {
+			font-size: clamp(1.9rem, 8vw, 3.4rem);
 		}
 
-		.hero__line {
-			font-size: clamp(1.9rem, 8vw, 3.4rem);
+		.hero__project-description {
+			margin-inline: auto;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.hero__cta,
-		.hero__arrow {
+		.hero__cta-label,
+		.hero__arrow,
+		.hero__project-description {
 			transition: none;
+		}
+
+		.retype__caret,
+		.hero__caret {
+			animation: none;
 		}
 	}
 </style>
+
+<script>
+	const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+	const line = document.querySelector<HTMLElement>('[data-repel]');
+	const ink = line?.querySelector<HTMLElement>('.hero__ink');
+
+	const textNodes = (root: Node) => {
+		const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+		const nodes: Text[] = [];
+		while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+		return nodes;
+	};
+
+	// The source's line breaks and tabs become single spaces (no-break spaces are
+	// kept), so the sentence can be typed back character by character.
+	if (ink) {
+		const nodes = textNodes(ink);
+		for (const node of nodes) node.data = node.data.replace(/[ \t\n\r]+/g, ' ');
+		nodes[0].data = nodes[0].data.trimStart();
+		nodes.at(-1)!.data = nodes.at(-1)!.data.trimEnd();
+	}
+
+	/* ------------------------------------------------------------------ repel */
+
+	// Words part around the cursor and spring back once it has gone. Each word is
+	// pushed as a whole, over a wide reach and a short distance, so the sentence
+	// stays readable while it moves. The role moves as one block with them.
+	const canRepel =
+		window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduce;
+
+	if (line && ink && canRepel) {
+		// Wrap each word of the sentence's own text in a span. The role is an
+		// element, not text, so it is left as it is.
+		for (const node of [...ink.childNodes]) {
+			if (node.nodeType !== Node.TEXT_NODE) continue;
+			const fragment = document.createDocumentFragment();
+			for (const part of (node.textContent ?? '').split(/(\s+)/)) {
+				if (!part) continue;
+				if (/^\s+$/.test(part)) {
+					fragment.append(part);
+					continue;
+				}
+				const word = document.createElement('span');
+				word.className = 'w';
+				word.textContent = part;
+				fragment.append(word);
+			}
+			node.replaceWith(fragment);
+		}
+
+		const targets = [...line.querySelectorAll<HTMLElement>('.w, [data-retype]')];
+		const state = targets.map(() => ({ amount: 0, velocity: 0, dx: 0, dy: -1 }));
+
+		const REACH = 2.4; // em of the headline, from the cursor to where the push dies
+		const SHOVE = 0.22; // em a word travels at full push
+		const TILT = 3; // deg at full push
+		const STIFFNESS = 0.1;
+		const DAMPING = 0.8;
+
+		let pointer: { x: number; y: number } | null = null;
+		let frame = 0;
+
+		const step = () => {
+			const reach = REACH * parseFloat(getComputedStyle(line).fontSize);
+			const box = line.getBoundingClientRect();
+			// offsetLeft/Top ignore transforms, so these are the resting positions.
+			const centres = targets.map((t) => [
+				t.offsetLeft + t.offsetWidth / 2,
+				t.offsetTop + t.offsetHeight / 2,
+			]);
+			let moving = false;
+
+			targets.forEach((target, i) => {
+				const s = state[i];
+				let goal = 0;
+
+				if (pointer) {
+					const dx = centres[i][0] - (pointer.x - box.left);
+					const dy = centres[i][1] - (pointer.y - box.top);
+					const distance = Math.hypot(dx, dy) || 1;
+					const t = Math.max(0, 1 - distance / reach);
+					goal = t * t * (3 - 2 * t);
+					if (goal > 0.01) {
+						s.dx = dx / distance;
+						s.dy = dy / distance;
+					}
+				}
+
+				s.velocity = (s.velocity + (goal - s.amount) * STIFFNESS) * DAMPING;
+				s.amount += s.velocity;
+				if (Math.abs(s.velocity) > 0.0005 || Math.abs(goal - s.amount) > 0.001) moving = true;
+
+				const amount = Math.max(0, s.amount);
+				const push = amount * SHOVE;
+				target.style.transform =
+					amount < 0.001
+						? ''
+						: `translate(${(s.dx * push).toFixed(3)}em, ${(s.dy * push).toFixed(3)}em) rotate(${(s.dx * amount * TILT).toFixed(2)}deg)`;
+			});
+
+			// Idle once every word is home, so nothing runs over a still line.
+			frame = moving ? requestAnimationFrame(step) : 0;
+		};
+
+		const wake = () => {
+			if (!frame) frame = requestAnimationFrame(step);
+		};
+
+		// The hero ignores the pointer so the cascade under it stays clickable,
+		// so the cursor is followed on the window instead.
+		window.addEventListener(
+			'pointermove',
+			(event) => {
+				if (event.pointerType !== 'mouse') return;
+				pointer = { x: event.clientX, y: event.clientY };
+				wake();
+			},
+			{ passive: true },
+		);
+
+		const release = () => {
+			pointer = null;
+			wake();
+		};
+
+		document.addEventListener('pointerleave', release);
+		window.addEventListener('blur', release);
+	}
+
+	/* ----------------------------------------------------------------- retype */
+
+	// Two things retype the headline, and never at once:
+	// - every few seconds the role is selected and the next one typed over it;
+	// - hovering a card selects the whole line and types the project's name in
+	//   its place, its description fading in beneath. Leaving selects the name
+	//   and types the sentence back.
+	// Each sequence takes a number from `run`; a newer one makes an older one
+	// stop at its next step. Reduced motion swaps the text outright.
+	const INTERVAL = 3000;
+	const morph = document.querySelector<HTMLElement>('[data-morph]');
+	const slot = document.querySelector<HTMLElement>('[data-retype]');
+
+	if (morph && slot && ink) {
+		const roles: string[] = JSON.parse(slot.dataset.retype ?? '[]');
+		const descriptions: Record<string, string> = JSON.parse(morph.dataset.morph ?? '{}');
+		const roleText = slot.querySelector<HTMLElement>('.retype__text')!;
+		const nameText = morph.querySelector<HTMLElement>('.hero__project-name-text')!;
+		const description = morph.querySelector<HTMLElement>('.hero__project-description')!;
+
+		let index = 0;
+		let run = 0;
+		// The project the hero is showing or heading to; null for the sentence.
+		let shown: string | null = null;
+
+		// The sentence's own text outside the role, as it reads at rest. The role
+		// is rewritten wholesale, so it is restored from `roles` instead.
+		const sentence = textNodes(ink)
+			.filter((node) => !roleText.contains(node))
+			.map((node) => ({ node, full: node.data }));
+
+		const restore = () => {
+			roleText.textContent = roles[index];
+			for (const { node, full } of sentence) node.data = full;
+			slot.classList.remove('is-selected', 'is-typing');
+			morph.classList.remove('is-typing-back');
+		};
+
+		const retypeRole = async (word: string) => {
+			const current = ++run;
+			if (reduce) {
+				roleText.textContent = word;
+				return;
+			}
+			slot.classList.add('is-selected');
+			await wait(480);
+			if (current !== run) return;
+			slot.classList.replace('is-selected', 'is-typing');
+			roleText.textContent = '';
+			for (const ch of word) {
+				await wait(45 + Math.random() * 55);
+				if (current !== run) return;
+				roleText.textContent += ch;
+			}
+			slot.classList.remove('is-typing');
+		};
+
+		const showProject = async (title: string) => {
+			const current = ++run;
+			const fromName = morph.classList.contains('show-project');
+			shown = title;
+			restore();
+			morph.classList.remove('show-description', 'is-typing');
+
+			if (reduce) {
+				nameText.textContent = title;
+				description.textContent = descriptions[title] ?? '';
+				morph.classList.add('show-project', 'show-description');
+				return;
+			}
+
+			// Select what is on screen: the sentence, or the last project's name.
+			morph.classList.add('is-selected');
+			await wait(fromName ? 260 : 380);
+			if (current !== run) return;
+			morph.classList.remove('is-selected');
+			nameText.textContent = '';
+			description.textContent = descriptions[title] ?? '';
+			morph.classList.add('show-project', 'is-typing');
+			for (const ch of title) {
+				await wait(40 + Math.random() * 50);
+				if (current !== run) return;
+				nameText.textContent += ch;
+			}
+			morph.classList.remove('is-typing');
+			morph.classList.add('show-description');
+		};
+
+		const hideProject = async () => {
+			const current = ++run;
+			shown = null;
+			morph.classList.remove('show-description', 'is-typing');
+
+			if (reduce || !morph.classList.contains('show-project')) {
+				restore();
+				morph.classList.remove('show-project', 'is-selected');
+				return;
+			}
+
+			morph.classList.add('is-selected');
+			await wait(260);
+			if (current !== run) return;
+			morph.classList.remove('is-selected', 'show-project');
+
+			// Type the sentence back, role included, two characters a tick.
+			restore();
+			const nodes = textNodes(ink).map((node) => ({ node, full: node.data }));
+			for (const { node } of nodes) node.data = '';
+			morph.classList.add('is-typing-back');
+			for (const { node, full } of nodes) {
+				for (let i = 0; i < full.length; i += 2) {
+					await wait(14);
+					if (current !== run) return;
+					node.data = full.slice(0, i + 2);
+				}
+			}
+			morph.classList.remove('is-typing-back');
+		};
+
+		setInterval(() => {
+			if (document.hidden || shown) return;
+			if (morph.matches('.show-project, .is-selected, .is-typing-back')) return;
+			index = (index + 1) % roles.length;
+			retypeRole(roles[index]);
+		}, INTERVAL);
+
+		// A short grace before typing the sentence back, so sliding from one card
+		// to the next goes straight from name to name.
+		let leaveTimer = 0;
+
+		document.addEventListener('cascade:project', (event) => {
+			const title = (event as CustomEvent<string | null>).detail;
+			clearTimeout(leaveTimer);
+			if (title) {
+				if (title !== shown) showProject(title);
+			} else {
+				leaveTimer = window.setTimeout(() => {
+					if (shown) hideProject();
+				}, 150);
+			}
+		});
+	}
+</script>

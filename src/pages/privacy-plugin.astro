@@ -36,9 +36,9 @@ const project = {
 			label: 'Approach',
 			title: 'One fine-tuned detector, an OCR pass, and a click for the rest',
 			body: [
-				'Premiere\u2019s extension runtime cannot host PyTorch, so the plugin is split in two: a UXP panel that is pure interface, and a local Python sidecar that runs every model. The panel hands over clip paths and in/out points, the sidecar reads the source media straight from disk.',
-				'Detection is graded. Most of the classes come from a single YOLO model, fine-tuned on a dataset built for exactly the things the plugin covers — faces, house numbers, laptop screens, phone screens, and so on. Text is the exception, because it is a different problem: it goes through an OCR pass, filtered by regex and NER so addresses and card numbers are hidden while the rest of the signs in the shot are left alone. Anything outside both is clicked once and tracked from there by EdgeTAM, which is the expensive path and therefore the one you have to ask for.',
-				'None of it runs on every frame. The input is downscaled first, the detectors fire every second or third frame, and ByteTrack carries the boxes across every frame in between. It is tuned to over-cover: a missed face is a privacy failure, an extra covered frame is a cosmetic one.',
+				'Premiere\u2019s UXP runtime cannot host PyTorch, so the plugin uses a UXP panel for the interface and a local Python sidecar for inference. The panel passes clip paths and in/out points; the sidecar reads the media directly from disk.',
+				'Detection is split by task. A fine-tuned YOLO model handles most classes, including faces, house numbers, and screens. Text goes through OCR, then regex and NER filtering to selectively mask sensitive information. Arbitrary objects can be selected once and tracked with EdgeTAM.',
+				'To keep processing practical, frames are downscaled and detection runs every 2\u20133 frames, with ByteTrack propagating detections in between. The system is deliberately tuned for over-coverage: false positives are cosmetic; missed sensitive content is a privacy failure.',
 			],
 		},
 	],
@@ -136,19 +136,6 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 					}
 
 					{
-						project.repo?.contact && (
-							<a
-								class="repo__request"
-								href={`mailto:${project.repo.contact}?subject=${encodeURIComponent(
-									`${project.title} — source access`
-								)}`}
-							>
-								Request access
-							</a>
-						)
-					}
-
-					{
 						project.status && (
 							<span class="repo__badge repo__badge--status">
 								<span class="repo__dot" aria-hidden="true" />
@@ -184,15 +171,6 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 					data-project-video></video>
 			</figure>
 
-			{
-				project.status && (
-					<p class="notice">
-						This project is still being built. The pipeline below is the design it is being built
-						against, and the parts of it that run today are not yet a plugin you could install.
-					</p>
-				)
-			}
-
 			<div class="prose">
 				{
 					project.sections.map((section) => (
@@ -208,30 +186,6 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 					))
 				}
 			</div>
-
-			{
-				project.classes.length > 0 && (
-					<section class="classes" aria-label="Privacy classes">
-						<p class="classes__label">What it covers</p>
-						<ol class="classes__list">
-							{project.classes.map((item, index) => (
-								<li class="classes__item">
-									<span class="classes__node" aria-hidden="true" />
-									<div class="classes__text">
-										<span class="classes__name">
-											{item.name}
-											<span class="classes__tick" aria-hidden="true">
-												{pad(index)}
-											</span>
-										</span>
-										<span class="classes__detail">{item.detail}</span>
-									</div>
-								</li>
-							))}
-						</ol>
-					</section>
-				)
-			}
 
 			<section class="flow" aria-label="Pipeline">
 				<p class="flow__label">Pipeline</p>

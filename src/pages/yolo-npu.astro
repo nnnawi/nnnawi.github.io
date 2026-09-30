@@ -5,12 +5,12 @@
 // ---------------------------------------------------------------------------
 const project = {
 	title: 'YOLO on NPU',
-	tagline: 'Compressing a YOLOv5 detector until it fits the power and memory budget of an embedded NPU, then getting it to actually run there — three times smaller, five times faster, for 2.8 points of mAP.',
+	tagline: 'Compressing a YOLOv5 detector until it fits the power and memory budget of an embedded NPU, then getting it to actually run there.',
 	meta: [
 		{ label: 'Discipline', value: 'Model compression · Edge inference' },
-		{ label: 'Stack', value: 'PyTorch, ONNX, TensorFlow Lite, NXP i.MX 8M Plus' },
-		{ label: 'Year', value: 'YEAR_PLACEHOLDER' },
-		{ label: 'Role', value: 'Final-year project · mandated by MBDA' },
+		{ label: 'Stack', value: 'PyTorch, TensorFlow Lite, NXP eIQ, Yocto, Phytec i.MX 8M Plus' },
+		{ label: 'Year', value: '2024' },
+		{ label: 'Role', value: 'Final-year project, two-person team · mandated by MBDA' },
 	],
 	hero: '/project_animation/NPU_animation.mp4',
 	// Repository. `private: true` swaps the link for a locked badge plus an access
@@ -28,36 +28,37 @@ const project = {
 			label: 'Overview',
 			title: 'A detector that has to run on the device, not in the datacentre',
 			body: [
-				'This was my final project at Télécom SudParis, in the HTI specialisation — Haute Technologie pour l’Imagerie — and it was mandated by MBDA, a French defence contractor. The brief was an object detector for military imagery that runs on embedded hardware rather than a server: a neural processing unit sitting inside a device with a fixed power draw and a fixed amount of memory.',
-				'That constraint is what makes the problem interesting. A detector is easy to make accurate and easy to make fast, but rarely both at once, and the specification was written across all three axes at the same time: latency, mAP score, and a model small enough to fit the target. Every technique we applied had to be paid for somewhere, so the real work was finding out where each one took its payment.',
-				'The project split cleanly in two. First, benchmarking and compressing the model on a workstation, where the numbers are comparable and the iteration is fast. Then deploying the compressed model to the NPU, where nothing is comparable and every iteration costs a reflash.',
+				'This was my final-year project at Télécom SudParis, in the HTI specialisation, which I did with Ahmed El Habib Izi for MBDA. The goal was to take a YOLOv5 object detector and run it on the NPU of a Phytec i.MX 8M Plus board, without going over the board’s power and memory budget.',
+				'On paper, YOLO is a good fit for an NPU: it is mostly convolutions, batch normalisation and max-pooling, which is exactly what the accelerator is built for. In practice the NPU only runs INT8 operations, and the spec set targets for latency, accuracy and model size all at once. Every optimisation helped one of those and cost us on another.',
+				'We split the work into five steps: benchmark a baseline on CPU, compress it, check what the compression cost, deploy it to the NPU, and compare the NPU against the CPU. Along with the model, we delivered our own pipeline tooling and enough documentation for someone else to reproduce the whole thing.',
 			],
 		},
 		{
 			label: 'Compression',
 			title: 'Pruning and quantisation, measured one at a time',
 			body: [
-				'The baseline was a YOLOv5 model trained and evaluated on COCO, with mAP50-95 on val2017 as the reference metric. From there we worked through the compression techniques methodically rather than stacking them blindly: structured pruning against unstructured pruning, then the family of post-training quantisation schemes, each one benchmarked on its own for parameter count, FLOPs, accuracy and inference time before being combined with anything else.',
-				'The distinction that mattered most was structured against unstructured pruning. Unstructured pruning zeroes individual weights and produces a sparse model that looks much smaller on paper but runs at exactly the same speed on hardware with no sparsity support — which is most hardware, and certainly this NPU. Structured pruning removes whole channels and filters, so the tensor shapes genuinely shrink and the speedup is real. That is the one we built the final pipeline around.',
-				'The pipeline ran from PyTorch through ONNX, where the structured pruning and the graph-level optimisations were applied, then to INT8 quantisation and finally to TensorFlow Lite — the format the NPU runtime expects. End to end it cut parameters and FLOPs by a factor of three, and the whole chain cost 2.8 points of mAP50-95.',
+				'We started from YOLOv5s, the smallest model in the family, pretrained on COCO 2017. It is quick to iterate on and light enough for embedded work. Before changing anything, we benchmarked it on CPU in both PyTorch and TensorFlow Lite so we had a fixed reference for every later result.',
+				'For pruning we used structured pruning in PyTorch, which removes whole channels and filters so the tensors actually get smaller. Unstructured pruning only zeroes out individual weights, and that does nothing for speed on hardware without sparsity support, which includes this NPU. We swept the pruning ratio from 20% to 40%. Accuracy held up until 30% and then dropped off quickly, so we stopped there.',
+				'For quantisation we compared post-training quantisation, static quantisation and quantisation-aware training, and went with static quantisation in TensorFlow Lite. It calibrates activation ranges on a sample of real data and then converts weights and activations from float32 to INT8, the only format the NPU runs. Together, pruning and quantisation cut parameters and FLOPs by 3× for a loss of 2.8 points of mAP50-95.',
 			],
 		},
 		{
 			label: 'Deployment',
 			title: 'The part where the hardware stops cooperating',
 			body: [
-				'The target was the NPU on an NXP i.MX 8M Plus, running Linux. Most of the difficulty here had nothing to do with machine learning. The board runs a specific kernel and a specific NPU driver stack, and the model, the runtime and the kernel all have to agree on versions before anything executes on the accelerator at all — otherwise inference silently falls back to the CPU and the entire point of the exercise disappears.',
-				'The second problem was the output tensors. Once the model is quantised and exported, the detection head no longer hands back clean bounding boxes and confidence scores: it hands back quantised tensors that have to be dequantised and decoded correctly on the other side. Getting boxes that land on the right objects with the right confidence values took considerably longer than it should have.',
-				'With it running on the accelerator, we measured throughput, power draw and memory footprint on the device itself. Inference went from 25 to 140 FPS — a 5.6× speedup — while staying inside the platform’s power and memory budget, which was the requirement the whole project was written against.',
+				'Neither Phytec’s nor NXP’s deployment guides (eIQ, OpenVINO) matched our setup, so we built our own conversion pipeline. The trained PyTorch model is exported to a TensorFlow SavedModel and then converted to an INT8 TensorFlow Lite file.',
+				'On the board, a Yocto-built BSP provides the kernel, the NPU drivers and the TFLite runtime, and NXP’s VX delegate hands the model to the accelerator. If the versions of any of these don’t line up, inference quietly falls back to the CPU and nothing tells you. We used TFLite’s benchmark tool to confirm that the whole graph was really running on the NPU.',
+				'The hardest part was the output. A quantised model doesn’t return bounding boxes, it returns raw INT8 tensors that have to be dequantised and decoded on the host. Our first runs on the NPU produced piles of spurious detections with broken box coordinates, and fixing the decoding took far more of our time than we had planned for.',
+				'Once it was running properly, we measured throughput, power and memory on the device. Throughput went from 25 to 140 FPS, a 5.6× speedup, and the model stayed within the platform’s power and memory budget.',
 			],
 		},
 	],
 	// Headline numbers, rendered as a tile row under the prose.
 	results: [
-		{ value: '3×', label: 'Smaller', detail: 'Fewer parameters and FLOPs than the YOLOv5 baseline.' },
+		{ value: '3×', label: 'Smaller', detail: 'Fewer parameters and FLOPs than the YOLOv5s baseline.' },
 		{ value: '−2.8', label: 'mAP50-95', detail: 'Accuracy cost of the full compression chain, on COCO val2017.' },
 		{ value: '5.6×', label: 'Faster', detail: 'On-device throughput, from 25 to 140 FPS.' },
-		{ value: 'i.MX 8M+', label: 'Target', detail: 'NXP NPU, within its power and memory budget.' },
+		{ value: 'i.MX 8M+', label: 'Target', detail: 'NXP NPU on a Phytec board, within its power and memory budget.' },
 	],
 	// Bento media grid — `span` drives how many of the 4 columns a tile takes.
 	media: [],

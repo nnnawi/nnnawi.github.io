@@ -124,16 +124,7 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 									</svg>
 									Private repository
 								</span>
-								{project.repo.contact && (
-									<a
-										class="repo__request"
-										href={`mailto:${project.repo.contact}?subject=${encodeURIComponent(
-											`${project.title} — source access`
-										)}`}
-									>
-										Request access
-									</a>
-								)}
+					
 							</p>
 						) : (
 							<p class="repo">
@@ -193,30 +184,6 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 					))
 				}
 			</div>
-
-			{
-				project.features.length > 0 && (
-					<section class="features" aria-label="Plugin parameters">
-						<p class="features__label">Specifications</p>
-						<ol class="features__list">
-							{project.features.map((item, index) => (
-								<li class="features__item">
-									<span class="features__node" aria-hidden="true" />
-									<div class="features__text">
-										<span class="features__name">
-											{item.label}
-											<span class="features__tick" aria-hidden="true">
-												{pad(index)}
-											</span>
-										</span>
-										<span class="features__value">{item.value}</span>
-									</div>
-								</li>
-							))}
-						</ol>
-					</section>
-				)
-			}
 
 			{
 				project.media.length > 0 && (

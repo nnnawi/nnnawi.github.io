@@ -1,0 +1,710 @@
+---
+// ---------------------------------------------------------------------------
+// Annex — five candidate treatments for the landing headline, side by side.
+// Every option cycles the same role word in sync, so they can be compared on
+// one clock. Not linked from the nav; delete once a direction is picked.
+// ---------------------------------------------------------------------------
+
+const words = ['creative', 'computer vision', 'software'];
+const interval = 3000;
+
+// Read by screen readers in place of the animated line.
+const spoken = 'I’m Iwan, a creative, computer vision and software engineer building the tools I wish I had.';
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="robots" content="noindex" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Geist+Pixel&family=Inter:wght@100..900&family=Instrument+Serif:ital@0;1&display=swap"
+		/>
+		<title>Title options — Iwan</title>
+	</head>
+	<body>
+		<main class="annex">
+			<header class="wrap intro">
+				<p class="label pixel">Annex</p>
+				<h1 class="intro__title">Landing title — five options</h1>
+				<p class="intro__text">
+					The same sentence set five ways. The role word changes every {interval / 1000} seconds,
+					in sync across all of them.
+				</p>
+				<ol class="ticker" aria-hidden="true">
+					{
+						words.map((word, i) => (
+							<li class:list={['ticker__item', { 'is-active': i === 0 }]}>
+								<span>{word}</span>
+								<span class="ticker__bar" />
+							</li>
+						))
+					}
+				</ol>
+			</header>
+
+			<!-- 01 — closest to the current landing: the serif word rolls up out of a slot. -->
+			<section class="wrap option">
+				<div class="option__meta">
+					<p class="option__num pixel">01</p>
+					<h2 class="option__name">Serif roll</h2>
+					<p class="option__note">
+						Closest to the current landing. The italic serif word slides up out of a clipped slot
+						while the sentence eases to its new width.
+					</p>
+				</div>
+				<div class="option__stage">
+					<p class="sr-only">{spoken}</p>
+					<p class="headline headline--roll" aria-hidden="true">
+						I’m Iwan, a&nbsp;<span class="rot" data-rotator="swap"
+							><span class="rot__word is-current">creative</span></span
+						>
+						engineer building the <em>tools</em> I&nbsp;wish I&nbsp;had.
+					</p>
+				</div>
+			</section>
+
+			<!-- 02 — the word is decoded glyph by glyph in the pixel face. -->
+			<section class="wrap option">
+				<div class="option__meta">
+					<p class="option__num pixel">02</p>
+					<h2 class="option__name">Pixel decode</h2>
+					<p class="option__note">
+						The word scrambles into noise and resolves left to right in Geist Pixel, with a block
+						cursor. Leans into the engineering side.
+					</p>
+				</div>
+				<div class="option__stage">
+					<p class="sr-only">{spoken}</p>
+					<p class="headline headline--decode" aria-hidden="true">
+						I’m Iwan, a&nbsp;<span class="decode" data-rotator="decode"
+							><span class="decode__text">creative</span><span class="decode__cursor" /></span
+						>
+						engineer building the tools I&nbsp;wish I&nbsp;had.
+					</p>
+				</div>
+			</section>
+
+			<!-- 03 — select-all, then retype: the sentence is dimmed so the word leads. -->
+			<section class="wrap option">
+				<div class="option__meta">
+					<p class="option__num pixel">03</p>
+					<h2 class="option__name">Retype</h2>
+					<p class="option__note">
+						The word is highlighted as if selected, then typed over with a caret. The rest of the
+						sentence is dimmed so the word carries it.
+					</p>
+				</div>
+				<div class="option__stage">
+					<p class="sr-only">{spoken}</p>
+					<p class="headline headline--type" aria-hidden="true">
+						I’m Iwan, a&nbsp;<span class="type" data-rotator="type"
+							><span class="type__text">creative</span><span class="type__caret" /></span
+						>
+						engineer building the tools I&nbsp;wish I&nbsp;had.
+					</p>
+				</div>
+			</section>
+
+			<!-- 04 — all-serif editorial line; the word focuses in through an RGB split. -->
+			<section class="wrap option">
+				<div class="option__meta">
+					<p class="option__num pixel">04</p>
+					<h2 class="option__name">Chromatic focus</h2>
+					<p class="option__note">
+						The whole line in Instrument Serif. The word blurs out and focuses back in through the
+						red/cyan split already used on the About rail.
+					</p>
+				</div>
+				<div class="option__stage">
+					<p class="sr-only">{spoken}</p>
+					<p class="headline headline--serif" aria-hidden="true">
+						I’m Iwan, a&nbsp;<span class="rot" data-rotator="swap"
+							><span class="rot__word is-current">creative</span></span
+						>
+						engineer building the <em>tools</em> I&nbsp;wish I&nbsp;had.
+					</p>
+				</div>
+			</section>
+
+			<!-- 05 — the word is "detected": a bounding box tracks it as it resizes. -->
+			<section class="wrap option">
+				<div class="option__meta">
+					<p class="option__num pixel">05</p>
+					<h2 class="option__name">Detection box</h2>
+					<p class="option__note">
+						A computer-vision bounding box around the word, with a class label and confidence
+						score. The box re-locks onto each new word.
+					</p>
+				</div>
+				<div class="option__stage">
+					<p class="sr-only">{spoken}</p>
+					<p class="headline headline--box" aria-hidden="true">
+						I’m Iwan, a&nbsp;<span class="rot rot--box" data-rotator="swap"
+							><span class="rot__tag pixel" data-tag>creative 0.97</span><span
+								class="rot__word is-current">creative</span
+							></span
+						>
+						engineer building the tools I&nbsp;wish I&nbsp;had.
+					</p>
+				</div>
+			</section>
+		</main>
+
+		<script is:inline define:vars={{ words, interval }}>
+			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+			// Stacked words in one grid cell: the old one leaves, the new one enters,
+			// and the slot's width eases between the two. The CSS decides how.
+			function swap(slot, word) {
+				for (const stale of slot.querySelectorAll('.is-leaving')) stale.remove();
+				const current = slot.querySelector('.is-current');
+				const next = document.createElement('span');
+				next.className = 'rot__word is-entering';
+				next.textContent = word;
+				slot.append(next);
+
+				const tag = slot.querySelector('[data-tag]');
+				const label = `${word} 0.${90 + Math.floor(Math.random() * 10)}`;
+
+				if (reduce) {
+					current.remove();
+					next.className = 'rot__word is-current';
+					if (tag) tag.textContent = label;
+					return;
+				}
+
+				slot.style.width = `${current.offsetWidth}px`;
+				const target = next.offsetWidth;
+				void slot.offsetWidth;
+				slot.style.width = `${target}px`;
+				current.classList.replace('is-current', 'is-leaving');
+				next.classList.replace('is-entering', 'is-current');
+
+				if (tag) {
+					slot.classList.remove('is-scanning');
+					void slot.offsetWidth;
+					slot.classList.add('is-scanning');
+					setTimeout(() => (tag.textContent = label), 300);
+				}
+
+				setTimeout(() => {
+					current.remove();
+					// Back to auto, so the slot keeps tracking the fluid font size.
+					slot.style.width = '';
+				}, 700);
+			}
+
+			// Old length shrinks or grows into noise, then the new word resolves
+			// left to right.
+			const glyphs = 'abcdefghijklmnopqrstuvwxyz0123456789#%&*+=/<>';
+			const noise = () => glyphs[Math.floor(Math.random() * glyphs.length)];
+
+			function decode(slot, word) {
+				const text = slot.querySelector('.decode__text');
+				clearInterval(slot.timer);
+				if (reduce) {
+					text.textContent = word;
+					return;
+				}
+				const from = text.textContent.length;
+				const start = performance.now();
+				const duration = 1000;
+				slot.timer = setInterval(() => {
+					const t = Math.min(1, (performance.now() - start) / duration);
+					const length = Math.round(from + (word.length - from) * Math.min(1, t / 0.35));
+					let html = '';
+					for (let i = 0; i < length; i++) {
+						const ch = word[i];
+						const settled = t >= 0.35 + (0.65 * (i + 1)) / word.length;
+						html += ch && (ch === ' ' || settled) ? ch : `<span class="decode__noise">${noise()}</span>`;
+					}
+					text.innerHTML = html;
+					if (t === 1) {
+						clearInterval(slot.timer);
+						text.textContent = word;
+					}
+				}, 45);
+			}
+
+			// Select the word, then type the new one over it.
+			async function type(slot, word) {
+				const text = slot.querySelector('.type__text');
+				if (reduce) {
+					text.textContent = word;
+					return;
+				}
+				slot.classList.add('is-selected');
+				await wait(480);
+				slot.classList.replace('is-selected', 'is-typing');
+				text.textContent = '';
+				for (const ch of word) {
+					await wait(45 + Math.random() * 55);
+					text.textContent += ch;
+				}
+				slot.classList.remove('is-typing');
+			}
+
+			const animators = { swap, decode, type };
+			const slots = [...document.querySelectorAll('[data-rotator]')];
+			const tickerItems = [...document.querySelectorAll('.ticker__item')];
+			let index = 0;
+
+			setInterval(() => {
+				if (document.hidden) return;
+				index = (index + 1) % words.length;
+				for (const slot of slots) animators[slot.dataset.rotator](slot, words[index]);
+				tickerItems.forEach((item, i) => item.classList.toggle('is-active', i === index));
+			}, interval);
+
+			document.documentElement.style.setProperty('--interval', `${interval}ms`);
+		</script>
+	</body>
+</html>
+
+<!-- Global: the script creates word spans at runtime, which scoped styles
+     would never reach. This stylesheet only ships with this page. -->
+<style is:global>
+	body {
+		--ink: #f2f3f5;
+		--muted: rgba(242, 243, 245, 0.5);
+		--faint: rgba(242, 243, 245, 0.38);
+		--rule: rgba(242, 243, 245, 0.12);
+		--serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+		--pixel: 'Geist Pixel', 'Geist Mono', ui-monospace, monospace;
+		--red: rgba(255, 47, 77, 0.9);
+		--cyan: rgba(33, 228, 255, 0.9);
+		--ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+		margin: 0;
+		background: #000;
+		color: var(--ink);
+		font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+		font-weight: 350;
+	}
+
+	.wrap {
+		max-inline-size: 1400px;
+		margin-inline: auto;
+		padding-inline: clamp(1rem, 4vw, 3rem);
+	}
+
+	.pixel {
+		font-family: var(--pixel);
+		font-weight: 400;
+		letter-spacing: 0.01em;
+	}
+
+	.label {
+		margin: 0;
+		font-size: 0.8rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--faint);
+	}
+
+	.sr-only {
+		position: absolute;
+		inline-size: 1px;
+		block-size: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	/* --- Intro ------------------------------------------------------------ */
+
+	.intro {
+		display: grid;
+		gap: 1rem;
+		justify-items: start;
+		padding-block: clamp(3rem, 10vh, 6rem) clamp(2.5rem, 6vh, 4rem);
+	}
+
+	.intro__title {
+		margin: 0;
+		font-size: clamp(1.9rem, 3.6vw, 3rem);
+		font-weight: 350;
+		line-height: 1.05;
+		letter-spacing: -0.045em;
+	}
+
+	.intro__text {
+		max-inline-size: 38rem;
+		margin: 0;
+		color: var(--muted);
+		line-height: 1.6;
+	}
+
+	.ticker {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin: 0.5rem 0 0;
+		padding: 0;
+		list-style: none;
+		font-size: 0.85rem;
+	}
+
+	.ticker__item {
+		position: relative;
+		overflow: hidden;
+		padding: 0.6em 1.05em;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 999px;
+		color: var(--faint);
+		line-height: 1;
+		transition:
+			color 200ms ease,
+			border-color 200ms ease;
+	}
+
+	.ticker__item.is-active {
+		color: var(--ink);
+		border-color: rgba(255, 255, 255, 0.34);
+	}
+
+	/* Fills over one interval, so it is clear when the next swap lands. */
+	.ticker__bar {
+		position: absolute;
+		inset: auto 0 0;
+		block-size: 2px;
+		background: var(--ink);
+		transform: scaleX(0);
+		transform-origin: left;
+	}
+
+	.ticker__item.is-active .ticker__bar {
+		animation: fill var(--interval, 3000ms) linear forwards;
+	}
+
+	@keyframes fill {
+		to {
+			transform: scaleX(1);
+		}
+	}
+
+	/* --- Option rows ------------------------------------------------------ */
+
+	/* Meta on the left, where the cascade sits on the landing; the headline on
+	   the right, at the landing's own size and measure. */
+	.option {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: clamp(2rem, 5vw, 5rem);
+		align-items: center;
+		min-block-size: 62vh;
+		padding-block: clamp(3rem, 8vh, 5rem);
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.option__meta {
+		display: grid;
+		gap: 0.6rem;
+		align-self: start;
+		max-inline-size: 24rem;
+	}
+
+	.option__num {
+		margin: 0;
+		font-size: 1rem;
+		color: var(--faint);
+	}
+
+	.option__name {
+		margin: 0;
+		font-size: clamp(1.3rem, 2vw, 1.6rem);
+		font-weight: 400;
+		letter-spacing: -0.03em;
+	}
+
+	.option__note {
+		margin: 0;
+		font-size: 0.95rem;
+		line-height: 1.6;
+		color: var(--muted);
+		text-wrap: pretty;
+	}
+
+	.option__stage {
+		justify-self: end;
+		max-inline-size: min(44vw, 46rem);
+	}
+
+	.headline {
+		margin: 0;
+		font-size: clamp(2rem, 4.1vw, 4.8rem);
+		font-weight: 400;
+		line-height: 1.02;
+		letter-spacing: -0.04em;
+		text-wrap: balance;
+	}
+
+	.headline em {
+		font-family: var(--serif);
+		font-size: 1.1em;
+		font-style: italic;
+		letter-spacing: -0.01em;
+	}
+
+	/* --- Shared swap slot (01, 04, 05) ------------------------------------ */
+
+	.rot {
+		display: inline-grid;
+		transition: width 650ms var(--ease);
+	}
+
+	.rot__word {
+		grid-area: 1 / 1;
+		justify-self: start;
+		white-space: nowrap;
+	}
+
+	/* --- 01 Serif roll ---------------------------------------------------- */
+
+	/* Clipped top and bottom only, so the italic overhang still shows. */
+	.headline--roll .rot {
+		padding-block: 0.12em;
+		margin-block: -0.12em;
+		clip-path: inset(0 -0.6em);
+	}
+
+	.headline--roll .rot__word {
+		font-family: var(--serif);
+		font-size: 1.1em;
+		font-style: italic;
+		letter-spacing: -0.01em;
+		transition:
+			transform 650ms var(--ease),
+			opacity 650ms var(--ease);
+	}
+
+	.headline--roll .rot__word.is-entering {
+		transform: translateY(140%);
+		opacity: 0;
+	}
+
+	.headline--roll .rot__word.is-leaving {
+		transform: translateY(-140%);
+		opacity: 0;
+	}
+
+	/* --- 02 Pixel decode -------------------------------------------------- */
+
+	.decode {
+		white-space: nowrap;
+	}
+
+	.decode__text {
+		font-family: var(--pixel);
+		letter-spacing: 0.01em;
+	}
+
+	.decode__noise {
+		color: var(--faint);
+	}
+
+	.decode__cursor {
+		display: inline-block;
+		inline-size: 0.42em;
+		block-size: 0.72em;
+		margin-inline-start: 0.08em;
+		background: var(--ink);
+		animation: blink 1s steps(1) infinite;
+	}
+
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+
+	/* --- 03 Retype -------------------------------------------------------- */
+
+	.headline--type {
+		color: var(--muted);
+	}
+
+	.type {
+		white-space: nowrap;
+		color: var(--ink);
+		font-weight: 600;
+	}
+
+	.type.is-selected .type__text {
+		background: var(--ink);
+		color: #000;
+	}
+
+	.type__caret {
+		display: inline-block;
+		inline-size: max(2px, 0.05em);
+		block-size: 0.9em;
+		margin-inline-start: 0.05em;
+		vertical-align: -0.1em;
+		background: var(--ink);
+		animation: blink 1s steps(1) infinite;
+	}
+
+	.type.is-typing .type__caret {
+		animation: none;
+	}
+
+	.type.is-selected .type__caret {
+		visibility: hidden;
+	}
+
+	/* --- 04 Chromatic focus ----------------------------------------------- */
+
+	.headline--serif {
+		font-family: var(--serif);
+		font-size: clamp(2.4rem, 5vw, 5.8rem);
+		line-height: 0.98;
+		letter-spacing: -0.02em;
+	}
+
+	.headline--serif em {
+		font-size: 1em;
+	}
+
+	.headline--serif .rot__word {
+		font-style: italic;
+		text-shadow:
+			0 0 0 transparent,
+			0 0 0 transparent;
+		transition:
+			opacity 650ms var(--ease),
+			filter 650ms var(--ease),
+			transform 650ms var(--ease),
+			text-shadow 650ms var(--ease);
+	}
+
+	.headline--serif .rot__word.is-entering,
+	.headline--serif .rot__word.is-leaving {
+		opacity: 0;
+		filter: blur(12px);
+		text-shadow:
+			-0.12em 0 0 var(--red),
+			0.12em 0 0 var(--cyan);
+	}
+
+	.headline--serif .rot__word.is-entering {
+		transform: scale(1.04);
+	}
+
+	.headline--serif .rot__word.is-leaving {
+		transform: scale(0.96);
+	}
+
+	/* --- 05 Detection box ------------------------------------------------- */
+
+	/* Extra leading leaves room for the label above the box. */
+	.headline--box {
+		line-height: 1.3;
+	}
+
+	.rot--box {
+		--c: var(--ink);
+		--l: 0.26em;
+		--w: 2px;
+
+		position: relative;
+		padding: 0.02em 0.16em;
+	}
+
+	/* Corner brackets over a faint full frame. */
+	.rot--box::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+		background:
+			linear-gradient(var(--c) 0 0) left top / var(--l) var(--w),
+			linear-gradient(var(--c) 0 0) left top / var(--w) var(--l),
+			linear-gradient(var(--c) 0 0) right top / var(--l) var(--w),
+			linear-gradient(var(--c) 0 0) right top / var(--w) var(--l),
+			linear-gradient(var(--c) 0 0) left bottom / var(--l) var(--w),
+			linear-gradient(var(--c) 0 0) left bottom / var(--w) var(--l),
+			linear-gradient(var(--c) 0 0) right bottom / var(--l) var(--w),
+			linear-gradient(var(--c) 0 0) right bottom / var(--w) var(--l);
+		background-repeat: no-repeat;
+	}
+
+	.rot--box.is-scanning::before {
+		animation: relock 650ms var(--ease);
+	}
+
+	@keyframes relock {
+		30% {
+			opacity: 0.35;
+			transform: scale(1.06);
+		}
+	}
+
+	.rot--box .rot__word {
+		transition: opacity 300ms steps(3);
+	}
+
+	.rot--box .rot__word.is-entering,
+	.rot--box .rot__word.is-leaving {
+		opacity: 0;
+	}
+
+	.rot__tag {
+		position: absolute;
+		inset-block-end: 100%;
+		inset-inline-start: 0;
+		padding: 0.35em 0.5em 0.3em;
+		background: var(--ink);
+		color: #000;
+		font-size: clamp(0.6rem, 0.85vw, 0.78rem);
+		line-height: 1;
+		white-space: nowrap;
+	}
+
+	/* --- Responsive ------------------------------------------------------- */
+
+	@media (max-width: 900px) {
+		.option {
+			grid-template-columns: minmax(0, 1fr);
+			min-block-size: 0;
+		}
+
+		.option__stage {
+			justify-self: center;
+			max-inline-size: 36rem;
+			text-align: center;
+		}
+
+		.headline {
+			font-size: clamp(1.9rem, 8vw, 3.4rem);
+		}
+
+		.headline--serif {
+			font-size: clamp(2.2rem, 9.5vw, 4rem);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.ticker__item,
+		.rot,
+		.rot__word {
+			transition: none !important;
+		}
+
+		.ticker__item.is-active .ticker__bar,
+		.rot--box.is-scanning::before,
+		.decode__cursor,
+		.type__caret {
+			animation: none;
+		}
+	}
+</style>

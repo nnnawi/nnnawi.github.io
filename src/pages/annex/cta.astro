@@ -1,0 +1,596 @@
+---
+// ---------------------------------------------------------------------------
+// Annex — five candidates for the landing's "See the work" link, each under a
+// still copy of the headline so it is judged in place. Not linked from the
+// nav; delete once one is picked.
+// ---------------------------------------------------------------------------
+
+const options = [
+	{
+		id: 'select',
+		name: 'Selection',
+		note: 'Bold, like the role. On hover the label is selected letter by letter, the same white block the retype uses, and the text flips to black.',
+	},
+	{
+		id: 'prompt',
+		name: 'Prompt',
+		note: 'A lowercase command with the headline’s blinking caret and a return key. Pressing Enter anywhere on the page opens the work, as the key suggests.',
+	},
+	{
+		id: 'line',
+		name: 'Next line',
+		note: 'Reads as the sentence carrying on, in the headline’s own grey at a smaller size. On hover it brightens and an underline draws in under it.',
+	},
+	{
+		id: 'pill',
+		name: 'Pill',
+		note: 'The contact pills from the About page, frosted so it holds up over the cascade. The arrow sits in a disc that fills white and turns to point ahead on hover.',
+	},
+	{
+		id: 'retype',
+		name: 'Retype on hover',
+		note: 'The headline’s mechanic, handed to the button: on hover “See the work” is selected and retyped as the path it leads to. It snaps back when the cursor leaves.',
+	},
+];
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="robots" content="noindex" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Geist+Pixel&family=Inter:wght@100..900&display=swap"
+		/>
+		<title>CTA options — Iwan</title>
+	</head>
+	<body>
+		<main class="annex">
+			<header class="wrap intro">
+				<a class="intro__back" href="/annex">← Title options</a>
+				<p class="label pixel">Annex</p>
+				<h1 class="intro__title">“See the work” — five options</h1>
+				<p class="intro__text">
+					Each sits under the landing headline at its real size and position. Hover them, and try
+					Tab to see the focus state.
+				</p>
+			</header>
+
+			{
+				options.map((option, i) => (
+					<section class="wrap option">
+						<div class="option__meta">
+							<p class="option__num pixel">{String(i + 1).padStart(2, '0')}</p>
+							<h2 class="option__name">{option.name}</h2>
+							<p class="option__note">{option.note}</p>
+						</div>
+						<div class="option__stage">
+							<p class="headline">
+								I’m Iwan, a&nbsp;<span class="headline__role">creative</span> engineer building the
+								tools I&nbsp;wish I&nbsp;had.
+							</p>
+
+							{option.id === 'select' && (
+								<a class="cta cta--select" href="/projects">
+									See the work <span class="cta__arrow" aria-hidden="true">→</span>
+								</a>
+							)}
+
+							{option.id === 'prompt' && (
+								<a class="cta cta--prompt" href="/projects" data-enter>
+									<span>see the work</span>
+									<span class="cta__caret" aria-hidden="true" />
+									<kbd class="cta__key" aria-hidden="true">↵</kbd>
+								</a>
+							)}
+
+							{option.id === 'line' && (
+								<a class="cta cta--line" href="/projects">
+									<span class="cta__underline">See what I’ve built</span>
+									<span class="cta__arrow" aria-hidden="true">→</span>
+								</a>
+							)}
+
+							{option.id === 'pill' && (
+								<a class="cta cta--pill" href="/projects">
+									See the work
+									<span class="cta__disc" aria-hidden="true">
+										<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+											<path d="M3 8h10M9 4l4 4-4 4" />
+										</svg>
+									</span>
+								</a>
+							)}
+
+							{option.id === 'retype' && (
+								<a
+									class="cta cta--retype"
+									href="/projects"
+									aria-label="See the work"
+									data-retype-to="/projects"
+								>
+									<span class="cta__text">See the work</span>
+									<span class="cta__caret" aria-hidden="true" />
+									<span class="cta__arrow" aria-hidden="true">→</span>
+								</a>
+							)}
+						</div>
+					</section>
+				))
+			}
+		</main>
+
+		<script is:inline>
+			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+			// --- 02 Prompt: Enter opens the work, unless something else has focus.
+			const prompt = document.querySelector('[data-enter]');
+			document.addEventListener('keydown', (event) => {
+				if (event.key !== 'Enter' || event.repeat) return;
+				if (document.activeElement && document.activeElement !== document.body) return;
+				prompt.classList.add('is-pressed');
+				setTimeout(() => (window.location.href = prompt.href), 140);
+			});
+
+			// --- 05 Retype on hover: select, then type the path over the label.
+			const button = document.querySelector('[data-retype-to]');
+			const text = button.querySelector('.cta__text');
+			const from = text.textContent;
+			const to = button.dataset.retypeTo;
+			let run = 0;
+
+			async function enter() {
+				const current = ++run;
+				if (reduce) {
+					text.textContent = to;
+					return;
+				}
+				button.classList.add('is-selected');
+				await wait(260);
+				if (current !== run) return;
+				button.classList.replace('is-selected', 'is-typing');
+				text.textContent = '';
+				for (const ch of to) {
+					await wait(35 + Math.random() * 40);
+					if (current !== run) return;
+					text.textContent += ch;
+				}
+				button.classList.remove('is-typing');
+			}
+
+			function leave() {
+				run++;
+				button.classList.remove('is-selected', 'is-typing');
+				text.textContent = from;
+			}
+
+			button.addEventListener('pointerenter', enter);
+			button.addEventListener('pointerleave', leave);
+			button.addEventListener('focus', enter);
+			button.addEventListener('blur', leave);
+		</script>
+	</body>
+</html>
+
+<!-- Global, to match the other annex pages; this stylesheet only ships here. -->
+<style is:global>
+	body {
+		--ink: #f2f3f5;
+		--muted: rgba(242, 243, 245, 0.5);
+		--faint: rgba(242, 243, 245, 0.38);
+		--rule: rgba(242, 243, 245, 0.12);
+		--pixel: 'Geist Pixel', 'Geist Mono', ui-monospace, monospace;
+		--ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+		margin: 0;
+		background: #000;
+		color: var(--ink);
+		font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+		font-weight: 350;
+	}
+
+	.wrap {
+		max-inline-size: 1400px;
+		margin-inline: auto;
+		padding-inline: clamp(1rem, 4vw, 3rem);
+	}
+
+	.pixel {
+		font-family: var(--pixel);
+		font-weight: 400;
+		letter-spacing: 0.01em;
+	}
+
+	.label {
+		margin: 0;
+		font-size: 0.8rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--faint);
+	}
+
+	/* --- Intro ------------------------------------------------------------ */
+
+	.intro {
+		display: grid;
+		gap: 1rem;
+		justify-items: start;
+		padding-block: clamp(3rem, 10vh, 6rem) clamp(2.5rem, 6vh, 4rem);
+	}
+
+	.intro__back {
+		margin-block-end: 1rem;
+		color: var(--faint);
+		font-size: 0.85rem;
+		text-decoration: none;
+		transition: color 160ms ease;
+	}
+
+	.intro__back:hover {
+		color: var(--ink);
+	}
+
+	.intro__title {
+		margin: 0;
+		font-size: clamp(1.9rem, 3.6vw, 3rem);
+		font-weight: 350;
+		line-height: 1.05;
+		letter-spacing: -0.045em;
+	}
+
+	.intro__text {
+		max-inline-size: 38rem;
+		margin: 0;
+		color: var(--muted);
+		line-height: 1.6;
+	}
+
+	/* --- Option rows ------------------------------------------------------ */
+
+	.option {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: clamp(2rem, 5vw, 5rem);
+		align-items: center;
+		min-block-size: 62vh;
+		padding-block: clamp(3rem, 8vh, 5rem);
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.option__meta {
+		display: grid;
+		gap: 0.6rem;
+		align-self: start;
+		max-inline-size: 24rem;
+	}
+
+	.option__num {
+		margin: 0;
+		font-size: 1rem;
+		color: var(--faint);
+	}
+
+	.option__name {
+		margin: 0;
+		font-size: clamp(1.3rem, 2vw, 1.6rem);
+		font-weight: 400;
+		letter-spacing: -0.03em;
+	}
+
+	.option__note {
+		margin: 0;
+		font-size: 0.95rem;
+		line-height: 1.6;
+		color: var(--muted);
+		text-wrap: pretty;
+	}
+
+	/* Same stack as the landing's hero body. */
+	.option__stage {
+		display: grid;
+		justify-items: start;
+		gap: clamp(1.2rem, 3vh, 2rem);
+		justify-self: end;
+		max-inline-size: min(44vw, 46rem);
+	}
+
+	.headline {
+		margin: 0;
+		color: var(--muted);
+		font-size: clamp(2rem, 4.1vw, 4.8rem);
+		font-weight: 400;
+		line-height: 1.02;
+		letter-spacing: -0.04em;
+		text-wrap: balance;
+	}
+
+	.headline__role {
+		color: var(--ink);
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	/* --- Shared ----------------------------------------------------------- */
+
+	.cta {
+		color: var(--ink);
+		text-decoration: none;
+	}
+
+	.cta:focus-visible {
+		outline: 2px solid rgba(242, 243, 245, 0.75);
+		outline-offset: 4px;
+	}
+
+	.cta__arrow {
+		display: inline-block;
+		transition: translate 240ms var(--ease);
+	}
+
+	.cta:hover .cta__arrow,
+	.cta:focus-visible .cta__arrow {
+		translate: 0.25em 0;
+	}
+
+	.cta__caret {
+		display: inline-block;
+		inline-size: 2px;
+		block-size: 1.05em;
+		margin-inline-start: 0.1em;
+		vertical-align: -0.15em;
+		background: var(--ink);
+		animation: blink 1s steps(1) infinite;
+	}
+
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+
+	/* --- 01 Selection ----------------------------------------------------- */
+
+	/* The white block steps across one letter at a time, like a drag-select.
+	   It sits over the text in difference mode, so each letter inverts to black
+	   the moment the block reaches it. Isolation keeps the blend off whatever
+	   is behind the link. */
+	.cta--select {
+		position: relative;
+		isolation: isolate;
+		display: inline-flex;
+		gap: 0.5em;
+		align-items: center;
+		padding: 0.3em 0.45em;
+		margin-inline-start: -0.45em;
+		font-size: clamp(1rem, 1.3vw, 1.2rem);
+		font-weight: 600;
+		letter-spacing: -0.02em;
+	}
+
+	.cta--select::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: var(--ink);
+		mix-blend-mode: difference;
+		pointer-events: none;
+		transform: scaleX(0);
+		transform-origin: left;
+		transition: transform 280ms steps(12, end);
+	}
+
+	.cta--select:hover::before,
+	.cta--select:focus-visible::before {
+		transform: scaleX(1);
+	}
+
+	/* --- 02 Prompt -------------------------------------------------------- */
+
+	.cta--prompt {
+		display: inline-flex;
+		align-items: center;
+		font-size: clamp(1rem, 1.3vw, 1.2rem);
+		font-weight: 500;
+		letter-spacing: -0.02em;
+	}
+
+	.cta--prompt:hover .cta__caret,
+	.cta--prompt:focus-visible .cta__caret {
+		animation: none;
+	}
+
+	.cta__key {
+		display: inline-grid;
+		place-items: center;
+		min-inline-size: 1.7em;
+		block-size: 1.7em;
+		margin-inline-start: 0.8em;
+		border: 1px solid rgba(255, 255, 255, 0.22);
+		border-block-end-width: 2px;
+		border-radius: 6px;
+		color: var(--muted);
+		font-family: inherit;
+		font-size: 0.75em;
+		transition:
+			color 160ms ease,
+			background-color 160ms ease,
+			border-color 160ms ease,
+			translate 90ms ease;
+	}
+
+	.cta--prompt:hover .cta__key,
+	.cta--prompt:focus-visible .cta__key,
+	.cta--prompt.is-pressed .cta__key {
+		border-color: var(--ink);
+		background: var(--ink);
+		color: #000;
+	}
+
+	.cta--prompt.is-pressed .cta__key {
+		translate: 0 1px;
+	}
+
+	/* --- 03 Next line ----------------------------------------------------- */
+
+	.cta--line {
+		display: inline-flex;
+		gap: 0.4em;
+		align-items: baseline;
+		color: var(--muted);
+		font-size: clamp(1.2rem, 1.9vw, 2.1rem);
+		font-weight: 400;
+		letter-spacing: -0.035em;
+		transition: color 240ms ease;
+	}
+
+	.cta__underline {
+		padding-block-end: 0.08em;
+		background: linear-gradient(var(--ink), var(--ink)) no-repeat left bottom / 0% 1px;
+		transition: background-size 420ms var(--ease);
+	}
+
+	.cta--line:hover,
+	.cta--line:focus-visible {
+		color: var(--ink);
+	}
+
+	.cta--line:hover .cta__underline,
+	.cta--line:focus-visible .cta__underline {
+		background-size: 100% 1px;
+	}
+
+	/* --- 04 Pill ---------------------------------------------------------- */
+
+	.cta--pill {
+		display: inline-flex;
+		gap: 0.8em;
+		align-items: center;
+		padding: 0.4em 0.4em 0.4em 1.15em;
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.035);
+		-webkit-backdrop-filter: blur(8px);
+		backdrop-filter: blur(8px);
+		font-size: 0.95rem;
+		line-height: 1;
+		transition:
+			border-color 200ms ease,
+			background-color 200ms ease;
+	}
+
+	.cta__disc {
+		display: grid;
+		place-items: center;
+		inline-size: 2em;
+		block-size: 2em;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.08);
+		transition:
+			background-color 240ms ease,
+			color 240ms ease;
+	}
+
+	.cta__disc svg {
+		inline-size: 0.95em;
+		block-size: 0.95em;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		rotate: -45deg;
+		transition: rotate 320ms var(--ease);
+	}
+
+	.cta--pill:hover,
+	.cta--pill:focus-visible {
+		border-color: rgba(255, 255, 255, 0.34);
+		background: rgba(255, 255, 255, 0.07);
+	}
+
+	.cta--pill:hover .cta__disc,
+	.cta--pill:focus-visible .cta__disc {
+		background: var(--ink);
+		color: #000;
+	}
+
+	.cta--pill:hover .cta__disc svg,
+	.cta--pill:focus-visible .cta__disc svg {
+		rotate: 0deg;
+	}
+
+	.cta--pill:focus-visible {
+		outline-offset: 3px;
+	}
+
+	/* --- 05 Retype on hover ----------------------------------------------- */
+
+	.cta--retype {
+		display: inline-flex;
+		align-items: center;
+		font-size: clamp(1rem, 1.3vw, 1.2rem);
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		white-space: nowrap;
+	}
+
+	.cta--retype .cta__arrow {
+		margin-inline-start: 0.5em;
+	}
+
+	/* The caret only shows while the label is being edited. */
+	.cta--retype .cta__caret {
+		visibility: hidden;
+	}
+
+	.cta--retype.is-typing .cta__caret {
+		visibility: visible;
+		animation: none;
+	}
+
+	.cta--retype.is-selected .cta__text {
+		background: var(--ink);
+		color: #000;
+	}
+
+	/* --- Responsive ------------------------------------------------------- */
+
+	@media (max-width: 900px) {
+		.option {
+			grid-template-columns: minmax(0, 1fr);
+			min-block-size: 0;
+		}
+
+		.option__stage {
+			justify-items: center;
+			justify-self: center;
+			max-inline-size: 36rem;
+			text-align: center;
+		}
+
+		.headline {
+			font-size: clamp(1.9rem, 8vw, 3.4rem);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.intro__back,
+		.cta,
+		.cta__arrow,
+		.cta__key,
+		.cta__underline,
+		.cta__disc,
+		.cta__disc svg,
+		.cta--select::before {
+			transition: none;
+		}
+
+		.cta__caret {
+			animation: none;
+		}
+	}
+</style>

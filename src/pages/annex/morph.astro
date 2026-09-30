@@ -1,0 +1,1015 @@
+---
+// ---------------------------------------------------------------------------
+// Annex — seven ways for the hero sentence to turn into a project's name when
+// a card is hovered. A square stands in for the card; each hover shows the
+// next project. Not linked from the nav; delete once one is picked.
+// ---------------------------------------------------------------------------
+
+// Same names as the cascade on the landing.
+const projects = [
+	'MorphoX',
+	'Vectorfield Pathfinding',
+	'Dither Plugin',
+	'Privacy Plugin',
+	'YOLO on NPU',
+	'Bowde',
+	'Image2Complex',
+	'SirAMP',
+];
+
+const options = [
+	{
+		id: 'retype',
+		name: 'Retype',
+		note: 'The headline’s own mechanic. The whole sentence is selected, then the name is typed in its place. On leave, the name is selected and the sentence is typed back, fast.',
+	},
+	{
+		id: 'blur',
+		name: 'Focus pull',
+		note: 'The sentence blurs out as the name comes into focus in the same spot, like a camera racking focus. The quietest of the seven.',
+	},
+	{
+		id: 'scatter',
+		name: 'Scatter',
+		note: 'The words drift apart and dissolve while the name’s letters come in from scattered positions and settle. Carries on the Word blocks motion of the headline.',
+	},
+	{
+		id: 'decode',
+		name: 'Decode',
+		note: 'The sentence breaks into random characters, shrinks to the name’s length and resolves into it letter by letter. The computer-vision take.',
+	},
+	{
+		id: 'roll',
+		name: 'Staggered roll',
+		note: 'Each word rolls up out of its own slot, one after another, then the name’s letters roll up from below. On leave, everything rewinds.',
+	},
+	{
+		id: 'wipe',
+		name: 'Scan wipe',
+		note: 'A thin line with the red/cyan fringe sweeps across the block: behind it the sentence is gone and the name is there. Reads like a scanner pass.',
+	},
+	{
+		id: 'aside',
+		name: 'Step aside',
+		note: 'The sentence does not leave: it shrinks into a small caption at the top and the name takes the space below it, so who you are stays on screen.',
+	},
+];
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="robots" content="noindex" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Geist+Pixel&family=Inter:wght@100..900&display=swap"
+		/>
+		<title>Hero morph — Iwan</title>
+	</head>
+	<body>
+		<main class="annex">
+			<header class="wrap intro">
+				<a class="intro__back" href="/annex">← Title options</a>
+				<p class="label pixel">Annex</p>
+				<h1 class="intro__title">Hero → project name — seven transitions</h1>
+				<p class="intro__text">
+					Hover the square to play a transition; leave it to play it back. Each hover shows the next
+					project, so short and long names both get a turn. The rotating role and the repel are
+					left out here, so the transition is the only thing moving.
+				</p>
+			</header>
+
+			{
+				options.map((option, i) => (
+					<section class="wrap option" data-demo>
+						<div class="option__meta">
+							<p class="option__num pixel">{String(i + 1).padStart(2, '0')}</p>
+							<h2 class="option__name">{option.name}</h2>
+							<p class="option__note">{option.note}</p>
+						</div>
+
+						<div class="demo">
+							<div class="demo__card">
+								<button class="trigger" type="button">
+									<span class="trigger__hint pixel">Hover</span>
+									<span class="trigger__name" />
+								</button>
+							</div>
+
+							<div class="demo__hero">
+								<div class={`morph morph--${option.id}`} data-morph={option.id}>
+									{/* Holds the block at the sentence's height whatever the layers do. */}
+									<p class="morph__sizer" aria-hidden="true">
+										I’m Iwan, a&nbsp;<span class="role">creative</span> engineer building the tools
+										I&nbsp;wish I&nbsp;had.
+									</p>
+									<p class="morph__sentence">
+										<span class="morph__text">
+											I’m Iwan, a&nbsp;<span class="role">creative</span> engineer building the
+											tools I&nbsp;wish I&nbsp;had.
+										</span>
+										{option.id === 'retype' && <span class="morph__caret" />}
+									</p>
+									<p class="morph__name" aria-live="polite">
+										<span class="morph__name-text" />
+										{option.id === 'retype' && <span class="morph__caret" />}
+									</p>
+									{option.id === 'decode' && <p class="morph__live" aria-hidden="true" />}
+									{option.id === 'wipe' && <span class="morph__edge" aria-hidden="true" />}
+								</div>
+								<a class="cta" href="/projects">
+									<span class="cta__label">See what I’ve built</span>
+									<span class="cta__arrow" aria-hidden="true">→</span>
+								</a>
+							</div>
+						</div>
+					</section>
+				))
+			}
+		</main>
+
+		<script is:inline define:vars={{ projects }}>
+			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+			const rand = (min, max) => min + Math.random() * (max - min);
+			const reflow = (el) => void el.offsetWidth;
+			const span = (className) => {
+				const el = document.createElement('span');
+				el.className = className;
+				return el;
+			};
+
+			// Drops the source formatting's line breaks and tabs, keeping no-break spaces.
+			function tidy(el) {
+				const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+				const nodes = [];
+				while (walker.nextNode()) nodes.push(walker.currentNode);
+				for (const node of nodes) node.nodeValue = node.nodeValue.replace(/[ \t\n\r]+/g, ' ');
+				if (nodes.length) {
+					nodes[0].nodeValue = nodes[0].nodeValue.trimStart();
+					nodes.at(-1).nodeValue = nodes.at(-1).nodeValue.trimEnd();
+				}
+			}
+
+			// Each word of the sentence in its own box, with an inner span that moves.
+			// The role is an element, so it becomes one word as it is.
+			function splitWords(text) {
+				let index = 0;
+				const box = () => {
+					const word = span('w');
+					const inner = span('w__in');
+					word.append(inner);
+					word.style.setProperty('--i', index++);
+					return [word, inner];
+				};
+				for (const node of [...text.childNodes]) {
+					if (node.nodeType === Node.ELEMENT_NODE) {
+						const [word, inner] = box();
+						node.before(word);
+						inner.append(node);
+						continue;
+					}
+					const fragment = document.createDocumentFragment();
+					for (const part of node.nodeValue.split(/(\s+)/)) {
+						if (!part) continue;
+						if (/^\s+$/.test(part)) {
+							fragment.append(part);
+							continue;
+						}
+						const [word, inner] = box();
+						inner.textContent = part;
+						fragment.append(word);
+					}
+					node.replaceWith(fragment);
+				}
+				return [...text.querySelectorAll('.w')];
+			}
+
+			// The name as one box per letter, same shape as the words above.
+			function setLetters(el, name) {
+				el.textContent = '';
+				[...name].forEach((ch, i) => {
+					if (ch === ' ') return el.append(' ');
+					const letter = span('ch');
+					const inner = span('ch__in');
+					inner.textContent = ch;
+					letter.append(inner);
+					letter.style.setProperty('--i', i);
+					el.append(letter);
+				});
+				return [...el.querySelectorAll('.ch')];
+			}
+
+			function scatterVars(el) {
+				el.style.setProperty('--x', `${rand(0.3, 1) * (Math.random() < 0.5 ? -1 : 1)}em`);
+				el.style.setProperty('--y', `${rand(-0.6, 0.6)}em`);
+				el.style.setProperty('--r', `${rand(-25, 25)}deg`);
+				el.style.setProperty('--d', `${rand(0, 140)}ms`);
+			}
+
+			// --- Decode -----------------------------------------------------------
+
+			const glyphs = 'abcdefghijklmnopqrstuvwxyz0123456789#%*+=/';
+			const noise = () => glyphs[Math.floor(Math.random() * glyphs.length)];
+
+			// Old characters drop out to noise at random, the length eases to the
+			// new text's, and the new text settles left to right.
+			function decode(m, from, to, showName) {
+				clearInterval(m.timer);
+				if (reduce) {
+					m.el.classList.toggle('show-name', showName);
+					return;
+				}
+				const inkAt = (text, i) =>
+					text === m.sentence ? i >= m.roleStart && i < m.roleEnd : true;
+				const char = (text, i) => {
+					const ch = text[i];
+					if (ch === ' ' || ch === ' ') return ch;
+					return inkAt(text, i) ? `<span class="x-ink">${ch}</span>` : ch;
+				};
+				const fades = [...from].map(() => rand(0, 0.35));
+				const start = performance.now();
+				const duration = 1100;
+				m.el.classList.add('is-live');
+
+				const paint = () => {
+					const t = Math.min(1, (performance.now() - start) / duration);
+					const length = Math.round(from.length + (to.length - from.length) * Math.min(1, t / 0.6));
+					let html = '';
+					for (let i = 0; i < length; i++) {
+						const settled = i < to.length && t >= 0.45 + (0.55 * (i + 1)) / to.length;
+						if (settled) html += char(to, i);
+						else if (i < from.length && t < fades[i]) html += char(from, i);
+						else html += `<span class="x-noise">${noise()}</span>`;
+					}
+					m.live.innerHTML = html;
+					if (t === 1) {
+						clearInterval(m.timer);
+						m.el.classList.remove('is-live');
+						m.el.classList.toggle('show-name', showName);
+					}
+				};
+				paint();
+				m.timer = setInterval(paint, 40);
+			}
+
+			// --- Wipe -------------------------------------------------------------
+
+			// Replays the edge's flash each pass; the position itself is a transition.
+			function sweep(m) {
+				m.el.classList.remove('is-sweeping');
+				reflow(m.el);
+				m.el.classList.add('is-sweeping');
+				clearTimeout(m.sweepTimer);
+				m.sweepTimer = setTimeout(() => m.el.classList.remove('is-sweeping'), 800);
+			}
+
+			// --- Iterations -------------------------------------------------------
+
+			const toggle = {
+				enter(m, name) {
+					m.nameText.textContent = name;
+					m.el.classList.add('is-project');
+				},
+				leave(m) {
+					m.el.classList.remove('is-project');
+				},
+			};
+
+			const kinds = {
+				retype: {
+					init(m) {
+						// The sentence's text nodes, typed back one after another.
+						m.parts = [...m.text.childNodes].map((node) => {
+							const text = node.nodeType === Node.TEXT_NODE ? node : node.firstChild;
+							return { text, full: text.nodeValue };
+						});
+					},
+					async enter(m, name) {
+						const run = ++m.run;
+						for (const part of m.parts) part.text.nodeValue = part.full;
+						m.el.classList.remove('show-name', 'is-typing');
+						if (reduce) {
+							m.nameText.textContent = name;
+							m.el.classList.add('show-name');
+							return;
+						}
+						m.el.classList.add('is-selected');
+						await wait(420);
+						if (run !== m.run) return;
+						m.el.classList.remove('is-selected');
+						m.nameText.textContent = '';
+						m.el.classList.add('show-name', 'is-typing');
+						for (const ch of name) {
+							await wait(rand(45, 100));
+							if (run !== m.run) return;
+							m.nameText.textContent += ch;
+						}
+						m.el.classList.remove('is-typing');
+					},
+					async leave(m) {
+						const run = ++m.run;
+						m.el.classList.remove('is-selected', 'is-typing');
+						if (reduce || !m.el.classList.contains('show-name')) {
+							for (const part of m.parts) part.text.nodeValue = part.full;
+							m.el.classList.remove('show-name');
+							return;
+						}
+						m.el.classList.add('is-selected');
+						await wait(260);
+						if (run !== m.run) return;
+						m.el.classList.remove('is-selected', 'show-name');
+						m.el.classList.add('is-typing');
+						for (const part of m.parts) part.text.nodeValue = '';
+						for (const part of m.parts) {
+							for (let i = 0; i < part.full.length; i += 2) {
+								await wait(14);
+								if (run !== m.run) return;
+								part.text.nodeValue = part.full.slice(0, i + 2);
+							}
+						}
+						m.el.classList.remove('is-typing');
+					},
+				},
+
+				blur: toggle,
+
+				scatter: {
+					init(m) {
+						splitWords(m.text).forEach(scatterVars);
+					},
+					enter(m, name) {
+						setLetters(m.nameText, name).forEach(scatterVars);
+						reflow(m.el);
+						m.el.classList.add('is-project');
+					},
+					leave: toggle.leave,
+				},
+
+				decode: {
+					init(m) {
+						m.sentence = m.text.textContent;
+						m.roleStart = m.sentence.indexOf(m.text.querySelector('.role').textContent);
+						m.roleEnd = m.roleStart + m.text.querySelector('.role').textContent.length;
+					},
+					enter(m, name) {
+						m.name = name;
+						m.nameText.textContent = name;
+						decode(m, m.sentence, name, true);
+					},
+					leave(m) {
+						decode(m, m.name, m.sentence, false);
+					},
+				},
+
+				roll: {
+					init(m) {
+						splitWords(m.text);
+					},
+					enter(m, name) {
+						setLetters(m.nameText, name);
+						reflow(m.el);
+						m.el.classList.add('is-project');
+					},
+					leave: toggle.leave,
+				},
+
+				wipe: {
+					enter(m, name) {
+						m.nameText.textContent = name;
+						if (!reduce) sweep(m);
+						m.el.classList.add('is-project');
+					},
+					leave(m) {
+						if (!reduce) sweep(m);
+						m.el.classList.remove('is-project');
+					},
+				},
+
+				aside: {
+					enter(m, name) {
+						m.nameText.textContent = name;
+						// Room above the name for the shrunk sentence, plus a little air.
+						const size = parseFloat(getComputedStyle(m.el).fontSize);
+						m.el.style.setProperty('--caption', `${m.sentenceEl.offsetHeight * 0.3 + size * 0.3}px`);
+						m.el.classList.add('is-project');
+					},
+					leave: toggle.leave,
+				},
+			};
+
+			for (const demo of document.querySelectorAll('[data-demo]')) {
+				const el = demo.querySelector('.morph');
+				const m = {
+					el,
+					run: 0,
+					sentenceEl: el.querySelector('.morph__sentence'),
+					text: el.querySelector('.morph__text'),
+					nameText: el.querySelector('.morph__name-text'),
+					live: el.querySelector('.morph__live'),
+				};
+				tidy(m.text);
+				const kind = kinds[el.dataset.morph];
+				kind.init?.(m);
+
+				const trigger = demo.querySelector('.trigger');
+				const label = trigger.querySelector('.trigger__name');
+				let next = 0;
+				let active = false;
+				label.textContent = projects[next];
+
+				const enter = () => {
+					if (active) return;
+					active = true;
+					kind.enter(m, projects[next]);
+				};
+				const leave = () => {
+					if (!active) return;
+					active = false;
+					kind.leave(m);
+					next = (next + 1) % projects.length;
+					label.textContent = projects[next];
+				};
+
+				trigger.addEventListener('pointerenter', enter);
+				trigger.addEventListener('pointerleave', leave);
+				trigger.addEventListener('focus', enter);
+				trigger.addEventListener('blur', leave);
+			}
+		</script>
+	</body>
+</html>
+
+<!-- Global: the script builds word and letter spans at runtime, which scoped
+     styles would never reach. This stylesheet only ships with this page. -->
+<style is:global>
+	body {
+		--ink: #f2f3f5;
+		--muted: rgba(242, 243, 245, 0.5);
+		--faint: rgba(242, 243, 245, 0.38);
+		--rule: rgba(242, 243, 245, 0.12);
+		--pixel: 'Geist Pixel', 'Geist Mono', ui-monospace, monospace;
+		--ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+		margin: 0;
+		background: #000;
+		color: var(--ink);
+		font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+		font-weight: 350;
+	}
+
+	.wrap {
+		max-inline-size: 1400px;
+		margin-inline: auto;
+		padding-inline: clamp(1rem, 4vw, 3rem);
+	}
+
+	.pixel {
+		font-family: var(--pixel);
+		font-weight: 400;
+		letter-spacing: 0.01em;
+	}
+
+	.label {
+		margin: 0;
+		font-size: 0.8rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--faint);
+	}
+
+	/* --- Intro ------------------------------------------------------------ */
+
+	.intro {
+		display: grid;
+		gap: 1rem;
+		justify-items: start;
+		padding-block: clamp(3rem, 10vh, 6rem) clamp(2.5rem, 6vh, 4rem);
+	}
+
+	.intro__back {
+		margin-block-end: 1rem;
+		color: var(--faint);
+		font-size: 0.85rem;
+		text-decoration: none;
+		transition: color 160ms ease;
+	}
+
+	.intro__back:hover {
+		color: var(--ink);
+	}
+
+	.intro__title {
+		margin: 0;
+		font-size: clamp(1.9rem, 3.6vw, 3rem);
+		font-weight: 350;
+		line-height: 1.05;
+		letter-spacing: -0.045em;
+	}
+
+	.intro__text {
+		max-inline-size: 40rem;
+		margin: 0;
+		color: var(--muted);
+		line-height: 1.6;
+	}
+
+	/* --- Option rows ------------------------------------------------------ */
+
+	.option {
+		display: grid;
+		gap: clamp(1.5rem, 4vh, 2.5rem);
+		padding-block: clamp(3rem, 8vh, 5rem);
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.option__meta {
+		display: grid;
+		gap: 0.6rem;
+		max-inline-size: 36rem;
+	}
+
+	.option__num {
+		margin: 0;
+		font-size: 1rem;
+		color: var(--faint);
+	}
+
+	.option__name {
+		margin: 0;
+		font-size: clamp(1.3rem, 2vw, 1.6rem);
+		font-weight: 400;
+		letter-spacing: -0.03em;
+	}
+
+	.option__note {
+		margin: 0;
+		font-size: 0.95rem;
+		line-height: 1.6;
+		color: var(--muted);
+		text-wrap: pretty;
+	}
+
+	/* The landing in miniature: the card's side on the left, the hero on the
+	   right at its real size and measure. */
+	.demo {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: clamp(2rem, 5vw, 5rem);
+		align-items: center;
+		min-block-size: 44vh;
+	}
+
+	.demo__card {
+		display: grid;
+		place-items: center;
+	}
+
+	.demo__hero {
+		display: grid;
+		justify-items: start;
+		gap: clamp(1.2rem, 3vh, 2rem);
+		justify-self: end;
+		max-inline-size: min(44vw, 46rem);
+	}
+
+	/* --- Trigger square --------------------------------------------------- */
+
+	.trigger {
+		display: grid;
+		align-content: space-between;
+		justify-items: start;
+		inline-size: clamp(9rem, 16vw, 13rem);
+		aspect-ratio: 1;
+		padding: 1rem;
+		border: 1px solid rgba(255, 255, 255, 0.16);
+		border-radius: 10px;
+		background: rgba(255, 255, 255, 0.03);
+		color: inherit;
+		font: inherit;
+		text-align: start;
+		cursor: default;
+		transition:
+			border-color 200ms ease,
+			background-color 200ms ease;
+	}
+
+	.trigger:hover,
+	.trigger:focus-visible {
+		border-color: rgba(255, 255, 255, 0.5);
+		background: rgba(255, 255, 255, 0.07);
+	}
+
+	.trigger:focus-visible {
+		outline: 2px solid rgba(242, 243, 245, 0.75);
+		outline-offset: 4px;
+	}
+
+	.trigger__hint {
+		font-size: 0.75rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--faint);
+	}
+
+	.trigger__name {
+		font-size: 0.9rem;
+		color: var(--muted);
+	}
+
+	/* --- CTA (as on the landing) ------------------------------------------ */
+
+	.cta {
+		display: inline-flex;
+		gap: 0.4em;
+		align-items: baseline;
+		color: var(--muted);
+		font-size: clamp(1.2rem, 1.9vw, 2.1rem);
+		font-weight: 400;
+		letter-spacing: -0.035em;
+		text-decoration: none;
+		transition: color 240ms ease;
+	}
+
+	.cta__label {
+		padding-block-end: 0.08em;
+		background: linear-gradient(var(--ink), var(--ink)) no-repeat left bottom / 0% 1px;
+		transition: background-size 420ms var(--ease);
+	}
+
+	.cta:hover,
+	.cta:focus-visible {
+		color: var(--ink);
+	}
+
+	.cta:hover .cta__label,
+	.cta:focus-visible .cta__label {
+		background-size: 100% 1px;
+	}
+
+	.cta__arrow {
+		transition: translate 240ms var(--ease);
+	}
+
+	.cta:hover .cta__arrow {
+		translate: 0.25em 0;
+	}
+
+	/* --- Morph block ------------------------------------------------------ */
+
+	/* Every layer sits in the same cell; the hidden sizer keeps the height. */
+	.morph {
+		display: grid;
+		color: var(--muted);
+		font-size: clamp(2rem, 4.1vw, 4.8rem);
+		font-weight: 400;
+		line-height: 1.02;
+		letter-spacing: -0.04em;
+		text-wrap: balance;
+	}
+
+	.morph > * {
+		grid-area: 1 / 1;
+		align-self: start;
+		margin: 0;
+	}
+
+	.morph__sizer {
+		visibility: hidden;
+	}
+
+	.role {
+		color: var(--ink);
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	.morph__name {
+		color: var(--ink);
+		font-weight: 600;
+	}
+
+	.w,
+	.ch,
+	.w__in,
+	.ch__in {
+		display: inline-block;
+	}
+
+	.w {
+		white-space: nowrap;
+	}
+
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+
+	/* --- 01 Retype -------------------------------------------------------- */
+
+	.morph--retype .morph__name,
+	.morph--decode .morph__name,
+	.morph__live {
+		visibility: hidden;
+	}
+
+	.morph--retype.show-name .morph__name,
+	.morph--decode.show-name .morph__name {
+		visibility: visible;
+	}
+
+	.morph--retype.show-name .morph__sentence,
+	.morph--decode.show-name .morph__sentence {
+		visibility: hidden;
+	}
+
+	.morph--retype.is-selected .morph__text,
+	.morph--retype.is-selected .morph__name-text {
+		-webkit-box-decoration-break: clone;
+		box-decoration-break: clone;
+		background: var(--ink);
+		color: #000;
+	}
+
+	.morph--retype.is-selected .role {
+		color: #000;
+	}
+
+	.morph__caret {
+		display: none;
+		inline-size: max(2px, 0.05em);
+		block-size: 0.9em;
+		margin-inline-start: 0.05em;
+		vertical-align: -0.1em;
+		background: var(--ink);
+		animation: blink 1s steps(1) infinite;
+	}
+
+	.morph--retype.show-name .morph__name .morph__caret,
+	.morph--retype.is-typing:not(.show-name) .morph__sentence .morph__caret {
+		display: inline-block;
+	}
+
+	.morph--retype.is-typing .morph__caret {
+		animation: none;
+	}
+
+	.morph--retype.is-selected .morph__caret {
+		visibility: hidden;
+	}
+
+	/* --- 02 Focus pull ---------------------------------------------------- */
+
+	.morph--blur .morph__sentence,
+	.morph--blur .morph__name {
+		transform-origin: 0 50%;
+		transition:
+			opacity 450ms ease,
+			filter 450ms ease,
+			transform 600ms var(--ease);
+	}
+
+	.morph--blur .morph__name,
+	.morph--blur.is-project .morph__sentence {
+		opacity: 0;
+		filter: blur(14px);
+	}
+
+	.morph--blur .morph__name {
+		transform: scale(1.04);
+	}
+
+	.morph--blur.is-project .morph__sentence {
+		transform: scale(0.97);
+	}
+
+	.morph--blur.is-project .morph__name {
+		opacity: 1;
+		filter: none;
+		transform: none;
+	}
+
+	/* --- 03 Scatter ------------------------------------------------------- */
+
+	/* Delays come from the state being entered: out first, then in. */
+	.morph--scatter .w__in,
+	.morph--scatter .ch__in {
+		transition:
+			transform 650ms var(--ease),
+			opacity 450ms ease,
+			filter 450ms ease;
+	}
+
+	.morph--scatter .w__in {
+		transition-delay: calc(var(--d) + 150ms);
+	}
+
+	.morph--scatter.is-project .w__in {
+		transition-delay: var(--d);
+	}
+
+	.morph--scatter .ch__in {
+		transition-delay: var(--d);
+	}
+
+	.morph--scatter.is-project .ch__in {
+		transition-delay: calc(var(--d) + 120ms);
+	}
+
+	.morph--scatter.is-project .w__in,
+	.morph--scatter .ch__in {
+		transform: translate(var(--x), var(--y)) rotate(var(--r));
+		opacity: 0;
+		filter: blur(6px);
+	}
+
+	.morph--scatter.is-project .ch__in {
+		transform: none;
+		opacity: 1;
+		filter: none;
+	}
+
+	/* --- 04 Decode -------------------------------------------------------- */
+
+	.morph--decode.is-live .morph__sentence,
+	.morph--decode.is-live .morph__name {
+		visibility: hidden;
+	}
+
+	.morph--decode.is-live .morph__live {
+		visibility: visible;
+	}
+
+	.morph__live .x-ink {
+		color: var(--ink);
+		font-weight: 600;
+	}
+
+	.morph__live .x-noise {
+		color: var(--faint);
+	}
+
+	/* --- 05 Staggered roll ------------------------------------------------ */
+
+	/* Each word and letter is its own slot, clipped top and bottom only. */
+	.morph--roll .w,
+	.morph--roll .ch {
+		padding-block: 0.1em;
+		margin-block: -0.1em;
+		clip-path: inset(0 -0.3em);
+	}
+
+	.morph--roll .w__in,
+	.morph--roll .ch__in {
+		transition: transform 550ms var(--ease);
+	}
+
+	.morph--roll .w__in {
+		transition-delay: calc(180ms + var(--i) * 22ms);
+	}
+
+	.morph--roll.is-project .w__in {
+		transform: translateY(-115%);
+		transition-delay: calc(var(--i) * 22ms);
+	}
+
+	.morph--roll .ch__in {
+		transform: translateY(115%);
+		transition-delay: calc(var(--i) * 15ms);
+	}
+
+	.morph--roll.is-project .ch__in {
+		transform: none;
+		transition-delay: calc(160ms + var(--i) * 28ms);
+	}
+
+	/* --- 06 Scan wipe ----------------------------------------------------- */
+
+	/* Both layers are cut at the same moving edge: sentence on one side, name
+	   on the other. */
+	.morph--wipe .morph__sentence,
+	.morph--wipe .morph__name {
+		transition: clip-path 750ms cubic-bezier(0.65, 0, 0.35, 1);
+	}
+
+	.morph--wipe .morph__sentence {
+		clip-path: inset(-0.2em -0.2em -0.2em -0.2em);
+	}
+
+	.morph--wipe.is-project .morph__sentence {
+		clip-path: inset(-0.2em -0.2em -0.2em 100%);
+	}
+
+	.morph--wipe .morph__name {
+		clip-path: inset(-0.2em 100% -0.2em -0.2em);
+	}
+
+	.morph--wipe.is-project .morph__name {
+		clip-path: inset(-0.2em -0.2em -0.2em -0.2em);
+	}
+
+	.morph__edge {
+		position: relative;
+		inset-inline-start: 0;
+		align-self: stretch;
+		justify-self: start;
+		inline-size: 2px;
+		margin-inline-start: -1px;
+		background: var(--ink);
+		box-shadow:
+			-2px 0 0 rgba(255, 47, 77, 0.55),
+			2px 0 0 rgba(33, 228, 255, 0.5);
+		opacity: 0;
+		transition: inset-inline-start 750ms cubic-bezier(0.65, 0, 0.35, 1);
+	}
+
+	.morph--wipe.is-project .morph__edge {
+		inset-inline-start: 100%;
+	}
+
+	.morph--wipe.is-sweeping .morph__edge {
+		animation: flash 750ms linear;
+	}
+
+	@keyframes flash {
+		0%,
+		100% {
+			opacity: 0;
+		}
+		10%,
+		90% {
+			opacity: 1;
+		}
+	}
+
+	/* --- 07 Step aside ---------------------------------------------------- */
+
+	.morph--aside .morph__sentence {
+		transform-origin: 0 0;
+		transition:
+			transform 650ms var(--ease),
+			color 650ms ease;
+	}
+
+	.morph--aside .morph__sentence .role {
+		transition: color 650ms ease;
+	}
+
+	.morph--aside.is-project .morph__sentence {
+		transform: scale(0.3);
+		color: var(--faint);
+	}
+
+	.morph--aside.is-project .morph__sentence .role {
+		color: var(--muted);
+	}
+
+	.morph--aside .morph__name {
+		padding-block-start: var(--caption, 1.2em);
+		opacity: 0;
+		transform: translateY(0.35em);
+		transition:
+			opacity 450ms ease,
+			transform 650ms var(--ease);
+	}
+
+	.morph--aside.is-project .morph__name {
+		opacity: 1;
+		transform: none;
+		transition-delay: 120ms;
+	}
+
+	/* --- Responsive ------------------------------------------------------- */
+
+	@media (max-width: 900px) {
+		.demo {
+			grid-template-columns: minmax(0, 1fr);
+			min-block-size: 0;
+		}
+
+		.demo__hero {
+			justify-self: center;
+			max-inline-size: 36rem;
+		}
+
+		.morph {
+			font-size: clamp(1.9rem, 8vw, 3.4rem);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			transition: none !important;
+			animation: none !important;
+		}
+	}
+</style>

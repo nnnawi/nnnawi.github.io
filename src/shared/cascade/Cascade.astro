@@ -2,7 +2,7 @@
 import BentoCard from '../bento-card/BentoCard.astro';
 
 export interface CascadeItem {
-	/** Project name, shown in the readout while the tile is hovered. */
+	/** Project name, announced to the page (`cascade:project`) while the tile is hovered. */
 	title: string;
 	/** Path/URL of the looping clip that fills the tile. */
 	video: string;
@@ -108,8 +108,6 @@ const round = (value: number) => Number(value.toFixed(3));
 		})
 	}
 </section>
-
-<p class="readout" data-cascade-readout aria-hidden="true"></p>
 
 <style define:vars={{ cascadeDuration: `${duration}s` }}>
 	.cascade {
@@ -272,31 +270,6 @@ const round = (value: number) => Number(value.toFixed(3));
 		}
 	}
 
-	/* ---------------------------------------------------------------- readout */
-
-	/* The card already carries the project name for assistive tech; this is the
-	   sighted counterpart, kept at a readable size whatever the tile's scale. */
-	.readout {
-		position: absolute;
-		z-index: 2;
-		inset-block-end: clamp(1.5rem, 4vh, 2.75rem);
-		inset-inline-start: clamp(1.75rem, 6vw, 7rem);
-		margin: 0;
-		min-block-size: 1em;
-		color: rgba(232, 234, 240, 0.72);
-		font-size: 0.8rem;
-		font-weight: 400;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		pointer-events: none;
-		opacity: 0;
-		transition: opacity 260ms ease;
-	}
-
-	.readout:not(:empty) {
-		opacity: 1;
-	}
-
 	@media (max-width: 900px) {
 		/* On a narrow screen the arc runs behind the headline, so it steps back
 		   to a texture and stops competing for the pointer. */
@@ -306,10 +279,6 @@ const round = (value: number) => Number(value.toFixed(3));
 
 		.cascade__tile {
 			pointer-events: none;
-		}
-
-		.readout {
-			display: none;
 		}
 	}
 
@@ -323,8 +292,7 @@ const round = (value: number) => Number(value.toFixed(3));
 			z-index: var(--still-z);
 		}
 
-		.cascade__tile,
-		.readout {
+		.cascade__tile {
 			transition: none;
 		}
 	}
@@ -342,9 +310,8 @@ const round = (value: number) => Number(value.toFixed(3));
 	}
 
 	const cascade = document.querySelector<HTMLElement>('.cascade');
-	const readout = document.querySelector<HTMLElement>('[data-cascade-readout]');
 
-	if (cascade && readout) {
+	if (cascade) {
 		// `updatePlaybackRate` retimes the arc in place, so easing it down on
 		// hover never makes a tile jump away from under the pointer.
 		const setRate = (rate: number) => {
@@ -355,14 +322,24 @@ const round = (value: number) => Number(value.toFixed(3));
 			}
 		};
 
+		// Tells the page which project is under the pointer or focus, and null
+		// once there is none. The landing's hero retypes itself into the name.
+		let current: string | null = null;
+
+		const announce = (title: string | null) => {
+			if (title === current) return;
+			current = title;
+			cascade.dispatchEvent(new CustomEvent('cascade:project', { detail: title, bubbles: true }));
+		};
+
 		const show = (event: Event) => {
 			const tile = (event.target as HTMLElement).closest<HTMLElement>('.cascade__tile');
-			readout.textContent = tile?.dataset.title ?? '';
+			announce(tile?.dataset.title ?? null);
 		};
 
 		const clear = () => {
 			setRate(1);
-			readout.textContent = '';
+			announce(null);
 		};
 
 		cascade.addEventListener('pointerenter', () => setRate(0.12));

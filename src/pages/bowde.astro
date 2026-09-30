@@ -31,7 +31,7 @@ const project = {
 			title: 'Desmos, but for transfer functions',
 			body: [
 				'In MPSI preparatory classes I leaned on Bode and time-response diagrams to understand how a dynamic system actually behaves, and then to tune it. Outside professional software like MATLAB there was nothing lightweight that could draw those diagrams from a transfer function and keep them live while you changed it. Bowde exists to be the free, instant, browser-based version of that loop.',
-				'The model it borrows is the graphing calculator, not the simulation package. You type G(p), every diagram appears at once, and dragging a parameter slider moves all of them together. There is no project to set up, nothing to install, and no backend — the whole thing runs client-side in a tab.',
+				'It borrows the model of a graphing calculator: you type G(p), every diagram appears at once, and dragging a parameter slider moves all of them together. There is no project to set up, nothing to install, and no backend — the whole thing runs client-side in a tab.',
 				'That immediacy is the pedagogical point. The distance between a formula and the behaviour it describes is where control theory is usually lost, and it closes much faster when a coefficient is something you can pull on and watch respond than when it is a number you resubmit.',
 			],
 		},
@@ -40,8 +40,8 @@ const project = {
 			title: 'It left my hands and kept going',
 			// Paragraphs are rendered as HTML, so inline links are allowed here.
 			body: [
-				'Once the first version was finished, I licensed it to a physics professor in France who wanted it as an add-on for his course website. It was the first money I ever made on the internet, and it ended up paying for part of my university.',
-				'A while later I found out the project had been forked by researchers at a Swedish engineering school, who built on it to teach their own students. It is also cited in one of the research papers that came out of that work: <a href="RESEARCH_PAPER_URL" target="_blank" rel="noopener noreferrer">read the paper</a>.',
+				'Once the first version was finished, I licensed it to physics & engineering professor in France who wanted it as an add-on for their course website. It was the first money I ever made on the internet, and it ended up paying for part of my university.',
+				'A while later I found out the project had been forked by researchers at a Swedish engineering school, who built on it to teach their own students. It is also cited in one of the research papers that came out of that work: <a href="https://arxiv.org/abs/2410.12466" target="_blank" rel="noopener noreferrer">read the paper</a>.',
 			],
 		},
 	],
@@ -507,15 +507,18 @@ const project = {
 	}
 
 	.prose__paragraph a {
-		color: rgba(232, 234, 240, 0.92);
+		color: #a9b8ff;
 		text-decoration: underline;
-		text-decoration-color: rgba(232, 234, 240, 0.35);
+		text-decoration-color: rgba(169, 184, 255, 0.35);
 		text-underline-offset: 0.2em;
-		transition: text-decoration-color 160ms ease;
+		transition:
+			color 160ms ease,
+			text-decoration-color 160ms ease;
 	}
 
 	.prose__paragraph a:hover {
-		text-decoration-color: rgba(232, 234, 240, 0.85);
+		color: #c8d2ff;
+		text-decoration-color: rgba(200, 210, 255, 0.85);
 	}
 
 	/* --- Bento grid ------------------------------------------------------ */

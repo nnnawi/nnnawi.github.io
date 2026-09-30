@@ -95,16 +95,7 @@ const project = {
 									</svg>
 									Private repository
 								</span>
-								{project.repo.contact && (
-									<a
-										class="repo__request"
-										href={`mailto:${project.repo.contact}?subject=${encodeURIComponent(
-											`${project.title} — source access`
-										)}`}
-									>
-										Request access
-									</a>
-								)}
+			
 							</p>
 						) : (
 							<p class="repo">
