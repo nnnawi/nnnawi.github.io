@@ -243,7 +243,9 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 		inset: 0 0 auto;
 	}
 
-	.hero__ghost {
+	/* The unwritten rest of a line being drawn. The sentence's are made by the
+	   script at runtime, hence :global. */
+	.hero__morph :global(.hero__ghost) {
 		visibility: hidden;
 	}
 
@@ -647,6 +649,7 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 		const nameText = morph.querySelector<HTMLElement>('.hero__project-name-text')!;
 		const descriptionText = morph.querySelector<HTMLElement>('.hero__project-description-text')!;
 		const [nameGhost, descriptionGhost] = morph.querySelectorAll<HTMLElement>('.hero__ghost');
+		const lineCaret = ink.querySelector<HTMLElement>('.hero__caret--line')!;
 		const cta = morph.querySelector<HTMLElement>('[data-cta]')!;
 		const sentenceLayer = morph.querySelector<HTMLElement>('.hero__layer--sentence')!;
 		const projectLayer = morph.querySelector<HTMLElement>('.hero__project')!;
@@ -657,6 +660,40 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 			morph.classList.toggle('show-project', project);
 			(project ? projectLayer : sentenceLayer).append(cta);
 		};
+
+		// Whenever the text above it changes height (a layer swap, a role that
+		// takes another line), the link glides to its new place instead of
+		// jumping, starting from wherever it is on screen, even mid-glide.
+		// Both layers start at the top of the block, so `offsetTop` compares
+		// across them.
+		if (!reduce) {
+			let settled = cta.offsetTop;
+			let glide: Animation | null = null;
+
+			new MutationObserver(() => {
+				const target = cta.offsetTop;
+				if (target === settled) return;
+				const drift = cta.getBoundingClientRect().top - morph.getBoundingClientRect().top - target;
+				const offset = settled + drift - target;
+				settled = target;
+				glide?.cancel();
+				glide = cta.animate([{ transform: `translateY(${offset}px)` }, { transform: 'none' }], {
+					duration: 1020,
+					easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+				});
+			}).observe(morph, {
+				subtree: true,
+				childList: true,
+				characterData: true,
+				attributes: true,
+				attributeFilter: ['class'],
+			});
+
+			// A resize moves it with everything else; no glide for that.
+			window.addEventListener('resize', () => {
+				settled = cta.offsetTop;
+			});
+		}
 
 		let index = 0;
 		let run = 0;
@@ -670,19 +707,22 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 			.map((node) => ({ node, full: node.data }));
 
 		const restore = () => {
+			for (const rest of ink.querySelectorAll('.hero__ghost')) rest.remove();
 			roleText.textContent = roles[index];
 			for (const { node, full } of sentence) node.data = full;
+			ink.append(lineCaret);
 			slot.classList.remove('is-selected', 'is-typing');
 			morph.classList.remove('is-typing-back');
 		};
 
 		// Writes text out in one eased stroke, a frame at a time, across as many
 		// text nodes as it spans. A part with a `ghost` keeps the unwritten rest
-		// there, invisible, so its lines are laid out once and never rewrap.
+		// there, invisible, so its lines are laid out once and never rewrap. A
+		// `caret`, if given, is kept at the point being written.
 		// Resolves false if a newer sequence took over.
 		type Part = { node: Text; full: string; ghost?: Text };
 
-		const draw = (parts: Part[], duration: number, current: number) =>
+		const draw = (parts: Part[], duration: number, current: number, caret?: HTMLElement) =>
 			new Promise<boolean>((resolve) => {
 				const total = parts.reduce((sum, part) => sum + part.full.length, 0);
 				const start = performance.now();
@@ -697,6 +737,10 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 							if (ghost) ghost.data = full.slice(count);
 						}
 						left -= count;
+					}
+					if (caret) {
+						const at = parts.find((part) => part.node.data.length < part.full.length) ?? parts.at(-1);
+						if (at && caret.previousSibling !== at.node) at.node.after(caret);
 					}
 					if (t < 1) requestAnimationFrame(frame);
 					else resolve(true);
@@ -817,13 +861,27 @@ const longestRole = roles.reduce((a, b) => (b.length > a.length ? b : a));
 			morph.classList.remove('is-selected');
 			showLayer(false);
 
-			// Draw the sentence back, role included, in one eased stroke.
+			// Draw the sentence back, role included, in one eased stroke. Like the
+			// project's lines, each piece keeps its unwritten rest beside it,
+			// invisible, so the sentence holds its full shape — and the link
+			// below it its place — while it is written.
 			restore();
-			const nodes = textNodes(ink).map((node) => ({ node, full: node.data }));
-			for (const { node } of nodes) node.data = '';
+			const parts: Part[] = textNodes(ink)
+				.filter((node) => node.data.length > 0)
+				.map((node) => {
+					const rest = document.createElement('span');
+					rest.className = 'hero__ghost';
+					const ghost = document.createTextNode(node.data);
+					rest.append(ghost);
+					node.after(rest);
+					const full = node.data;
+					node.data = '';
+					return { node, full, ghost };
+				});
+			parts[0]?.node.after(lineCaret);
 			morph.classList.add('is-typing-back');
-			if (!(await draw(nodes, REDRAW, current))) return;
-			morph.classList.remove('is-typing-back');
+			if (!(await draw(parts, REDRAW, current, lineCaret))) return;
+			restore();
 			scheduleRole();
 		};
 
