@@ -32,7 +32,7 @@ const project = {
 		},
 		{
 			label: 'Approach',
-			title: 'Making a sequential algorithm run in parallel',
+			title: 'Making sequential algorithms run in parallel',
 			body: [
 				'The constraint I set at the start was real time performance. An effect you have to render to preview is an effect you stop experimenting with, and experimenting is the whole point. Real time means the GPU and thus parallelization.',
 				'But dithering algorithms like error diffusion are inherently sequential: each pixel depends on the error propagated by previous ones. Rewriting these algorithms for thousands of threads without losing their characteristic look was the hardest and most interesting part of the project.'

@@ -34,7 +34,7 @@ const project = {
 		},
 		{
 			label: 'Approach',
-			title: 'Sixty effects, one GPU pipeline, recompute only what changed',
+			title: 'Sixty effects, one GPU pipeline recomputing only what changed',
 			body: [
 				'MorphoX is an Angular application running inside Electron, accelerated end to end through WebGPU on top of a custom framework written for image-processing workloads. Over sixty effects live as self-contained classes carrying both their parameters and their WGSL shaders, published through a declarative registry.',
 				'The execution engine is a caching dataflow graph: changing a parameter recomputes that node and its descendants and nothing else, which is what keeps the interface responsive as graphs grow. Everything stays on the GPU until an export is requested, so no frame is round-tripped through host memory on its way to the screen. Rendering, node editing, effect management and controls are separate services, which is how a dozen independent tools can read the same image data without becoming entangled.',
