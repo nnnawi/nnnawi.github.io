@@ -5,12 +5,10 @@
 // ---------------------------------------------------------------------------
 const project = {
 	title: 'Dither Plugin',
-	tagline: 'A professional-grade dithering plugin for After Effects: four families of dithering algorithms, a full pre- and post-processing chain, and GPU kernels written to keep all of it running in real time.',
+	tagline: 'A professional-grade dithering plugin for After Effects with GPU kernels written to keep all of it running in real time.',
 	meta: [
-		{ label: 'Discipline', value: 'Image processing · GPU compute' },
 		{ label: 'Stack', value: 'After Effects SDK, C++, CUDA, Metal' },
 		{ label: 'Year', value: '2026' },
-		{ label: 'Role', value: 'Self initiated' },
 	],
 	hero: '/project_animation/DitherPlugin/Dither_main.mp4',
 	// Repository. `private: true` swaps the link for a locked badge plus an access
@@ -66,6 +64,13 @@ const project = {
 			value: 'Pixel smoothing on the dithered result.',
 		},
 	],
+	// Headline numbers, rendered as a tile row under the hero.
+	results: [
+		{ value: '4', label: 'Algorithm Families', detail: 'Error diffusion, ordered dithering, halftoning and FM modulation.' },
+		{ value: '60 FPS', label: 'Real time', detail: 'On 1080p footage, on an Apple M3 with 8 GB of RAM.' },
+		{ value: '30+', label: 'Presets', detail: 'Dithering patterns, plus 20+ colour palettes and palettes taken from any image.' },
+		{ value: '6', label: 'Editable stages', detail: 'From sampling and preprocessing to palette and smoothing, every parameter exposed.' },
+	],
 	// Bento media grid — `span` drives how many of the 4 columns a tile takes.
 	// Convention: clips live in /project_animation/DitherPlugin/.
 	media: [
@@ -97,7 +102,7 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 	</head>
 	<body>
 		<main>
-			<a class="back-link" href="/">
+			<a class="back-link" href="/projects">
 				<span class="back-link__arrow" aria-hidden="true">←</span>
 				Back to all projects
 			</a>
@@ -106,10 +111,10 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 				<h1 class="project-title">{project.title}</h1>
 				<p class="project-tagline">{project.tagline}</p>
 
-				{
-					project.repo &&
-						(project.repo.private ? (
-							<p class="repo">
+				<p class="repo">
+					{
+						project.repo &&
+							(project.repo.private ? (
 								<span class="repo__badge">
 									<svg
 										class="repo__icon"
@@ -124,10 +129,7 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 									</svg>
 									Private repository
 								</span>
-					
-							</p>
-						) : (
-							<p class="repo">
+							) : (
 								<a
 									class="repo__link"
 									href={project.repo.url}
@@ -139,20 +141,17 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 									</svg>
 									View source on GitHub
 								</a>
-							</p>
-						))
-				}
-
-				<dl class="project-meta">
-					{
-						project.meta.map((item) => (
-							<div class="project-meta__row">
-								<dt class="project-meta__label">{item.label}</dt>
-								<dd class="project-meta__value">{item.value}</dd>
-							</div>
-						))
+							))
 					}
-				</dl>
+
+					<span class="project-meta">
+						{project.meta.map((item) => (
+							<span class="project-meta__item" title={item.label}>
+								{item.value}
+							</span>
+						))}
+					</span>
+				</p>
 			</header>
 
 			<figure class="hero">
@@ -168,6 +167,22 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 					aria-hidden="true"
 					data-project-video></video>
 			</figure>
+
+			{
+				project.results.length > 0 && (
+					<section class="results" aria-label="Headline results">
+						<div class="results__grid">
+							{project.results.map((item) => (
+								<div class="results__tile">
+									<p class="results__value">{item.value}</p>
+									<p class="results__name">{item.label}</p>
+									<p class="results__detail">{item.detail}</p>
+								</div>
+							))}
+						</div>
+					</section>
+				)
+			}
 
 			<div class="prose">
 				{
@@ -220,7 +235,6 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 
 			<footer class="site-footer">
 				<span>Iwan Ibnoulouafi</span>
-				<a href="mailto:iwan@ibnoulouafi.com">iwan@ibnoulouafi.com</a>
 			</footer>
 		</main>
 	</body>
@@ -276,7 +290,7 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 	.project-title {
 		margin: 0;
 		font-size: clamp(2.75rem, 9vw, 5.5rem);
-		font-weight: 350;
+		font-weight: 450;
 		line-height: 0.98;
 		letter-spacing: -0.035em;
 	}
@@ -355,34 +369,18 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 		border-color: rgba(232, 234, 240, 0.55);
 	}
 
+	/* Stack and year, unlabelled, on the repository row. */
 	.project-meta {
-		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		gap: clamp(0.75rem, 1.5vw, 1.25rem);
-		margin: clamp(2rem, 5vw, 3.25rem) 0 0;
-		padding-block-start: 1.25rem;
-		border-block-start: 1px solid rgba(255, 255, 255, 0.09);
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: 0 0.7em;
+		color: rgba(232, 234, 240, 0.55);
 	}
 
-	.project-meta__row {
-		display: flex;
-		flex-direction: column;
-		gap: 0.4em;
-	}
-
-	.project-meta__label {
-		font-size: 0.72rem;
-		letter-spacing: 0.09em;
-		text-transform: uppercase;
+	.project-meta__item + .project-meta__item::before {
+		content: '·';
+		margin-inline-end: 0.7em;
 		color: rgba(232, 234, 240, 0.38);
-	}
-
-	.project-meta__value {
-		margin: 0;
-		font-size: 0.92rem;
-		line-height: 1.35;
-		color: rgba(232, 234, 240, 0.88);
-		text-wrap: pretty;
 	}
 
 	/* --- Hero ------------------------------------------------------------ */
@@ -459,6 +457,56 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 				rgba(255, 255, 255, 0) 55%
 			);
 		mix-blend-mode: screen;
+	}
+
+	/* --- Results --------------------------------------------------------- */
+
+	/* The numbers are the deliverable here, so they sit directly under the hero. */
+	.results {
+		margin-block-start: clamp(1.25rem, 3vw, 2rem);
+	}
+
+	.results__grid {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: clamp(0.75rem, 1.5vw, 1.25rem);
+	}
+
+	.results__tile {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2em;
+		padding: clamp(1rem, 2.5vw, 1.4rem) clamp(1rem, 2.5vw, 1.35rem);
+		border: 1px solid rgba(255, 255, 255, 0.09);
+		border-radius: 14px;
+		background: rgba(255, 255, 255, 0.02);
+	}
+
+	.results__value {
+		margin: 0;
+		font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+		font-weight: 350;
+		line-height: 1.05;
+		letter-spacing: -0.03em;
+		color: #e8eaf0;
+		/* Keeps 3x and -2.8 optically aligned across the row. */
+		font-variant-numeric: tabular-nums;
+	}
+
+	.results__name {
+		margin: 0.25em 0 0;
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.results__detail {
+		margin: 0.5em 0 0;
+		font-size: 0.85rem;
+		line-height: 1.4;
+		color: rgba(232, 234, 240, 0.6);
+		text-wrap: pretty;
 	}
 
 	/* --- Prose ----------------------------------------------------------- */
@@ -735,15 +783,14 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 	/* --- Responsive ------------------------------------------------------ */
 
 	@media (max-width: 720px) {
-		.project-meta {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 1.25rem;
-		}
-
 		.prose__section,
 		.features {
 			grid-template-columns: minmax(0, 1fr);
 			gap: 0.75rem;
+		}
+
+		.results__grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 
 		.features__list {

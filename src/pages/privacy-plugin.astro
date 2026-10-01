@@ -7,10 +7,8 @@ const project = {
 	title: 'Privacy Plugin',
 	tagline: 'A Premiere Pro plugin that finds the private things in a shot (faces, addresses, screens, a room you would rather not identify) and keeps them covered for the whole cut. Toggle a class, not a mask.',
 	meta: [
-		{ label: 'Discipline', value: 'Computer vision · Video post-production' },
 		{ label: 'Stack', value: 'UXP, Python, YOLO, ByteTrack, EdgeTAM, CoreML / ONNX Runtime' },
 		{ label: 'Year', value: '2026' },
-		{ label: 'Role', value: 'Self initiated' },
 	],
 	hero: '/project_animation/PPlugin_animation.mp4',
 	// Work in progress. Drop the key once the project ships.
@@ -34,7 +32,7 @@ const project = {
 		},
 		{
 			label: 'Approach',
-			title: 'One fine-tuned detector, an OCR pass, and a click for the rest',
+			title: 'Handling a complex AI pipeline inside Premiere Pro',
 			body: [
 				'Premiere\u2019s UXP runtime cannot host PyTorch, so the plugin uses a UXP panel for the interface and a local Python sidecar for inference. The panel passes clip paths and in/out points; the sidecar reads the media directly from disk.',
 				'Detection is split by task. A fine-tuned YOLO model handles most classes, including faces, house numbers, and screens. Text goes through OCR, then regex and NER filtering to selectively mask sensitive information. Arbitrary objects can be selected once and tracked with EdgeTAM.',
@@ -93,7 +91,7 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 	</head>
 	<body>
 		<main>
-			<a class="back-link" href="/">
+			<a class="back-link" href="/projects">
 				<span class="back-link__arrow" aria-hidden="true">←</span>
 				Back to all projects
 			</a>
@@ -143,18 +141,15 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 							</span>
 						)
 					}
-				</p>
 
-				<dl class="project-meta">
-					{
-						project.meta.map((item) => (
-							<div class="project-meta__row">
-								<dt class="project-meta__label">{item.label}</dt>
-								<dd class="project-meta__value">{item.value}</dd>
-							</div>
-						))
-					}
-				</dl>
+					<span class="project-meta">
+						{project.meta.map((item) => (
+							<span class="project-meta__item" title={item.label}>
+								{item.value}
+							</span>
+						))}
+					</span>
+				</p>
 			</header>
 
 			<figure class="hero">
@@ -289,7 +284,6 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 
 			<footer class="site-footer">
 				<span>Iwan Ibnoulouafi</span>
-				<a href="mailto:iwan@ibnoulouafi.com">iwan@ibnoulouafi.com</a>
 			</footer>
 		</main>
 	</body>
@@ -345,7 +339,7 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 	.project-title {
 		margin: 0;
 		font-size: clamp(2.75rem, 9vw, 5.5rem);
-		font-weight: 350;
+		font-weight: 450;
 		line-height: 0.98;
 		letter-spacing: -0.035em;
 	}
@@ -434,34 +428,18 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 		border-color: rgba(232, 234, 240, 0.55);
 	}
 
+	/* Stack and year, unlabelled, on the repository row. */
 	.project-meta {
-		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		gap: clamp(0.75rem, 1.5vw, 1.25rem);
-		margin: clamp(2rem, 5vw, 3.25rem) 0 0;
-		padding-block-start: 1.25rem;
-		border-block-start: 1px solid rgba(255, 255, 255, 0.09);
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: 0 0.7em;
+		color: rgba(232, 234, 240, 0.55);
 	}
 
-	.project-meta__row {
-		display: flex;
-		flex-direction: column;
-		gap: 0.4em;
-	}
-
-	.project-meta__label {
-		font-size: 0.72rem;
-		letter-spacing: 0.09em;
-		text-transform: uppercase;
+	.project-meta__item + .project-meta__item::before {
+		content: '·';
+		margin-inline-end: 0.7em;
 		color: rgba(232, 234, 240, 0.38);
-	}
-
-	.project-meta__value {
-		margin: 0;
-		font-size: 0.92rem;
-		line-height: 1.35;
-		color: rgba(232, 234, 240, 0.88);
-		text-wrap: pretty;
 	}
 
 	/* --- Hero ------------------------------------------------------------ */
@@ -1068,11 +1046,6 @@ const pad = (index: number) => String(index + 1).padStart(2, '0');
 	/* --- Responsive ------------------------------------------------------ */
 
 	@media (max-width: 720px) {
-		.project-meta {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 1.25rem;
-		}
-
 		.prose__section,
 		.classes {
 			grid-template-columns: minmax(0, 1fr);

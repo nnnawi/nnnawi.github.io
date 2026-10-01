@@ -1,0 +1,1361 @@
+---
+// ---------------------------------------------------------------------------
+// Project template — everything a project needs lives in this block.
+// Copy this file, swap the data, keep the markup.
+// ---------------------------------------------------------------------------
+const project = {
+	title: 'SirAMP',
+	tagline: 'A handcrafted portable bass amp made from scratch: from circuit design to a 3D printed enclosure that clips onto your trousers, so you can practise in silence.',
+	meta: [
+		{ label: 'Stack', value: 'KiCad, Fusion 360, 3D printing' },
+		{ label: 'Year', value: '2026' },
+	],
+	hero: '/project_animation/SIRAMP_animation.mp4',
+	sections: [
+		{
+			label: 'Summary',
+			body: [
+				'SirAMP is a portable headphone amp for electric bass that I designed and built from scratch for my friend Siran, who had no amplifier and a small room with thin walls. Instead of buying one of the few portable amps on the market, I designed my own circuit: a USB-C charger and a 9 V boost converter for the battery, a pi filter and an op-amp-buffered reference voltage to keep the supply clean, a preamp with gain and volume controls, and a headphone amplifier. I drew it in KiCad, simulated it, debugged it on a breadboard with an oscilloscope I made from an Arduino Mega, then hand-soldered it onto a through-hole board. The enclosure went through many sketches before landing on a rounded star, modelled in Fusion 360 and 3D-printed, with a carabiner hook so it can hang from your trousers while you play. The project isn’t finished yet, since the enclosure still needs primer, paint and a clear coat, so this page is just a gallery of the steps so far.',
+			],
+		},
+	],
+	// Step-by-step photo gallery. `file` is the basename in /siramp/web/ (full size)
+	// and /siramp/thumbs/ (carousel), both WebP, encoded from the PNGs in /siramp/.
+	photos: [
+		{
+			file: 'KICAD_SCHEMATICS',
+			text: 'The full circuit in KiCad, in four blocks. A TP4056 module charges the battery over USB-C and a boost converter raises it to 9 V, cleaned up by a 1 Ω and 22 µH pi filter. One half of a JRC4558 op-amp buffers a voltage divider to give a stable reference voltage, and the other half is the bass preamp, with its gain and volume pots. A TDA2822 drives the headphones, with a Zobel network on each output.',
+		},
+		{
+			file: 'WIRING_SCHEMATICS',
+			text: 'Before soldering anything, I placed every component on the perfboard grid by hand, top layer and bottom layer, with their connection lines clearly defined to fit the PCB size and layout constraints.',
+		},
+		{
+			file: 'PCB',
+			text: 'The V1 of the board, hand-soldered on perfboard. The blue module is the USB-C charger, with the boost converter above it and the pi-filter inductor next to it. The second smaller board is the headphone amp, stacked on the top left to keep the footprint small enough for the enclosure.',
+		},
+		{
+			file: 'PCB_SIDE',
+			text: 'Everything is through-hole parts and modules, so the board stays easy to rework while the design is still changing.',
+		},
+		{
+			file: 'CARTER_DRAWING_2',
+			text: 'Before the star, the enclosure went through a Z-shaped direction. I tried building it from a handful of geometric variables: three radii, three lengths and one angle.',
+		},
+		{
+			file: 'CARTER_DRAWINGS',
+			text: 'Variations of the Z shape, each changing a single parameter. You can see I went deep into the detail rabbit-hole.',
+		},
+		{
+			file: 'CARTER_DRAWING_3',
+			text: 'Two variants drawn precisely with the real size PCB overlayed onto it. This was to get a grasp on how big the final product will be.',
+		},
+		{
+			file: 'CARTER_FAILS',
+			text: 'Some of the 3D-printed tests that didn’t make it.',
+		},
+		{
+			file: 'CARTER_TOP',
+			text: 'The final rounded star, printed in two halves, with the board, battery and wiring fitted inside. The hole at the top is for the carabiner. What’s left is the finish: primer, paint and a clear coat.',
+		},
+	],
+};
+
+const firstPhoto = project.photos[0];
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={project.tagline} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+		/>
+		<title>{project.title}</title>
+	</head>
+	<body>
+		<main>
+			<a class="back-link" href="/projects">
+				<span class="back-link__arrow" aria-hidden="true">←</span>
+				Back to all projects
+			</a>
+
+			<header class="project-header">
+				<h1 class="project-title">{project.title}</h1>
+				<p class="project-tagline">{project.tagline}</p>
+
+				<p class="repo">
+					<span class="project-meta">
+						{project.meta.map((item) => (
+							<span class="project-meta__item" title={item.label}>
+								{item.value}
+							</span>
+						))}
+					</span>
+				</p>
+			</header>
+
+			<figure class="hero">
+				<video
+					class="hero__video"
+					src={project.hero}
+					autoplay
+					muted
+					loop
+					playsinline
+					preload="metadata"
+					tabindex="-1"
+					aria-hidden="true"
+					data-project-video></video>
+			</figure>
+
+			<div class="prose">
+				{
+					project.sections.map((section) => (
+						<section class="prose__section">
+							<p class="prose__label">{section.label}</p>
+							<div class="prose__body">
+								{section.body.map((paragraph) => (
+									<p class="prose__paragraph">{paragraph}</p>
+								))}
+							</div>
+						</section>
+					))
+				}
+			</div>
+
+			<section class="steps" aria-label="Project steps" data-steps>
+				<p class="gallery__label">Selected Pictures</p>
+
+				<div class="steps__stage">
+					<div class="steps__frame">
+						<button class="steps__open" type="button" aria-label="Open the full-size image" data-steps-open>
+							<img
+								class="steps__image"
+								src={`/siramp/web/${firstPhoto.file}.webp`}
+								alt={firstPhoto.text}
+								decoding="async"
+								data-steps-image
+							/>
+						</button>
+						<button class="steps__arrow steps__arrow--prev" type="button" aria-label="Previous image" data-steps-prev>
+							<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+								<path d="M10 3.5 5.5 8l4.5 4.5" />
+							</svg>
+						</button>
+						<button class="steps__arrow steps__arrow--next" type="button" aria-label="Next image" data-steps-next>
+							<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+								<path d="M6 3.5 10.5 8 6 12.5" />
+							</svg>
+						</button>
+					</div>
+					<p class="steps__caption" aria-live="polite">
+						<span class="steps__text" data-steps-text>{firstPhoto.text}</span>
+					</p>
+				</div>
+
+				<div class="steps__rail" data-steps-rail>
+					{project.photos.map((photo, index) => (
+						<button
+							class="steps__thumb"
+							type="button"
+							aria-label={`Show image ${index + 1} of ${project.photos.length}`}
+							aria-current={index === 0 ? 'true' : undefined}
+							data-steps-thumb
+							data-src={`/siramp/web/${photo.file}.webp`}
+							data-full={`/siramp/full/${photo.file}.webp`}
+							data-text={photo.text}
+						>
+							<img src={`/siramp/thumbs/${photo.file}.webp`} alt="" loading="lazy" decoding="async" />
+						</button>
+					))}
+				</div>
+			</section>
+
+			<dialog class="zoom" aria-label="Full-size image" data-zoom>
+				<div class="zoom__canvas" data-zoom-canvas>
+					<img class="zoom__image" alt="" draggable="false" data-zoom-image />
+				</div>
+				<button class="zoom__button zoom__close" type="button" aria-label="Close" data-zoom-close>
+					<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+						<path d="m4 4 8 8M12 4l-8 8" />
+					</svg>
+				</button>
+				<div class="zoom__controls">
+					<button class="zoom__button" type="button" aria-label="Zoom out" data-zoom-out>
+						<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+							<path d="M3.5 8h9" />
+						</svg>
+					</button>
+					<button class="zoom__button" type="button" aria-label="Reset zoom" data-zoom-reset>
+						<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+							<path d="M2.75 6V2.75H6M10 2.75h3.25V6M13.25 10v3.25H10M6 13.25H2.75V10" />
+						</svg>
+					</button>
+					<button class="zoom__button" type="button" aria-label="Zoom in" data-zoom-in>
+						<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+							<path d="M3.5 8h9M8 3.5v9" />
+						</svg>
+					</button>
+				</div>
+			</dialog>
+
+			<footer class="site-footer">
+				<span>Iwan Ibnoulouafi</span>
+			</footer>
+		</main>
+	</body>
+</html>
+
+<style>
+	:global(body) {
+		margin: 0;
+		background: #05070c;
+		color: #e8eaf0;
+		font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+		font-weight: 350;
+	}
+
+	main {
+		max-inline-size: 1100px;
+		margin-inline: auto;
+		padding: clamp(1.5rem, 5vw, 4rem) clamp(1rem, 4vw, 2rem);
+	}
+
+	/* --- Back link ------------------------------------------------------- */
+
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5em;
+		color: rgba(232, 234, 240, 0.55);
+		font-size: 0.85rem;
+		letter-spacing: 0.01em;
+		text-decoration: none;
+		transition: color 160ms ease;
+	}
+
+	.back-link:hover {
+		color: rgba(232, 234, 240, 0.9);
+	}
+
+	.back-link__arrow {
+		display: inline-block;
+		transition: transform 160ms ease;
+	}
+
+	.back-link:hover .back-link__arrow {
+		transform: translateX(-3px);
+	}
+
+	/* --- Header ---------------------------------------------------------- */
+
+	.project-header {
+		margin-block: clamp(2.5rem, 7vw, 5rem) clamp(1.5rem, 4vw, 2.5rem);
+	}
+
+	.project-title {
+		margin: 0;
+		font-size: clamp(2.75rem, 9vw, 5.5rem);
+		font-weight: 450;
+		line-height: 0.98;
+		letter-spacing: -0.035em;
+	}
+
+	.project-tagline {
+		margin: clamp(1rem, 2.5vw, 1.5rem) 0 0;
+		max-inline-size: 46ch;
+		font-size: clamp(1rem, 1.6vw, 1.2rem);
+		line-height: 1.45;
+		color: rgba(232, 234, 240, 0.62);
+		text-wrap: pretty;
+	}
+
+	/* --- Repository ------------------------------------------------------ */
+
+	.repo {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem;
+		margin: clamp(1.25rem, 2.5vw, 1.75rem) 0 0;
+		font-size: 0.85rem;
+	}
+
+	.repo__link,
+	.repo__badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55em;
+		padding: 0.5em 0.95em;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.03);
+		line-height: 1;
+		text-decoration: none;
+	}
+
+	.repo__link {
+		color: rgba(232, 234, 240, 0.82);
+		transition:
+			color 160ms ease,
+			border-color 160ms ease,
+			background-color 160ms ease;
+	}
+
+	.repo__link:hover {
+		color: #e8eaf0;
+		border-color: rgba(255, 255, 255, 0.28);
+		background: rgba(255, 255, 255, 0.07);
+	}
+
+	.repo__badge {
+		color: rgba(232, 234, 240, 0.5);
+	}
+
+	.repo__icon {
+		flex: none;
+		inline-size: 1.05em;
+		block-size: 1.05em;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	/* Stack and year, unlabelled, on the repository row. */
+	.project-meta {
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: 0 0.7em;
+		color: rgba(232, 234, 240, 0.55);
+	}
+
+	.project-meta__item + .project-meta__item::before {
+		content: '·';
+		margin-inline-end: 0.7em;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	/* --- Hero ------------------------------------------------------------ */
+
+	.hero {
+		position: relative;
+		margin: 0;
+		aspect-ratio: 21 / 9;
+		overflow: hidden;
+		isolation: isolate;
+		border-radius: 20px;
+		background-color: #0a0c11;
+		box-shadow:
+			0 1px 2px rgba(5, 7, 12, 0.28),
+			0 30px 60px -30px rgba(5, 7, 12, 0.8);
+	}
+
+	.hero__video {
+		position: absolute;
+		inset: 0;
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+		transform: scale(1.015);
+	}
+
+	/* Same liquid-glass edge treatment as the bento cards on the index page. */
+	.hero::after,
+	.media-card::after,
+	.steps__stage::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 4;
+		pointer-events: none;
+		border-radius: inherit;
+		padding: 1px;
+		opacity: 40%;
+		background: linear-gradient(
+			150deg,
+			rgba(255, 255, 255, 0.75) 0%,
+			rgba(255, 255, 255, 0.22) 18%,
+			rgba(255, 255, 255, 0.04) 42%,
+			rgba(255, 255, 255, 0.1) 70%,
+			rgba(255, 255, 255, 0.45) 100%
+		);
+		mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		mask-composite: exclude;
+		-webkit-mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+	}
+
+	.hero::before,
+	.media-card::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 2;
+		pointer-events: none;
+		border-radius: inherit;
+		background:
+			linear-gradient(
+				145deg,
+				rgba(255, 255, 255, 0.16) 0%,
+				rgba(255, 255, 255, 0.05) 22%,
+				rgba(255, 255, 255, 0) 46%
+			),
+			radial-gradient(
+				120% 80% at 85% 0%,
+				rgba(255, 255, 255, 0.12) 0%,
+				rgba(255, 255, 255, 0) 55%
+			);
+		mix-blend-mode: screen;
+	}
+
+	/* --- Results --------------------------------------------------------- */
+
+	/* The numbers are the deliverable here, so they sit directly under the hero. */
+	.results {
+		margin-block-start: clamp(1.25rem, 3vw, 2rem);
+	}
+
+	.results__grid {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: clamp(0.75rem, 1.5vw, 1.25rem);
+	}
+
+	.results__tile {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2em;
+		padding: clamp(1rem, 2.5vw, 1.4rem) clamp(1rem, 2.5vw, 1.35rem);
+		border: 1px solid rgba(255, 255, 255, 0.09);
+		border-radius: 14px;
+		background: rgba(255, 255, 255, 0.02);
+	}
+
+	.results__value {
+		margin: 0;
+		font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+		font-weight: 350;
+		line-height: 1.05;
+		letter-spacing: -0.03em;
+		color: #e8eaf0;
+		/* Keeps 3x and -2.8 optically aligned across the row. */
+		font-variant-numeric: tabular-nums;
+	}
+
+	.results__name {
+		margin: 0.25em 0 0;
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.results__detail {
+		margin: 0.5em 0 0;
+		font-size: 0.85rem;
+		line-height: 1.4;
+		color: rgba(232, 234, 240, 0.6);
+		text-wrap: pretty;
+	}
+
+	/* --- Prose ----------------------------------------------------------- */
+
+	.prose {
+		display: flex;
+		flex-direction: column;
+		gap: clamp(2.5rem, 6vw, 4rem);
+		margin-block: clamp(3rem, 8vw, 5.5rem);
+	}
+
+	.prose__section {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+		gap: clamp(1rem, 3vw, 2rem);
+	}
+
+	.prose__label {
+		margin: 0;
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.prose__body {
+		max-inline-size: 62ch;
+	}
+
+	.prose__heading {
+		margin: 0 0 0.9em;
+		font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+		font-weight: 350;
+		line-height: 1.2;
+		letter-spacing: -0.02em;
+		text-wrap: balance;
+	}
+
+	.prose__paragraph {
+		margin: 0 0 1em;
+		font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+		line-height: 1.6;
+		color: rgba(232, 234, 240, 0.68);
+		text-wrap: pretty;
+	}
+
+	.prose__paragraph:last-child {
+		margin-block-end: 0;
+	}
+
+	/* --- Feature list ---------------------------------------------------- */
+
+	/* Same 1fr/3fr axis as .prose__section, so the list sits under the body copy
+	   instead of starting back at the page margin. */
+	.features {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+		gap: clamp(1rem, 3vw, 2rem);
+		margin-block-start: clamp(3rem, 8vw, 5.5rem);
+	}
+
+	/* A signal chain rather than a bullet list: one spine, one node per stage,
+	   read top to bottom in the order the work actually happens. */
+	.features__list {
+		/* --pad and the 0.75em half-line (line-height 1.5 / 2) are what keep the
+		   spine, the node and the first line of text on one axis. Change one of
+		   the three and the other two have to follow. */
+		--pad: clamp(0.85rem, 2vw, 1.1rem);
+		--node: 0.6rem;
+		display: flex;
+		flex-direction: column;
+		/* The negative top cancels the first item's leading pad, so the first
+		   spec sits on the label's line the way .prose__heading does. */
+		margin: calc(var(--pad) * -1) 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.features__item {
+		position: relative;
+		display: grid;
+		grid-template-columns: 1.5rem minmax(0, 1fr);
+		gap: clamp(0.85rem, 2vw, 1.4rem);
+		padding-block: var(--pad);
+		font-size: clamp(0.9rem, 1.4vw, 1rem);
+		line-height: 1.5;
+	}
+
+	/* One continuous spine, trimmed at the first and last stage so it starts and
+	   stops on a node instead of in mid-air. */
+	.features__item::before {
+		content: '';
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: calc(0.75rem - 0.5px);
+		inline-size: 1px;
+		background: rgba(255, 255, 255, 0.13);
+	}
+
+	.features__item:first-child::before {
+		inset-block-start: calc(var(--pad) + 0.75em);
+	}
+
+	.features__item:last-child::before {
+		inset-block-end: calc(100% - var(--pad) - 0.75em);
+	}
+
+	.features__node {
+		position: relative;
+		z-index: 1;
+		justify-self: center;
+		align-self: start;
+		margin-block-start: calc(0.75em - var(--node) / 2);
+		inline-size: var(--node);
+		block-size: var(--node);
+		border: 1px solid rgba(232, 234, 240, 0.4);
+		border-radius: 999px;
+		background: #05070c;
+		transition:
+			border-color 220ms ease,
+			background-color 220ms ease,
+			box-shadow 220ms ease;
+	}
+
+	.features__item:hover .features__node {
+		border-color: rgba(232, 234, 240, 0.95);
+		background: rgba(232, 234, 240, 0.95);
+		box-shadow: 0 0 0 4px rgba(232, 234, 240, 0.09);
+	}
+
+	.features__text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.3em;
+	}
+
+	.features__name {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.7em;
+		color: rgba(232, 234, 240, 0.9);
+	}
+
+	.features__tick {
+		font-size: 0.68rem;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.08em;
+		color: rgba(232, 234, 240, 0.28);
+		transition: color 220ms ease;
+	}
+
+	.features__item:hover .features__tick {
+		color: rgba(232, 234, 240, 0.55);
+	}
+
+	.features__value {
+		max-inline-size: 62ch;
+		color: rgba(232, 234, 240, 0.58);
+		text-wrap: pretty;
+	}
+
+	/* --- Bento grid ------------------------------------------------------ */
+
+	.bento-grid {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		align-items: start;
+		gap: clamp(0.75rem, 1.5vw, 1.25rem);
+	}
+
+	.bento-grid > .span-2 {
+		grid-column: span 2;
+	}
+
+	.bento-grid > .span-4 {
+		grid-column: span 4;
+	}
+
+	.gallery {
+		margin-block-start: clamp(3rem, 8vw, 5.5rem);
+	}
+
+	.gallery__label,
+	.features__label {
+		margin: 0;
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: rgba(232, 234, 240, 0.38);
+	}
+
+	.gallery__label {
+		margin-block-end: clamp(1rem, 2vw, 1.5rem);
+	}
+
+	.media-card {
+		position: relative;
+		margin: 0;
+		aspect-ratio: var(--media-ratio, 16 / 9);
+		overflow: hidden;
+		isolation: isolate;
+		border-radius: 20px;
+		background-color: #0a0c11;
+		box-shadow:
+			0 1px 2px rgba(5, 7, 12, 0.28),
+			0 18px 40px -22px rgba(5, 7, 12, 0.7);
+		container-type: inline-size;
+	}
+
+	.media-card__video {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+		transform: scale(1.015);
+	}
+
+	.media-card__frost {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		backdrop-filter: blur(14px) saturate(130%);
+		-webkit-backdrop-filter: blur(14px) saturate(130%);
+		background: linear-gradient(
+			to top,
+			rgba(8, 10, 16, 0.55) 0%,
+			rgba(8, 10, 16, 0.22) 30%,
+			rgba(8, 10, 16, 0) 60%
+		);
+		mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 26%, transparent 58%);
+		-webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.6) 26%, transparent 58%);
+	}
+
+	.media-card__caption {
+		position: absolute;
+		inset-block-end: 0;
+		inset-inline: 0;
+		z-index: 3;
+		padding: clamp(0.875rem, 4.5cqi, 1.5rem);
+		font-size: clamp(0.75rem, 2.2cqi, 0.9rem);
+		line-height: 1.35;
+		color: rgba(255, 255, 255, 0.72);
+		text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
+		text-wrap: pretty;
+	}
+
+	/* --- Step gallery --------------------------------------------------- */
+
+	.steps {
+		margin-block-start: clamp(3rem, 8vw, 5.5rem);
+	}
+
+	.steps__stage {
+		position: relative;
+		overflow: hidden;
+		isolation: isolate;
+		border-radius: 20px;
+		background-color: #0a0c11;
+		box-shadow:
+			0 1px 2px rgba(5, 7, 12, 0.28),
+			0 30px 60px -30px rgba(5, 7, 12, 0.8);
+	}
+
+	/* 16:9 matches the photos, so they fill it; portrait sketches are pillarboxed. */
+	.steps__frame {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		touch-action: pan-y;
+	}
+
+	.steps__image {
+		position: absolute;
+		inset: 0;
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: contain;
+		transition: opacity 220ms ease;
+	}
+
+	.steps__open {
+		position: absolute;
+		inset: 0;
+		padding: 0;
+		border: 0;
+		background: none;
+		cursor: zoom-in;
+	}
+
+	.steps__open:focus-visible {
+		outline: 2px solid #a9b8ff;
+		outline-offset: -4px;
+		border-radius: 20px;
+	}
+
+	.steps__image.is-swapping {
+		opacity: 0;
+	}
+
+	.steps__arrow {
+		position: absolute;
+		inset-block-start: 50%;
+		z-index: 5;
+		display: grid;
+		place-items: center;
+		inline-size: 2.75rem;
+		block-size: 2.75rem;
+		padding: 0;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(5, 7, 12, 0.5);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		color: rgba(232, 234, 240, 0.85);
+		cursor: pointer;
+		transform: translateY(-50%);
+		transition:
+			color 160ms ease,
+			border-color 160ms ease,
+			background-color 160ms ease;
+	}
+
+	.steps__arrow:hover {
+		border-color: rgba(255, 255, 255, 0.4);
+		background: rgba(5, 7, 12, 0.72);
+		color: #fff;
+	}
+
+	.steps__arrow:focus-visible,
+	.steps__thumb:focus-visible {
+		outline: 2px solid #a9b8ff;
+		outline-offset: 2px;
+	}
+
+	.steps__arrow--prev {
+		inset-inline-start: clamp(0.5rem, 2vw, 1.25rem);
+	}
+
+	.steps__arrow--next {
+		inset-inline-end: clamp(0.5rem, 2vw, 1.25rem);
+	}
+
+	.steps__arrow svg {
+		inline-size: 1.1rem;
+		block-size: 1.1rem;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	/* The description sits on the image, over a soft dark gradient for contrast. */
+	.steps__caption {
+		position: absolute;
+		inset-inline: 0;
+		inset-block-end: 0;
+		z-index: 3;
+		margin: 0;
+		padding: clamp(3rem, 7vw, 5rem) clamp(1rem, 3vw, 1.75rem) clamp(1rem, 2.5vw, 1.5rem);
+		background: linear-gradient(
+			to top,
+			rgba(5, 7, 12, 0.82) 0%,
+			rgba(5, 7, 12, 0.6) 55%,
+			rgba(5, 7, 12, 0) 100%
+		);
+		pointer-events: none;
+	}
+
+	.steps__text {
+		display: block;
+		max-inline-size: 72ch;
+		font-size: clamp(0.88rem, 1.3vw, 1rem);
+		line-height: 1.55;
+		color: rgba(255, 255, 255, 0.9);
+		text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+		text-wrap: pretty;
+	}
+
+	.steps__rail {
+		position: relative;
+		margin-block-start: 0.75rem;
+		display: flex;
+		gap: 0.75rem;
+		padding: 4px;
+		margin-inline: -4px;
+		overflow-x: auto;
+		scroll-snap-type: x proximity;
+		scrollbar-width: thin;
+		scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+	}
+
+	.steps__thumb {
+		flex: none;
+		inline-size: 8.5rem;
+		aspect-ratio: 3 / 2;
+		padding: 0;
+		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		background: #0a0c11;
+		cursor: pointer;
+		opacity: 0.45;
+		scroll-snap-align: start;
+		transition:
+			opacity 160ms ease,
+			border-color 160ms ease;
+	}
+
+	.steps__thumb:hover {
+		opacity: 0.8;
+	}
+
+	.steps__thumb[aria-current='true'] {
+		opacity: 1;
+		border-color: rgba(232, 234, 240, 0.85);
+	}
+
+	.steps__thumb img {
+		display: block;
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+	}
+
+	/* --- Zoom view ------------------------------------------------------- */
+
+	:global(html:has(dialog.zoom[open])) {
+		overflow: hidden;
+	}
+
+	.zoom {
+		position: fixed;
+		inset: 0;
+		inline-size: 100vw;
+		block-size: 100dvh;
+		max-inline-size: none;
+		max-block-size: none;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		overflow: hidden;
+		background: rgba(3, 4, 8, 0.9);
+		color: #e8eaf0;
+	}
+
+	.zoom[open] {
+		animation: zoom-in 180ms ease;
+	}
+
+	/* Blurs the page behind, so only the picture reads. */
+	.zoom::backdrop {
+		background: transparent;
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+	}
+
+	@keyframes zoom-in {
+		from {
+			opacity: 0;
+		}
+	}
+
+	.zoom__canvas {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		touch-action: none;
+		cursor: zoom-in;
+	}
+
+	.zoom__canvas.is-zoomed {
+		cursor: grab;
+	}
+
+	.zoom__canvas.is-dragging {
+		cursor: grabbing;
+	}
+
+	/* Centred and fitted to the screen; zoom and pan are a transform on top of that. */
+	.zoom__image {
+		position: absolute;
+		inset: 0;
+		max-inline-size: calc(100% - 2 * clamp(1rem, 4vw, 3rem));
+		max-block-size: calc(100% - 2 * clamp(1rem, 4vw, 3rem));
+		margin: auto;
+		user-select: none;
+		-webkit-user-select: none;
+		-webkit-user-drag: none;
+	}
+
+	.zoom__image.is-easing {
+		transition: transform 200ms ease;
+	}
+
+	.zoom__button {
+		display: grid;
+		place-items: center;
+		inline-size: 2.75rem;
+		block-size: 2.75rem;
+		padding: 0;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(5, 7, 12, 0.6);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		color: rgba(232, 234, 240, 0.85);
+		cursor: pointer;
+		transition:
+			color 160ms ease,
+			border-color 160ms ease,
+			background-color 160ms ease;
+	}
+
+	.zoom__button:hover {
+		border-color: rgba(255, 255, 255, 0.4);
+		background: rgba(5, 7, 12, 0.8);
+		color: #fff;
+	}
+
+	.zoom__button:focus-visible {
+		outline: 2px solid #a9b8ff;
+		outline-offset: 2px;
+	}
+
+	.zoom__button svg {
+		inline-size: 1.1rem;
+		block-size: 1.1rem;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.zoom__close {
+		position: absolute;
+		inset-block-start: clamp(0.75rem, 2vw, 1.25rem);
+		inset-inline-end: clamp(0.75rem, 2vw, 1.25rem);
+	}
+
+	.zoom__controls {
+		position: absolute;
+		inset-block-end: clamp(0.75rem, 2vw, 1.25rem);
+		inset-inline-start: 50%;
+		display: flex;
+		gap: 0.5rem;
+		transform: translateX(-50%);
+	}
+
+	/* --- Footer ---------------------------------------------------------- */
+
+	.site-footer {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-block-start: clamp(3rem, 8vw, 5.5rem);
+		padding-block-start: 1.25rem;
+		border-block-start: 1px solid rgba(255, 255, 255, 0.09);
+		font-size: 0.85rem;
+		color: rgba(232, 234, 240, 0.45);
+	}
+
+	.site-footer a {
+		color: inherit;
+		text-decoration: none;
+		transition: color 160ms ease;
+	}
+
+	.site-footer a:hover {
+		color: rgba(232, 234, 240, 0.9);
+	}
+
+	/* --- Responsive ------------------------------------------------------ */
+
+	@media (max-width: 720px) {
+		.results__grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.prose__section,
+		.features {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 0.75rem;
+		}
+
+		.features__list {
+			margin-block-start: 0;
+		}
+
+		.bento-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.bento-grid > .span-4 {
+			grid-column: span 2;
+		}
+
+		.hero {
+			aspect-ratio: 16 / 9;
+		}
+
+		/* Too short at phone width to carry a paragraph, so the text drops below the image. */
+		.steps__caption {
+			position: static;
+			padding: 0.9rem 1rem 1.1rem;
+			background: none;
+		}
+
+		.steps__text {
+			color: rgba(232, 234, 240, 0.75);
+			text-shadow: none;
+		}
+
+		.steps__arrow {
+			inline-size: 2.4rem;
+			block-size: 2.4rem;
+		}
+
+		.steps__thumb {
+			inline-size: 6.5rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.features__node,
+		.features__tick {
+			transition: none;
+		}
+
+		.hero__video,
+		.media-card__video {
+			transform: none;
+		}
+
+		.back-link__arrow,
+		.steps__image,
+		.zoom__image.is-easing {
+			transition: none;
+		}
+
+		.zoom[open] {
+			animation: none;
+		}
+	}
+</style>
+
+<script>
+	// Autoplaying video is motion: honour the OS setting and show the first frame instead.
+	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		for (const video of document.querySelectorAll<HTMLVideoElement>('video[data-project-video]')) {
+			video.autoplay = false;
+			video.pause();
+		}
+	}
+	// Step gallery: the arrows, the thumbnails, the arrow keys and a horizontal swipe
+	// all go through show(), which swaps the main image once the next one is decoded.
+	const steps = document.querySelector<HTMLElement>('[data-steps]');
+
+	if (steps) {
+		const image = steps.querySelector<HTMLImageElement>('[data-steps-image]')!;
+		const text = steps.querySelector<HTMLElement>('[data-steps-text]')!;
+		const rail = steps.querySelector<HTMLElement>('[data-steps-rail]')!;
+		const thumbs = [...steps.querySelectorAll<HTMLButtonElement>('[data-steps-thumb]')];
+		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		let current = 0;
+
+		const preload = (index: number) => {
+			new Image().src = thumbs[(index + thumbs.length) % thumbs.length].dataset.src!;
+		};
+
+		const show = (next: number) => {
+			current = (next + thumbs.length) % thumbs.length;
+			const thumb = thumbs[current];
+			const { src, text: body } = thumb.dataset;
+
+			text.textContent = body!;
+			thumbs.forEach((item, index) => {
+				if (index === current) item.setAttribute('aria-current', 'true');
+				else item.removeAttribute('aria-current');
+			});
+
+			// Centre the active thumbnail in the rail without scrolling the page.
+			rail.scrollTo({
+				left: thumb.offsetLeft - (rail.clientWidth - thumb.offsetWidth) / 2,
+				behavior: reduceMotion ? 'auto' : 'smooth',
+			});
+
+			const target = current;
+			const incoming = new Image();
+			incoming.src = src!;
+			image.classList.add('is-swapping');
+			incoming
+				.decode()
+				.catch(() => {})
+				.then(() => {
+					// A quicker click may have moved on while this one was loading.
+					if (target !== current) return;
+					image.src = src!;
+					image.alt = body!;
+					image.classList.remove('is-swapping');
+				});
+
+			preload(current + 1);
+			preload(current - 1);
+		};
+
+		steps.querySelector('[data-steps-prev]')!.addEventListener('click', () => show(current - 1));
+		steps.querySelector('[data-steps-next]')!.addEventListener('click', () => show(current + 1));
+		thumbs.forEach((thumb, index) => thumb.addEventListener('click', () => show(index)));
+
+		steps.addEventListener('keydown', (event) => {
+			if (event.key === 'ArrowLeft') show(current - 1);
+			else if (event.key === 'ArrowRight') show(current + 1);
+			else return;
+			event.preventDefault();
+		});
+
+		const stage = steps.querySelector<HTMLElement>('.steps__frame')!;
+		let startX: number | null = null;
+		stage.addEventListener('touchstart', (event) => (startX = event.touches[0].clientX), { passive: true });
+		stage.addEventListener('touchend', (event) => {
+			if (startX === null) return;
+			const delta = event.changedTouches[0].clientX - startX;
+			startX = null;
+			if (Math.abs(delta) > 40) show(current + (delta < 0 ? 1 : -1));
+		});
+
+		// Zoom view. The image is fitted to the screen, then scaled and moved with a
+		// transform: wheel or pinch to zoom around the pointer, drag to pan, tap the
+		// image to zoom in or back out, tap outside it to close.
+		const dialog = document.querySelector<HTMLDialogElement>('[data-zoom]')!;
+		const canvas = dialog.querySelector<HTMLElement>('[data-zoom-canvas]')!;
+		const full = dialog.querySelector<HTMLImageElement>('[data-zoom-image]')!;
+		const maxScale = 8;
+		let scale = 1;
+		let x = 0;
+		let y = 0;
+
+		const apply = (ease = false) => {
+			full.classList.toggle('is-easing', ease);
+			full.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+			canvas.classList.toggle('is-zoomed', scale > 1);
+		};
+
+		// Keep the image covering the screen on any axis where it is bigger than it.
+		const clamp = () => {
+			const maxX = Math.max(0, (full.offsetWidth * scale - canvas.clientWidth) / 2);
+			const maxY = Math.max(0, (full.offsetHeight * scale - canvas.clientHeight) / 2);
+			x = Math.min(maxX, Math.max(-maxX, x));
+			y = Math.min(maxY, Math.max(-maxY, y));
+		};
+
+		// Zoom so that the point under (clientX, clientY) stays where it is.
+		const zoomAt = (next: number, clientX: number, clientY: number, ease = false) => {
+			next = Math.min(maxScale, Math.max(1, next));
+			const rect = canvas.getBoundingClientRect();
+			const px = clientX - rect.left - rect.width / 2;
+			const py = clientY - rect.top - rect.height / 2;
+			x = px - (next / scale) * (px - x);
+			y = py - (next / scale) * (py - y);
+			scale = next;
+			clamp();
+			apply(ease);
+		};
+
+		const zoomCentre = (factor: number) => {
+			const rect = canvas.getBoundingClientRect();
+			zoomAt(scale * factor, rect.left + rect.width / 2, rect.top + rect.height / 2, !reduceMotion);
+		};
+
+		const reset = (ease = false) => {
+			scale = 1;
+			x = 0;
+			y = 0;
+			apply(ease);
+		};
+
+		steps.querySelector('[data-steps-open]')!.addEventListener('click', () => {
+			const { src, full: fullSrc, text: body } = thumbs[current].dataset;
+			// Show the already-loaded screen version at once, then swap in full resolution.
+			full.src = src!;
+			full.alt = body!;
+			const sharp = new Image();
+			sharp.src = fullSrc!;
+			sharp
+				.decode()
+				.then(() => {
+					if (dialog.open && full.src.endsWith(src!)) full.src = fullSrc!;
+				})
+				.catch(() => {});
+			reset();
+			dialog.showModal();
+		});
+
+		dialog.querySelector('[data-zoom-close]')!.addEventListener('click', () => dialog.close());
+		dialog.querySelector('[data-zoom-in]')!.addEventListener('click', () => zoomCentre(1.6));
+		dialog.querySelector('[data-zoom-out]')!.addEventListener('click', () => zoomCentre(1 / 1.6));
+		dialog.querySelector('[data-zoom-reset]')!.addEventListener('click', () => reset(!reduceMotion));
+		dialog.addEventListener('close', () => reset());
+
+		dialog.addEventListener('keydown', (event) => {
+			if (event.key === '+' || event.key === '=') zoomCentre(1.6);
+			else if (event.key === '-') zoomCentre(1 / 1.6);
+			else if (event.key === '0') reset(!reduceMotion);
+			else return;
+			event.preventDefault();
+		});
+
+		canvas.addEventListener(
+			'wheel',
+			(event) => {
+				event.preventDefault();
+				zoomAt(scale * Math.exp(-event.deltaY * 0.0015), event.clientX, event.clientY);
+			},
+			{ passive: false },
+		);
+
+		const pointers = new Map<number, { x: number; y: number }>();
+		let down = { x: 0, y: 0 };
+		let moved = false;
+		let pinched = false;
+		let pinchDistance = 0;
+
+		const spread = () => {
+			const [a, b] = [...pointers.values()];
+			return {
+				distance: Math.hypot(a.x - b.x, a.y - b.y),
+				x: (a.x + b.x) / 2,
+				y: (a.y + b.y) / 2,
+			};
+		};
+
+		canvas.addEventListener('pointerdown', (event) => {
+			canvas.setPointerCapture(event.pointerId);
+			pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+			if (pointers.size === 1) {
+				down = { x: event.clientX, y: event.clientY };
+				moved = false;
+				pinched = false;
+			} else if (pointers.size === 2) {
+				pinched = true;
+				pinchDistance = spread().distance;
+			}
+			canvas.classList.toggle('is-dragging', scale > 1);
+		});
+
+		canvas.addEventListener('pointermove', (event) => {
+			const previous = pointers.get(event.pointerId);
+			if (!previous) return;
+			pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+			if (Math.hypot(event.clientX - down.x, event.clientY - down.y) > 4) moved = true;
+
+			if (pointers.size === 2) {
+				const { distance, x: midX, y: midY } = spread();
+				zoomAt((scale * distance) / pinchDistance, midX, midY);
+				pinchDistance = distance;
+			} else if (scale > 1) {
+				x += event.clientX - previous.x;
+				y += event.clientY - previous.y;
+				clamp();
+				apply();
+			}
+		});
+
+		const release = (event: PointerEvent) => {
+			if (!pointers.delete(event.pointerId)) return;
+			if (pointers.size > 0) return;
+			canvas.classList.remove('is-dragging');
+			if (moved || pinched || event.type === 'pointercancel') return;
+
+			// A tap: on the image it toggles zoom, anywhere else it closes the view.
+			const rect = full.getBoundingClientRect();
+			const onImage =
+				event.clientX >= rect.left &&
+				event.clientX <= rect.right &&
+				event.clientY >= rect.top &&
+				event.clientY <= rect.bottom;
+			if (!onImage) dialog.close();
+			else if (scale > 1) reset(!reduceMotion);
+			else zoomAt(2.5, event.clientX, event.clientY, !reduceMotion);
+		};
+
+		canvas.addEventListener('pointerup', release);
+		canvas.addEventListener('pointercancel', release);
+
+		window.addEventListener('resize', () => {
+			if (!dialog.open) return;
+			clamp();
+			apply();
+		});
+
+		preload(1);
+	}
+</script>

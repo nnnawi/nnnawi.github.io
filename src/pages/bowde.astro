@@ -7,10 +7,8 @@ const project = {
 	title: 'Bowde',
 	tagline: 'A browser-based control-systems workbench: type a transfer function and watch Bode, Nyquist, Nichols, pole-zero and time-response diagrams redraw together as you sweep its parameters.',
 	meta: [
-		{ label: 'Discipline', value: 'Control theory · Numerical methods' },
 		{ label: 'Stack', value: 'Angular, TypeScript, p5.js, mathjs, MathLive' },
 		{ label: 'Year', value: '2019 · rebuilt 2026' },
-		{ label: 'Role', value: 'Self initiated · licensed for teaching' },
 	],
 	hero: '/project_animation/BOWDE_animation.mp4',
 	// Primary call to action. Drop the key to hide the link.
@@ -37,7 +35,7 @@ const project = {
 		},
 		{
 			label: 'Result',
-			title: 'It left my hands and kept going',
+			title: 'Where this project ended up',
 			// Paragraphs are rendered as HTML, so inline links are allowed here.
 			body: [
 				'Once the first version was finished, I licensed it to physics & engineering professor in France who wanted it as an add-on for their course website. It was the first money I ever made on the internet, and it ended up paying for part of my university.',
@@ -71,7 +69,7 @@ const project = {
 	</head>
 	<body>
 		<main>
-			<a class="back-link" href="/">
+			<a class="back-link" href="/projects">
 				<span class="back-link__arrow" aria-hidden="true">←</span>
 				Back to all projects
 			</a>
@@ -136,18 +134,15 @@ const project = {
 								</a>
 							))
 					}
-				</p>
 
-				<dl class="project-meta">
-					{
-						project.meta.map((item) => (
-							<div class="project-meta__row">
-								<dt class="project-meta__label">{item.label}</dt>
-								<dd class="project-meta__value">{item.value}</dd>
-							</div>
-						))
-					}
-				</dl>
+					<span class="project-meta">
+						{project.meta.map((item) => (
+							<span class="project-meta__item" title={item.label}>
+								{item.value}
+							</span>
+						))}
+					</span>
+				</p>
 			</header>
 
 			<figure class="hero">
@@ -216,7 +211,6 @@ const project = {
 
 			<footer class="site-footer">
 				<span>Iwan Ibnoulouafi</span>
-				<a href="mailto:iwan@ibnoulouafi.com">iwan@ibnoulouafi.com</a>
 			</footer>
 		</main>
 	</body>
@@ -272,7 +266,7 @@ const project = {
 	.project-title {
 		margin: 0;
 		font-size: clamp(2.75rem, 9vw, 5.5rem);
-		font-weight: 350;
+		font-weight: 450;
 		line-height: 0.98;
 		letter-spacing: -0.035em;
 	}
@@ -352,34 +346,18 @@ const project = {
 		stroke-linejoin: round;
 	}
 
+	/* Stack and year, unlabelled, on the repository row. */
 	.project-meta {
-		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		gap: clamp(0.75rem, 1.5vw, 1.25rem);
-		margin: clamp(2rem, 5vw, 3.25rem) 0 0;
-		padding-block-start: 1.25rem;
-		border-block-start: 1px solid rgba(255, 255, 255, 0.09);
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: 0 0.7em;
+		color: rgba(232, 234, 240, 0.55);
 	}
 
-	.project-meta__row {
-		display: flex;
-		flex-direction: column;
-		gap: 0.4em;
-	}
-
-	.project-meta__label {
-		font-size: 0.72rem;
-		letter-spacing: 0.09em;
-		text-transform: uppercase;
+	.project-meta__item + .project-meta__item::before {
+		content: '·';
+		margin-inline-end: 0.7em;
 		color: rgba(232, 234, 240, 0.38);
-	}
-
-	.project-meta__value {
-		margin: 0;
-		font-size: 0.92rem;
-		line-height: 1.35;
-		color: rgba(232, 234, 240, 0.88);
-		text-wrap: pretty;
 	}
 
 	/* --- Hero ------------------------------------------------------------ */
@@ -670,11 +648,6 @@ const project = {
 	/* --- Responsive ------------------------------------------------------ */
 
 	@media (max-width: 720px) {
-		.project-meta {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 1.25rem;
-		}
-
 		.prose__section {
 			grid-template-columns: minmax(0, 1fr);
 			gap: 0.75rem;

@@ -1,0 +1,908 @@
+---
+// ---------------------------------------------------------------------------
+// Annex — six candidates for the Discipline / Stack / Year / Role block on the
+// project pages, each shown at the page's real width down to the top of the
+// hero. The readout measures title-to-hero, so the space saved is a number.
+// Not linked from the nav; delete once one is picked.
+// ---------------------------------------------------------------------------
+
+// Two projects, so every option is seen with a private badge and with a public
+// link plus a restriction, and with short and long values.
+const projects = [
+	{
+		id: 'morphox',
+		title: 'MorphoX',
+		tagline:
+			'A visual computer vision sandbox where image-processing pipelines are built by wiring effect nodes together, each one a real algorithm you can tune and watch respond.',
+		discipline: 'Computer vision · GPU compute',
+		stack: ['Angular', 'Electron', 'WebGPU', 'WGSL'],
+		year: '2025',
+		role: 'Self initiated',
+		sentence:
+			'<b>Self initiated</b>, 2025. <b>Computer vision and GPU compute</b>, built with Angular, Electron, WebGPU and WGSL.',
+		hero: '/project_animation/MorphoX_main2_animation.mp4',
+		tags: [{ icon: 'lock', text: 'Private repository' }],
+	},
+	{
+		id: 'yolo',
+		title: 'YOLO on NPU',
+		tagline:
+			'Compressing a YOLOv5 detector until it fits the power and memory budget of an embedded NPU, then getting it to actually run there.',
+		discipline: 'Model compression · Edge inference',
+		stack: ['PyTorch', 'TensorFlow Lite', 'NXP eIQ', 'Yocto', 'Phytec i.MX 8M Plus'],
+		year: '2024',
+		role: 'Final-year project, two-person team · mandated by MBDA',
+		sentence:
+			'<b>Final-year project for MBDA</b>, in a team of two, 2024. <b>Model compression and edge inference</b>, with PyTorch, TensorFlow Lite, NXP eIQ and Yocto on a Phytec i.MX 8M Plus.',
+		hero: '/project_animation/NPU_animation.mp4',
+		tags: [
+			{ icon: 'github', text: 'Optimisation notebook', href: '#' },
+			{ icon: 'lock', text: 'Model and deployment under NDA' },
+		],
+	},
+];
+
+const meta = (p) => [
+	{ label: 'Discipline', value: p.discipline },
+	{ label: 'Stack', value: p.stack.join(', ') },
+	{ label: 'Year', value: p.year },
+	{ label: 'Role', value: p.role },
+];
+
+const icons = {
+	lock: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3.25" y="7" width="9.5" height="6.75" rx="1.6"/><path d="M5.75 7V4.75a2.25 2.25 0 0 1 4.5 0V7"/></svg>',
+	github:
+		'<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>',
+};
+
+const options = [
+	{
+		id: 'current',
+		name: 'Current',
+		note: 'For reference: the four-column row under the repository tag, with its own top rule.',
+	},
+	{
+		id: 'corner',
+		name: 'Beside the title',
+		note: 'The block moves up into the empty space to the right of the title and becomes a tight label / value list. The title and tagline keep the left side, as they do now.',
+	},
+	{
+		id: 'byline',
+		name: 'Byline',
+		note: 'One quiet line directly under the title, like an article byline. Labels stay, but in the value’s size and a fainter tone, split by slashes instead of columns.',
+	},
+	{
+		id: 'kicker',
+		name: 'Kicker and footnote',
+		note: 'Each value goes where it reads naturally: the discipline as an eyebrow over the title, the year as a superscript on it, role and stack on the tag line. No labels.',
+	},
+	{
+		id: 'pills',
+		name: 'One tag row',
+		note: 'The meta joins the repository tag in a single wrapping row. The repository keeps its outlined pill, and the meta values are quieter filled chips after a divider.',
+	},
+	{
+		id: 'side',
+		name: 'Across from the tagline',
+		note: 'The title keeps the full width. Under it, the tagline and tag sit on the left and a compact 2 × 2 grid on the right, bottom-aligned with the tag.',
+	},
+	{
+		id: 'prose',
+		name: 'Written out',
+		note: 'No labels, no grid. The meta is a second, fainter sentence after the tagline, with the role and discipline slightly brighter so they can be picked out.',
+	},
+];
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="robots" content="noindex" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Geist+Pixel&family=Inter:wght@100..900&display=swap"
+		/>
+		<title>Project meta options — Iwan</title>
+	</head>
+	<body data-show="morphox">
+		<main class="annex">
+			<header class="wrap intro">
+				<a class="intro__back" href="/annex">← Title options</a>
+				<p class="label pixel">Annex</p>
+				<h1 class="intro__title">Project details — six options</h1>
+				<p class="intro__text">
+					Discipline, stack, year and role, set six ways at the project page’s real width. Each one
+					runs down to the top of the hero, and the readout shows how far the hero sits below the
+					title.
+				</p>
+				<div class="switch" role="group" aria-label="Preview project">
+					{
+						projects.map((p, i) => (
+							<button class="switch__btn" type="button" data-pick={p.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+								{p.title}
+								<span class="switch__hint">{p.tags.length > 1 ? 'link + NDA' : 'private'}</span>
+							</button>
+						))
+					}
+				</div>
+			</header>
+
+			{
+				options.map((option, i) => (
+					<section class:list={['wrap option', { 'option--ref': option.id === 'current' }]}>
+						<div class="option__meta">
+							<p class="option__num pixel">{String(i).padStart(2, '0')}</p>
+							<h2 class="option__name">{option.name}</h2>
+							<p class="option__note">{option.note}</p>
+							<p class="option__readout pixel" data-readout aria-live="polite" />
+						</div>
+
+						{projects.map((p) => {
+							const tags = p.tags.map((tag) =>
+								tag.href ? (
+									<a class="tag tag--link" href={tag.href}>
+										<span class="tag__icon" set:html={icons[tag.icon]} />
+										{tag.text}
+									</a>
+								) : (
+									<span class="tag">
+										<span class="tag__icon" set:html={icons[tag.icon]} />
+										{tag.text}
+									</span>
+								),
+							);
+
+							return (
+								<div class="stage" data-project={p.id}>
+									{/* --- 00 Current ------------------------------------ */}
+									{option.id === 'current' && (
+										<header class="ph" data-head>
+											<h3 class="ph__title">{p.title}</h3>
+											<p class="ph__tagline">{p.tagline}</p>
+											<p class="tags">{tags}</p>
+											<dl class="cur">
+												{meta(p).map((m) => (
+													<div class="cur__row">
+														<dt class="k">{m.label}</dt>
+														<dd class="cur__value">{m.value}</dd>
+													</div>
+												))}
+											</dl>
+										</header>
+									)}
+
+									{/* --- 01 Beside the title --------------------------- */}
+									{option.id === 'corner' && (
+										<header class="ph ph--corner" data-head>
+											<h3 class="ph__title">{p.title}</h3>
+											<dl class="corner">
+												{meta(p).map((m) => (
+													<>
+														<dt class="k">{m.label}</dt>
+														<dd>{m.value}</dd>
+													</>
+												))}
+											</dl>
+											<p class="ph__tagline">{p.tagline}</p>
+											<p class="tags">{tags}</p>
+										</header>
+									)}
+
+									{/* --- 02 Byline ------------------------------------- */}
+									{option.id === 'byline' && (
+										<header class="ph" data-head>
+											<h3 class="ph__title">{p.title}</h3>
+											<dl class="byline">
+												{meta(p).map((m) => (
+													<div class="byline__item">
+														<dt>{m.label}</dt>
+														<dd>{m.value}</dd>
+													</div>
+												))}
+											</dl>
+											<p class="ph__tagline">{p.tagline}</p>
+											<p class="tags">{tags}</p>
+										</header>
+									)}
+
+									{/* --- 03 Kicker and footnote ------------------------ */}
+									{option.id === 'kicker' && (
+										<header class="ph" data-head>
+											<p class="k kicker">{p.discipline}</p>
+											<h3 class="ph__title">
+												{p.title}
+												<sup class="kicker__year">{p.year}</sup>
+											</h3>
+											<p class="ph__tagline">{p.tagline}</p>
+											<p class="tags">
+												{tags}
+												<span class="kicker__line">
+													<span>{p.role}</span>
+													<span class="kicker__stack">{p.stack.join(', ')}</span>
+												</span>
+											</p>
+										</header>
+									)}
+
+									{/* --- 04 One tag row -------------------------------- */}
+									{option.id === 'pills' && (
+										<header class="ph" data-head>
+											<h3 class="ph__title">{p.title}</h3>
+											<p class="ph__tagline">{p.tagline}</p>
+											<p class="tags tags--row">
+												{tags}
+												<span class="tags__divider" aria-hidden="true" />
+												<span class="chip" title="Discipline">{p.discipline}</span>
+												<span class="chip" title="Year">{p.year}</span>
+												<span class="chip" title="Role">{p.role}</span>
+												{p.stack.map((s) => (
+													<span class="chip chip--quiet" title="Stack">{s}</span>
+												))}
+											</p>
+										</header>
+									)}
+
+									{/* --- 05 Across from the tagline -------------------- */}
+									{option.id === 'side' && (
+										<header class="ph ph--side" data-head>
+											<h3 class="ph__title">{p.title}</h3>
+											<div class="side__left">
+												<p class="ph__tagline">{p.tagline}</p>
+												<p class="tags">{tags}</p>
+											</div>
+											<dl class="side">
+												{meta(p).map((m) => (
+													<div class="side__cell">
+														<dt class="k">{m.label}</dt>
+														<dd>{m.value}</dd>
+													</div>
+												))}
+											</dl>
+										</header>
+									)}
+
+									{/* --- 06 Written out -------------------------------- */}
+									{option.id === 'prose' && (
+										<header class="ph" data-head>
+											<h3 class="ph__title">{p.title}</h3>
+											<p class="ph__tagline">{p.tagline}</p>
+											<p class="written" set:html={p.sentence} />
+											<p class="tags">{tags}</p>
+										</header>
+									)}
+
+									<div class="peek" data-hero aria-hidden="true">
+										<video src={p.hero} muted loop playsinline preload="metadata" tabindex="-1" data-lazy-play />
+									</div>
+								</div>
+							);
+						})}
+					</section>
+				))
+			}
+		</main>
+
+		<script is:inline>
+			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			const buttons = [...document.querySelectorAll('[data-pick]')];
+			let baseline = null;
+
+			// Title-to-hero distance for the visible stage of each option, plus the
+			// difference from the current layout.
+			function measure() {
+				const rows = [...document.querySelectorAll('.option')];
+				const show = document.body.dataset.show;
+				const heights = rows.map((row) => {
+					const stage = row.querySelector(`.stage[data-project="${show}"]`);
+					const head = stage.querySelector('[data-head]');
+					const hero = stage.querySelector('[data-hero]');
+					return Math.round(hero.getBoundingClientRect().top - head.getBoundingClientRect().top);
+				});
+				baseline = heights[0];
+				rows.forEach((row, i) => {
+					const out = row.querySelector('[data-readout]');
+					const delta = heights[i] - baseline;
+					out.textContent =
+						i === 0
+							? `Title → hero ${heights[i]}px`
+							: `Title → hero ${heights[i]}px · ${delta <= 0 ? '−' : '+'}${Math.abs(delta)}px`;
+					out.classList.toggle('is-saving', delta < 0);
+				});
+			}
+
+			function pick(id) {
+				document.body.dataset.show = id;
+				buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pick === id)));
+				try {
+					localStorage.setItem('annex-meta-project', id);
+				} catch {}
+				measure();
+			}
+
+			buttons.forEach((b) => b.addEventListener('click', () => pick(b.dataset.pick)));
+
+			// ?p=yolo links straight to a project; otherwise the last one picked.
+			let saved = new URLSearchParams(location.search).get('p');
+			try {
+				saved ??= localStorage.getItem('annex-meta-project');
+			} catch {}
+			pick(buttons.some((b) => b.dataset.pick === saved) ? saved : buttons[0].dataset.pick);
+
+			document.fonts.ready.then(measure);
+			window.addEventListener('resize', measure);
+
+			// Fourteen hero videos on one page: only the ones on screen play.
+			const io = new IntersectionObserver((entries) => {
+				for (const { target, isIntersecting } of entries) {
+					if (isIntersecting && !reduce) target.play().catch(() => {});
+					else target.pause();
+				}
+			});
+			document.querySelectorAll('[data-lazy-play]').forEach((v) => io.observe(v));
+		</script>
+	</body>
+</html>
+
+<!-- Global, to match the other annex pages; this stylesheet only ships here. -->
+<style is:global>
+	body {
+		--ink: #e8eaf0;
+		--muted: rgba(232, 234, 240, 0.62);
+		--faint: rgba(232, 234, 240, 0.38);
+		--rule: rgba(255, 255, 255, 0.09);
+		--pixel: 'Geist Pixel', 'Geist Mono', ui-monospace, monospace;
+		--ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+		margin: 0;
+		/* The project pages' own background, since every stage is one. */
+		background: #05070c;
+		color: var(--ink);
+		font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+		font-weight: 350;
+	}
+
+	/* The project page's `main`: same max width, same gutter. */
+	.wrap {
+		max-inline-size: 1100px;
+		margin-inline: auto;
+		padding-inline: clamp(1rem, 4vw, 2rem);
+		box-sizing: border-box;
+	}
+
+	.pixel {
+		font-family: var(--pixel);
+		font-weight: 400;
+		letter-spacing: 0.01em;
+	}
+
+	.label {
+		margin: 0;
+		font-size: 0.8rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--faint);
+	}
+
+	/* --- Intro ------------------------------------------------------------ */
+
+	.intro {
+		display: grid;
+		gap: 1rem;
+		justify-items: start;
+		padding-block: clamp(3rem, 10vh, 6rem) clamp(2.5rem, 6vh, 4rem);
+	}
+
+	.intro__back {
+		margin-block-end: 1rem;
+		color: var(--faint);
+		font-size: 0.85rem;
+		text-decoration: none;
+		transition: color 160ms ease;
+	}
+
+	.intro__back:hover {
+		color: var(--ink);
+	}
+
+	.intro__title {
+		margin: 0;
+		font-size: clamp(1.9rem, 3.6vw, 3rem);
+		font-weight: 350;
+		line-height: 1.05;
+		letter-spacing: -0.045em;
+	}
+
+	.intro__text {
+		max-inline-size: 40rem;
+		margin: 0;
+		color: var(--muted);
+		line-height: 1.6;
+	}
+
+	.switch {
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-block-start: 0.5rem;
+	}
+
+	.switch__btn {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.6em;
+		padding: 0.6em 1.05em;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 999px;
+		background: transparent;
+		color: var(--faint);
+		font: inherit;
+		font-size: 0.85rem;
+		line-height: 1;
+		cursor: pointer;
+		transition:
+			color 160ms ease,
+			border-color 160ms ease,
+			background-color 160ms ease;
+	}
+
+	.switch__btn:hover {
+		color: var(--ink);
+	}
+
+	.switch__btn[aria-pressed='true'] {
+		color: var(--ink);
+		border-color: rgba(255, 255, 255, 0.34);
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.switch__hint {
+		font-size: 0.72rem;
+		color: var(--faint);
+	}
+
+	.switch__btn:focus-visible {
+		outline: 2px solid var(--ink);
+		outline-offset: 2px;
+	}
+
+	/* --- Option rows ------------------------------------------------------ */
+
+	/* Notes on top, stage below at full page width: the point is how the
+	   header reads at its real size, so it can't share the row. */
+	.option {
+		padding-block: clamp(3rem, 8vh, 5rem) 0;
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.option__meta {
+		display: grid;
+		grid-template-columns: 3rem minmax(0, 14rem) minmax(0, 1fr) auto;
+		align-items: baseline;
+		gap: 0.4rem 1.5rem;
+		margin-block-end: clamp(2.5rem, 6vw, 4rem);
+	}
+
+	.option__num,
+	.option__name,
+	.option__note,
+	.option__readout {
+		margin: 0;
+	}
+
+	.option__num {
+		font-size: 1rem;
+		color: var(--faint);
+	}
+
+	.option__name {
+		font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+		font-weight: 400;
+		letter-spacing: -0.03em;
+	}
+
+	.option__note {
+		max-inline-size: 42rem;
+		font-size: 0.9rem;
+		line-height: 1.55;
+		color: var(--muted);
+		text-wrap: pretty;
+	}
+
+	.option__readout {
+		font-size: 0.78rem;
+		color: var(--faint);
+		white-space: nowrap;
+	}
+
+	.option__readout.is-saving {
+		color: #8ee6a8;
+	}
+
+	.option--ref .option__name::after {
+		content: 'reference';
+		margin-inline-start: 0.7em;
+		padding: 0.25em 0.55em;
+		border: 1px solid var(--rule);
+		border-radius: 999px;
+		font-size: 0.65rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		vertical-align: 0.3em;
+		color: var(--faint);
+	}
+
+	.stage {
+		display: none;
+	}
+
+	body[data-show='morphox'] .stage[data-project='morphox'],
+	body[data-show='yolo'] .stage[data-project='yolo'] {
+		display: block;
+	}
+
+	/* Top of the hero, faded out: enough to see where the page's first image
+	   lands without scrolling a full video per option. */
+	.peek {
+		position: relative;
+		block-size: clamp(7rem, 16vw, 11rem);
+		overflow: hidden;
+		border-radius: 20px 20px 0 0;
+		background: #0a0c11;
+		mask-image: linear-gradient(to bottom, #000 30%, transparent);
+		-webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent);
+	}
+
+	/* Same crop as a 21:9 hero, so the peek shows its real top edge. */
+	.peek video {
+		display: block;
+		inline-size: 100%;
+		aspect-ratio: 21 / 9;
+		object-fit: cover;
+	}
+
+	/* --- Project header, shared ------------------------------------------- */
+
+	/* Copied from the project pages. The bottom margin is the gap to the hero. */
+	.ph {
+		margin-block-end: clamp(1.5rem, 4vw, 2.5rem);
+	}
+
+	.ph__title {
+		margin: 0;
+		font-size: clamp(2.75rem, 9vw, 5.5rem);
+		font-weight: 350;
+		line-height: 0.98;
+		letter-spacing: -0.035em;
+	}
+
+	.ph__tagline {
+		margin: clamp(1rem, 2.5vw, 1.5rem) 0 0;
+		max-inline-size: 46ch;
+		font-size: clamp(1rem, 1.6vw, 1.2rem);
+		line-height: 1.45;
+		color: var(--muted);
+		text-wrap: pretty;
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem;
+		margin: clamp(1.25rem, 2.5vw, 1.75rem) 0 0;
+		font-size: 0.85rem;
+	}
+
+	.tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55em;
+		padding: 0.5em 0.95em;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.03);
+		color: rgba(232, 234, 240, 0.5);
+		line-height: 1;
+		text-decoration: none;
+	}
+
+	.tag--link {
+		color: rgba(232, 234, 240, 0.82);
+		transition:
+			color 160ms ease,
+			border-color 160ms ease,
+			background-color 160ms ease;
+	}
+
+	.tag--link:hover {
+		color: var(--ink);
+		border-color: rgba(255, 255, 255, 0.28);
+		background: rgba(255, 255, 255, 0.07);
+	}
+
+	.tag__icon {
+		display: inline-flex;
+		flex: none;
+		inline-size: 1.05em;
+		block-size: 1.05em;
+	}
+
+	.tag__icon svg {
+		inline-size: 100%;
+		block-size: 100%;
+	}
+
+	/* The small-caps label the project pages already use. */
+	.k {
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: var(--faint);
+	}
+
+	dl,
+	dd {
+		margin: 0;
+	}
+
+	/* --- 00 Current ------------------------------------------------------- */
+
+	.cur {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: clamp(0.75rem, 1.5vw, 1.25rem);
+		margin-block-start: clamp(2rem, 5vw, 3.25rem);
+		padding-block-start: 1.25rem;
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.cur__row {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4em;
+	}
+
+	.cur__value {
+		font-size: 0.92rem;
+		line-height: 1.35;
+		color: rgba(232, 234, 240, 0.88);
+		text-wrap: pretty;
+	}
+
+	/* --- 01 Beside the title ---------------------------------------------- */
+
+	.ph--corner {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 21rem);
+		column-gap: clamp(1.5rem, 4vw, 3rem);
+	}
+
+	.ph--corner > :not(.corner) {
+		grid-column: 1;
+	}
+
+	/* Spans the title and tagline rows; the top pad lines its first row up
+	   with the title's cap height rather than its line box. */
+	.corner {
+		grid-column: 2;
+		grid-row: 1 / span 3;
+		align-self: start;
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: 0.55rem 1rem;
+		padding-block-start: clamp(0.4rem, 1.1vw, 0.85rem);
+		font-size: 0.85rem;
+		line-height: 1.4;
+	}
+
+	.corner dt {
+		padding-block-start: 0.15em;
+		font-size: 0.66rem;
+	}
+
+	.corner dd {
+		color: rgba(232, 234, 240, 0.82);
+		text-wrap: pretty;
+	}
+
+	/* --- 02 Byline -------------------------------------------------------- */
+
+	.byline {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem 0;
+		margin-block-start: clamp(0.9rem, 2vw, 1.25rem);
+		font-size: 0.85rem;
+		line-height: 1.4;
+	}
+
+	.byline__item {
+		display: inline-flex;
+		gap: 0.45em;
+	}
+
+	/* Trailing, so a wrapped line ends on a slash instead of starting on one. */
+	.byline__item:not(:last-child)::after {
+		content: '/';
+		margin-inline: 0.8em;
+		color: rgba(232, 234, 240, 0.2);
+	}
+
+	.byline dt {
+		color: var(--faint);
+	}
+
+	.byline dd {
+		color: rgba(232, 234, 240, 0.82);
+	}
+
+	/* --- 03 Kicker and footnote ------------------------------------------- */
+
+	.kicker {
+		margin: 0 0 clamp(0.6rem, 1.4vw, 1rem);
+	}
+
+	/* Sized off the root, not the title, so it stays a footnote at any width. */
+	.kicker__year {
+		margin-inline-start: 0.35em;
+		font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.02em;
+		color: var(--faint);
+		vertical-align: top;
+		position: relative;
+		inset-block-start: 0.6em;
+	}
+
+	.kicker__line {
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: 0 0.7em;
+		color: rgba(232, 234, 240, 0.55);
+	}
+
+	.kicker__stack {
+		color: var(--faint);
+	}
+
+	.kicker__stack::before {
+		content: '·';
+		margin-inline-end: 0.7em;
+	}
+
+	/* --- 04 One tag row --------------------------------------------------- */
+
+	.tags--row {
+		gap: 0.5rem;
+	}
+
+	.tags__divider {
+		inline-size: 1px;
+		block-size: 1.1rem;
+		margin-inline: 0.35rem;
+		background: rgba(255, 255, 255, 0.14);
+	}
+
+	.chip {
+		padding: 0.5em 0.85em;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.055);
+		color: rgba(232, 234, 240, 0.75);
+		line-height: 1;
+	}
+
+	.chip--quiet {
+		background: transparent;
+		padding-inline: 0.35em;
+		color: var(--faint);
+	}
+
+	/* --- 05 Across from the tagline --------------------------------------- */
+
+	.ph--side {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+		column-gap: clamp(1.5rem, 4vw, 3rem);
+		align-items: end;
+	}
+
+	.ph--side .ph__title {
+		grid-column: 1 / -1;
+	}
+
+	.side {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.9rem 1.25rem;
+		padding-block-start: 0.9rem;
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.side__cell {
+		display: grid;
+		align-content: start;
+		gap: 0.3em;
+	}
+
+	.side dd {
+		font-size: 0.85rem;
+		line-height: 1.35;
+		color: rgba(232, 234, 240, 0.85);
+		text-wrap: pretty;
+	}
+
+	/* --- 06 Written out --------------------------------------------------- */
+
+	.written {
+		margin: 0.7em 0 0;
+		max-inline-size: 60ch;
+		font-size: 0.92rem;
+		line-height: 1.55;
+		color: var(--faint);
+		text-wrap: pretty;
+	}
+
+	.written b {
+		font-weight: 400;
+		color: rgba(232, 234, 240, 0.75);
+	}
+
+	/* --- Responsive ------------------------------------------------------- */
+
+	@media (max-width: 900px) {
+		.option__meta {
+			grid-template-columns: 2.5rem minmax(0, 1fr);
+		}
+
+		.option__note,
+		.option__readout {
+			grid-column: 2;
+		}
+	}
+
+	@media (max-width: 720px) {
+		.cur {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1.25rem;
+		}
+
+		.ph--corner,
+		.ph--side {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.corner {
+			grid-column: 1;
+			grid-row: auto;
+			margin-block-start: 1.25rem;
+			padding-block-start: 0;
+		}
+
+		.side {
+			margin-block-start: 1.5rem;
+		}
+
+		/* Values wrap at this width, so slashes would float; stack instead. */
+		.byline {
+			flex-direction: column;
+		}
+
+		.byline__item:not(:last-child)::after {
+			content: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.switch__btn,
+		.tag--link,
+		.intro__back {
+			transition: none;
+		}
+	}
+</style>

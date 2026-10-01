@@ -1,0 +1,884 @@
+---
+// ---------------------------------------------------------------------------
+// Annex — six candidates for the headline-results tiles under the YOLO on NPU
+// hero, each under the real video at the page's real width. The readout gives
+// the block's height against the current tiles. Not linked from the nav;
+// delete once one is picked.
+// ---------------------------------------------------------------------------
+
+const hero = '/project_animation/NPU_animation.mp4';
+
+// Same data as yolo-npu.astro.
+const results = [
+	{ value: '3×', label: 'Smaller', detail: 'Fewer parameters and FLOPs than the YOLOv5s baseline.' },
+	{ value: '−2.8', label: 'mAP50-95', detail: 'Accuracy cost of the full compression chain, on COCO val2017.' },
+	{ value: '5.6×', label: 'Faster', detail: 'On-device throughput, from 25 to 140 FPS.' },
+	{ value: 'i.MX 8M+', label: 'Target', detail: 'NXP NPU on a Phytec board, within its power and memory budget.' },
+];
+
+const options = [
+	{
+		id: 'current',
+		name: 'Current',
+		note: 'For reference: four separate outlined cards, large value, small-caps label, one sentence each.',
+	},
+	{
+		id: 'rule',
+		name: 'Hairline columns',
+		note: 'The cards lose their boxes. Four columns split by hairlines under one top rule, the label moved up beside its value, everything a step smaller.',
+	},
+	{
+		id: 'panel',
+		name: 'One panel',
+		note: 'Still a card, but one: a single outlined strip divided into four cells. Tighter padding, value and label on one baseline, detail below.',
+	},
+	{
+		id: 'overlay',
+		name: 'On the hero',
+		note: 'The numbers sit in the hero’s bottom edge, under the same frosted fade the bento cards use. Adds no height at all, the video just carries them.',
+	},
+	{
+		id: 'ledger',
+		name: 'Ledger',
+		note: 'A short table on the prose’s 1 : 3 axis, one line per result. Reads like the spec sheet it is, and lines up with the Overview section below.',
+	},
+	{
+		id: 'pills',
+		name: 'Pills',
+		note: 'The smallest: a single row of value + label pills. The sentence moves into a tooltip on hover or focus, so it is still there but only on request.',
+	},
+	{
+		id: 'side',
+		name: 'Beside the hero',
+		note: 'The hero gives up a quarter of its width and the four results stack down its right side, so they use the video’s height instead of adding their own.',
+	},
+];
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="robots" content="noindex" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Geist+Pixel&family=Inter:wght@100..900&display=swap"
+		/>
+		<title>Results options — Iwan</title>
+	</head>
+	<body>
+		<main class="annex">
+			<header class="wrap intro">
+				<a class="intro__back" href="/annex">← Title options</a>
+				<p class="label pixel">Annex</p>
+				<h1 class="intro__title">Headline results — six options</h1>
+				<p class="intro__text">
+					The four YOLO on NPU numbers, set six ways under the real hero at the project page’s
+					width. The readout is the height from the top of the hero to the start of the
+					Overview section, against the current cards.
+				</p>
+			</header>
+
+			{
+				options.map((option, i) => (
+					<section class:list={['wrap option', { 'option--ref': option.id === 'current' }]}>
+						<div class="option__meta">
+							<p class="option__num pixel">{String(i).padStart(2, '0')}</p>
+							<h2 class="option__name">{option.name}</h2>
+							<p class="option__note">{option.note}</p>
+							<p class="option__readout pixel" data-readout />
+						</div>
+
+						<div class="stage" data-stage>
+							{/* --- 00 Current ------------------------------------------ */}
+							{option.id === 'current' && (
+								<>
+									<figure class="hero">
+										<video src={hero} muted loop playsinline preload="metadata" tabindex="-1" aria-hidden="true" data-lazy-play />
+									</figure>
+									<div class="cur">
+										{results.map((r) => (
+											<div class="cur__tile">
+												<p class="cur__value">{r.value}</p>
+												<p class="k cur__name">{r.label}</p>
+												<p class="cur__detail">{r.detail}</p>
+											</div>
+										))}
+									</div>
+								</>
+							)}
+
+							{/* --- 01 Hairline columns --------------------------------- */}
+							{option.id === 'rule' && (
+								<>
+									<figure class="hero">
+										<video src={hero} muted loop playsinline preload="metadata" tabindex="-1" aria-hidden="true" data-lazy-play />
+									</figure>
+									<div class="rule">
+										{results.map((r) => (
+											<div class="rule__cell">
+												<p class="pair">
+													<span class="pair__value">{r.value}</span>
+													<span class="k">{r.label}</span>
+												</p>
+												<p class="detail">{r.detail}</p>
+											</div>
+										))}
+									</div>
+								</>
+							)}
+
+							{/* --- 02 One panel ---------------------------------------- */}
+							{option.id === 'panel' && (
+								<>
+									<figure class="hero">
+										<video src={hero} muted loop playsinline preload="metadata" tabindex="-1" aria-hidden="true" data-lazy-play />
+									</figure>
+									<div class="panel">
+										{results.map((r) => (
+											<div class="panel__cell">
+												<p class="pair">
+													<span class="pair__value">{r.value}</span>
+													<span class="k">{r.label}</span>
+												</p>
+												<p class="detail">{r.detail}</p>
+											</div>
+										))}
+									</div>
+								</>
+							)}
+
+							{/* --- 03 On the hero -------------------------------------- */}
+							{option.id === 'overlay' && (
+								<figure class="hero hero--overlay">
+									<video src={hero} muted loop playsinline preload="metadata" tabindex="-1" aria-hidden="true" data-lazy-play />
+									<div class="frost" aria-hidden="true" />
+									<div class="overlay">
+										{results.map((r) => (
+											<div class="overlay__cell">
+												<p class="pair">
+													<span class="pair__value">{r.value}</span>
+													<span class="k">{r.label}</span>
+												</p>
+												<p class="detail">{r.detail}</p>
+											</div>
+										))}
+									</div>
+								</figure>
+							)}
+
+							{/* --- 04 Ledger ------------------------------------------- */}
+							{option.id === 'ledger' && (
+								<>
+									<figure class="hero">
+										<video src={hero} muted loop playsinline preload="metadata" tabindex="-1" aria-hidden="true" data-lazy-play />
+									</figure>
+									<div class="ledger">
+										<p class="k">Results</p>
+										<dl class="ledger__list">
+											{results.map((r) => (
+												<div class="ledger__row">
+													<dt class="ledger__value">{r.value}</dt>
+													<dd class="k ledger__name">{r.label}</dd>
+													<dd class="ledger__detail">{r.detail}</dd>
+												</div>
+											))}
+										</dl>
+									</div>
+								</>
+							)}
+
+							{/* --- 05 Pills -------------------------------------------- */}
+							{option.id === 'pills' && (
+								<>
+									<figure class="hero">
+										<video src={hero} muted loop playsinline preload="metadata" tabindex="-1" aria-hidden="true" data-lazy-play />
+									</figure>
+									<ul class="pills">
+										{results.map((r) => (
+											<li class="pill" tabindex="0">
+												<span class="pill__value">{r.value}</span>
+												<span class="pill__name">{r.label}</span>
+												<span class="pill__tip" role="tooltip">{r.detail}</span>
+											</li>
+										))}
+									</ul>
+								</>
+							)}
+
+							{/* --- 06 Beside the hero ---------------------------------- */}
+							{option.id === 'side' && (
+								<div class="beside">
+									<figure class="hero hero--beside">
+										<video src={hero} muted loop playsinline preload="metadata" tabindex="-1" aria-hidden="true" data-lazy-play />
+									</figure>
+									<div class="beside__list">
+										{results.map((r) => (
+											<div class="beside__item">
+												<p class="pair">
+													<span class="pair__value">{r.value}</span>
+													<span class="k">{r.label}</span>
+												</p>
+												<p class="detail">{r.detail}</p>
+											</div>
+										))}
+									</div>
+								</div>
+							)}
+
+							{/* The start of the next section on the real page, so the
+							    gap after the results reads at its real size. */}
+							<div class="next" data-next aria-hidden="true">
+								<p class="k">Overview</p>
+								<p class="next__heading">A detector that has to run on the device, not in the datacentre</p>
+							</div>
+						</div>
+					</section>
+				))
+			}
+		</main>
+
+		<script is:inline>
+			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+			// Hero top to Overview top, so an overlay that adds nothing still
+			// counts the hero it sits on.
+			function measure() {
+				const rows = [...document.querySelectorAll('.option')];
+				const heights = rows.map((row) => {
+					const stage = row.querySelector('[data-stage]');
+					const next = row.querySelector('[data-next]');
+					return Math.round(next.getBoundingClientRect().top - stage.getBoundingClientRect().top);
+				});
+				rows.forEach((row, i) => {
+					const out = row.querySelector('[data-readout]');
+					const delta = heights[i] - heights[0];
+					out.textContent =
+						i === 0
+							? `Hero → Overview ${heights[i]}px`
+							: `Hero → Overview ${heights[i]}px · ${delta <= 0 ? '−' : '+'}${Math.abs(delta)}px`;
+					out.classList.toggle('is-saving', delta < 0);
+				});
+			}
+
+			document.fonts.ready.then(measure);
+			window.addEventListener('resize', measure);
+			document.querySelectorAll('video').forEach((v) => v.addEventListener('loadedmetadata', measure, { once: true }));
+
+			const io = new IntersectionObserver((entries) => {
+				for (const { target, isIntersecting } of entries) {
+					if (isIntersecting && !reduce) target.play().catch(() => {});
+					else target.pause();
+				}
+			});
+			document.querySelectorAll('[data-lazy-play]').forEach((v) => io.observe(v));
+		</script>
+	</body>
+</html>
+
+<!-- Global, to match the other annex pages; this stylesheet only ships here. -->
+<style is:global>
+	body {
+		--ink: #e8eaf0;
+		--muted: rgba(232, 234, 240, 0.62);
+		--faint: rgba(232, 234, 240, 0.38);
+		--rule: rgba(255, 255, 255, 0.09);
+		--pixel: 'Geist Pixel', 'Geist Mono', ui-monospace, monospace;
+
+		margin: 0;
+		background: #05070c;
+		color: var(--ink);
+		font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+		font-weight: 350;
+	}
+
+	.wrap {
+		max-inline-size: 1100px;
+		margin-inline: auto;
+		padding-inline: clamp(1rem, 4vw, 2rem);
+		box-sizing: border-box;
+	}
+
+	.pixel {
+		font-family: var(--pixel);
+		font-weight: 400;
+		letter-spacing: 0.01em;
+	}
+
+	.label {
+		margin: 0;
+		font-size: 0.8rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--faint);
+	}
+
+	p,
+	dl,
+	dd {
+		margin: 0;
+	}
+
+	/* --- Intro ------------------------------------------------------------ */
+
+	.intro {
+		display: grid;
+		gap: 1rem;
+		justify-items: start;
+		padding-block: clamp(3rem, 10vh, 6rem) clamp(2.5rem, 6vh, 4rem);
+	}
+
+	.intro__back {
+		margin-block-end: 1rem;
+		color: var(--faint);
+		font-size: 0.85rem;
+		text-decoration: none;
+		transition: color 160ms ease;
+	}
+
+	.intro__back:hover {
+		color: var(--ink);
+	}
+
+	.intro__title {
+		font-size: clamp(1.9rem, 3.6vw, 3rem);
+		font-weight: 350;
+		line-height: 1.05;
+		letter-spacing: -0.045em;
+		margin: 0;
+	}
+
+	.intro__text {
+		max-inline-size: 40rem;
+		color: var(--muted);
+		line-height: 1.6;
+	}
+
+	/* --- Option rows ------------------------------------------------------ */
+
+	.option {
+		padding-block: clamp(3rem, 8vh, 5rem);
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.option__meta {
+		display: grid;
+		grid-template-columns: 3rem minmax(0, 14rem) minmax(0, 1fr) auto;
+		align-items: baseline;
+		gap: 0.4rem 1.5rem;
+		margin-block-end: clamp(2.5rem, 6vw, 4rem);
+	}
+
+	.option__num {
+		font-size: 1rem;
+		color: var(--faint);
+	}
+
+	.option__name {
+		margin: 0;
+		font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+		font-weight: 400;
+		letter-spacing: -0.03em;
+	}
+
+	.option__note {
+		max-inline-size: 42rem;
+		font-size: 0.9rem;
+		line-height: 1.55;
+		color: var(--muted);
+		text-wrap: pretty;
+	}
+
+	.option__readout {
+		font-size: 0.78rem;
+		color: var(--faint);
+		white-space: nowrap;
+	}
+
+	.option__readout.is-saving {
+		color: #8ee6a8;
+	}
+
+	.option--ref .option__name::after {
+		content: 'reference';
+		margin-inline-start: 0.7em;
+		padding: 0.25em 0.55em;
+		border: 1px solid var(--rule);
+		border-radius: 999px;
+		font-size: 0.65rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		vertical-align: 0.3em;
+		color: var(--faint);
+	}
+
+	/* --- Shared pieces from the project page ------------------------------ */
+
+	.k {
+		font-size: 0.72rem;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: var(--faint);
+	}
+
+	.hero {
+		position: relative;
+		margin: 0;
+		aspect-ratio: 21 / 9;
+		overflow: hidden;
+		isolation: isolate;
+		border-radius: 20px;
+		background-color: #0a0c11;
+		box-shadow:
+			0 1px 2px rgba(5, 7, 12, 0.28),
+			0 30px 60px -30px rgba(5, 7, 12, 0.8);
+		container-type: inline-size;
+	}
+
+	.hero video {
+		position: absolute;
+		inset: 0;
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+		transform: scale(1.015);
+	}
+
+	.hero::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 4;
+		pointer-events: none;
+		border-radius: inherit;
+		padding: 1px;
+		opacity: 40%;
+		background: linear-gradient(
+			150deg,
+			rgba(255, 255, 255, 0.75) 0%,
+			rgba(255, 255, 255, 0.22) 18%,
+			rgba(255, 255, 255, 0.04) 42%,
+			rgba(255, 255, 255, 0.1) 70%,
+			rgba(255, 255, 255, 0.45) 100%
+		);
+		mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		mask-composite: exclude;
+		-webkit-mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+	}
+
+	.hero::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 2;
+		pointer-events: none;
+		border-radius: inherit;
+		background:
+			linear-gradient(145deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 22%, rgba(255, 255, 255, 0) 46%),
+			radial-gradient(120% 80% at 85% 0%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 55%);
+		mix-blend-mode: screen;
+	}
+
+	/* Value and label on one baseline, used by most options. */
+	.pair {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.2em 0.6em;
+	}
+
+	.pair__value {
+		font-size: clamp(1.3rem, 2.4vw, 1.6rem);
+		font-weight: 350;
+		line-height: 1.05;
+		letter-spacing: -0.03em;
+		font-variant-numeric: tabular-nums;
+		color: var(--ink);
+	}
+
+	.detail {
+		margin-block-start: 0.45em;
+		font-size: 0.8rem;
+		line-height: 1.4;
+		color: rgba(232, 234, 240, 0.55);
+		text-wrap: pretty;
+	}
+
+	/* Same gap and style as the prose that follows the results on the page. */
+	.next {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+		gap: clamp(1rem, 3vw, 2rem);
+		margin-block-start: clamp(3rem, 8vw, 5.5rem);
+		opacity: 0.45;
+	}
+
+	.next__heading {
+		font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+		line-height: 1.2;
+		letter-spacing: -0.02em;
+		text-wrap: balance;
+	}
+
+	/* --- 00 Current ------------------------------------------------------- */
+
+	.cur {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: clamp(0.75rem, 1.5vw, 1.25rem);
+		margin-block-start: clamp(1.25rem, 3vw, 2rem);
+	}
+
+	.cur__tile {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2em;
+		padding: clamp(1rem, 2.5vw, 1.4rem) clamp(1rem, 2.5vw, 1.35rem);
+		border: 1px solid var(--rule);
+		border-radius: 14px;
+		background: rgba(255, 255, 255, 0.02);
+	}
+
+	.cur__value {
+		font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+		line-height: 1.05;
+		letter-spacing: -0.03em;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.cur__name {
+		margin-block-start: 0.25em;
+	}
+
+	.cur__detail {
+		margin-block-start: 0.5em;
+		font-size: 0.85rem;
+		line-height: 1.4;
+		color: rgba(232, 234, 240, 0.6);
+		text-wrap: pretty;
+	}
+
+	/* --- 01 Hairline columns ---------------------------------------------- */
+
+	.rule {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		margin-block-start: clamp(1.25rem, 3vw, 1.75rem);
+		padding-block-start: 1rem;
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.rule__cell {
+		padding-inline: clamp(0.75rem, 2vw, 1.25rem);
+		border-inline-start: 1px solid var(--rule);
+	}
+
+	.rule__cell:first-child {
+		padding-inline-start: 0;
+		border-inline-start: 0;
+	}
+
+	/* --- 02 One panel ----------------------------------------------------- */
+
+	.panel {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		margin-block-start: clamp(0.75rem, 1.5vw, 1rem);
+		border: 1px solid var(--rule);
+		border-radius: 14px;
+		background: rgba(255, 255, 255, 0.02);
+		overflow: hidden;
+	}
+
+	.panel__cell {
+		padding: 0.85rem clamp(0.85rem, 2vw, 1.15rem);
+	}
+
+	.panel__cell + .panel__cell {
+		border-inline-start: 1px solid var(--rule);
+	}
+
+	.panel .pair__value {
+		font-size: clamp(1.15rem, 2vw, 1.35rem);
+	}
+
+	/* --- 03 On the hero --------------------------------------------------- */
+
+	/* The bento cards' frost, taller, so four lines of detail stay legible
+	   over bright frames. */
+	.frost {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		pointer-events: none;
+		backdrop-filter: blur(14px) saturate(130%);
+		-webkit-backdrop-filter: blur(14px) saturate(130%);
+		background: linear-gradient(to top, rgba(8, 10, 16, 0.8) 0%, rgba(8, 10, 16, 0.4) 32%, rgba(8, 10, 16, 0) 55%);
+		mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.7) 28%, transparent 50%);
+		-webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.7) 28%, transparent 50%);
+	}
+
+	.overlay {
+		position: absolute;
+		inset-block-end: 0;
+		inset-inline: 0;
+		z-index: 3;
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: clamp(0.75rem, 2.5cqi, 1.5rem);
+		padding: clamp(0.9rem, 3cqi, 1.5rem);
+		text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
+	}
+
+	.overlay .k {
+		color: rgba(255, 255, 255, 0.55);
+	}
+
+	.overlay .detail {
+		color: rgba(255, 255, 255, 0.7);
+		font-size: clamp(0.72rem, 1.4cqi, 0.8rem);
+	}
+
+	/* --- 04 Ledger -------------------------------------------------------- */
+
+	.ledger {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+		gap: clamp(1rem, 3vw, 2rem);
+		margin-block-start: clamp(1.25rem, 3vw, 1.75rem);
+	}
+
+	.ledger__row {
+		display: grid;
+		grid-template-columns: 6.5rem 6.5rem minmax(0, 1fr);
+		align-items: baseline;
+		gap: 1rem;
+		padding-block: 0.45rem;
+		border-block-end: 1px solid var(--rule);
+	}
+
+	/* Pulls the first row onto the label's line, like .prose__heading. */
+	.ledger__row:first-child {
+		padding-block-start: 0;
+	}
+
+	.ledger__value {
+		font-size: 1.05rem;
+		letter-spacing: -0.02em;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.ledger__detail {
+		font-size: 0.88rem;
+		line-height: 1.45;
+		color: rgba(232, 234, 240, 0.58);
+		text-wrap: pretty;
+	}
+
+	/* --- 05 Pills --------------------------------------------------------- */
+
+	.pills {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin: clamp(1rem, 2.5vw, 1.4rem) 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.pill {
+		position: relative;
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.55em;
+		padding: 0.55em 1em;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.03);
+		font-size: 0.9rem;
+		line-height: 1;
+		cursor: default;
+		transition:
+			border-color 160ms ease,
+			background-color 160ms ease;
+	}
+
+	.pill:hover,
+	.pill:focus-visible {
+		border-color: rgba(255, 255, 255, 0.28);
+		background: rgba(255, 255, 255, 0.07);
+		outline: none;
+	}
+
+	.pill__value {
+		font-weight: 450;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.pill__name {
+		color: var(--faint);
+	}
+
+	.pill__tip {
+		position: absolute;
+		inset-block-start: calc(100% + 0.5rem);
+		inset-inline-start: 0;
+		z-index: 5;
+		inline-size: max-content;
+		max-inline-size: 16rem;
+		padding: 0.6em 0.8em;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		border-radius: 10px;
+		background: #11141b;
+		font-size: 0.8rem;
+		line-height: 1.4;
+		color: var(--muted);
+		opacity: 0;
+		transform: translateY(-3px);
+		pointer-events: none;
+		transition:
+			opacity 160ms ease,
+			transform 160ms ease;
+	}
+
+	.pill:hover .pill__tip,
+	.pill:focus-visible .pill__tip {
+		opacity: 1;
+		transform: none;
+	}
+
+	/* --- 06 Beside the hero ----------------------------------------------- */
+
+	.beside {
+		display: grid;
+		grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+		gap: clamp(0.75rem, 1.5vw, 1.25rem);
+	}
+
+	.hero--beside {
+		aspect-ratio: 16 / 9;
+	}
+
+	/* Spread over the video's height, each opened by a hairline. If the text
+	   outgrows the video, the row grows and the video crops instead. */
+	.beside__list {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+
+	.beside__item {
+		padding-block: 0.7rem;
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.beside__item:first-child {
+		padding-block-start: 0;
+		border-block-start: 0;
+	}
+
+	.beside .pair__value {
+		font-size: clamp(1.1rem, 1.8vw, 1.3rem);
+	}
+
+	.beside .detail {
+		font-size: 0.78rem;
+	}
+
+	/* --- Responsive ------------------------------------------------------- */
+
+	@media (max-width: 900px) {
+		.option__meta {
+			grid-template-columns: 2.5rem minmax(0, 1fr);
+		}
+
+		.option__note,
+		.option__readout {
+			grid-column: 2;
+		}
+	}
+
+	@media (max-width: 720px) {
+		.cur,
+		.rule,
+		.panel,
+		.overlay {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.rule {
+			row-gap: 1.25rem;
+		}
+
+		.rule__cell:nth-child(3) {
+			padding-inline-start: 0;
+			border-inline-start: 0;
+		}
+
+		.panel__cell:nth-child(3) {
+			border-inline-start: 0;
+		}
+
+		.panel__cell:nth-child(n + 3) {
+			border-block-start: 1px solid var(--rule);
+		}
+
+		/* Four cells don't fit over a phone-width video; the hero gets taller. */
+		.hero--overlay {
+			aspect-ratio: 4 / 5;
+		}
+
+		.ledger,
+		.next {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 0.75rem;
+		}
+
+		.ledger__row {
+			grid-template-columns: 5rem minmax(0, 1fr);
+			row-gap: 0.25rem;
+		}
+
+		.ledger__detail {
+			grid-column: 2;
+		}
+
+		.beside {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.beside__list {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1rem 1.25rem;
+		}
+
+		.beside__item,
+		.beside__item:first-child {
+			padding-block: 0.75rem 0;
+			border-block-start: 1px solid var(--rule);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero video {
+			transform: none;
+		}
+
+		.pill,
+		.pill__tip,
+		.intro__back {
+			transition: none;
+		}
+	}
+</style>

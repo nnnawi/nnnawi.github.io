@@ -34,7 +34,7 @@ const icons: Record<string, { filled: boolean; paths: string[] }> = {
 
 const contacts = [
 	{ label: email, href: `mailto:${email}`, icon: 'mail' },
-	{ label: 'LinkedIn', href: 'https://www.linkedin.com/in/iwan-ibnoulouafi/', icon: 'linkedin' },
+	{ label: 'LinkedIn', href: 'https://www.linkedin.com/in/iwan-i-01166a231/', icon: 'linkedin' },
 	{ label: 'GitHub', href: 'https://github.com/nnnawi', icon: 'github' },
 ];
 
@@ -47,7 +47,7 @@ const lead = 'I build interactive systems for complex computational and creative
 const intro = [
 	'My work spans real-time graphics, computer vision and interaction design, focused on making technically complex systems easier to explore, control and understand through intuitive manipulation and visual feedback.',
 	'I have built and sold interactive visualization and generative tools such as Bowde and MorphoX, and developed software distributed through freelance and independent work.',
-	'The recurring problem is the mismatch between what a system can do and the structure it exposes. I work on closing that gap between intent and execution, designing interfaces that make structure legible and decisions faster — expanding creative possibilities rather than reducing complexity.',
+	'The recurring problem is the mismatch between what a system can do and the structure it exposes. I work on closing that gap between intent and execution, designing interfaces that make structure legible and decisions faster, expanding creative possibilities rather than reducing complexity.',
 	'Alongside engineering, a decade across video production, motion design, VFX, generative visuals and creative coding — including motion-graphics systems and production workflows for large-scale media — continues to shape how I think about interaction, aesthetics and creative flow.',
 ];
 
@@ -105,7 +105,14 @@ const experience = [
 	},
 ];
 
-const interests = ['Piano · 15 years', 'Sailing', 'Electronic circuit design'];
+const interests = [
+	'Piano · 15 years',
+	'Sailing',
+	'Electronic circuit design',
+	'3D printing & modeling',
+	'Microcontrollers & robotics',
+];
+const software = ['After Effects', 'Premiere Pro', 'Fusion 360'];
 const languages = 'French (native) · English (fluent)';
 
 const sections = [
@@ -140,7 +147,7 @@ const sections = [
 				<aside class="identity">
 					<h1 class="name reveal">
 						<span class="name__first">Iwan</span>
-						<span class="name__last pixel">Ibnoulouafi</span>
+						<span class="name__last">Ibnoulouafi</span>
 					</h1>
 
 					<ul class="pills reveal" style="--d: 100ms">
@@ -178,6 +185,7 @@ const sections = [
 								{interests.map((item) => <li class="chip">{item}</li>)}
 							</ul>
 						</div>
+			
 					</div>
 				</aside>
 
@@ -220,8 +228,7 @@ const sections = [
 
 			<div class="wrap">
 				<footer class="site-footer">
-					<span>Iwan Ibnoulouafi</span>
-					<a href={`mailto:${email}`}>{email}</a>
+					
 				</footer>
 			</div>
 		</main>
@@ -339,16 +346,9 @@ const sections = [
 		letter-spacing: -0.05em;
 	}
 
-	.name__first {
-		font-weight: 700;
-	}
-
+	.name__first,
 	.name__last {
-		/* Geist Pixel sets wider and taller than the sans, so it is scaled down to
-		   sit on the same optical line length as the first name above it. */
-		font-size: clamp(2.75rem, 5.6vw, 4.85rem);
-		letter-spacing: -0.005em;
-		color: var(--fg);
+		font-weight: 700;
 	}
 
 	/* --- Contact pills ---------------------------------------------------- */
