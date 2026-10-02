@@ -52,22 +52,24 @@ const cardStyle = [
 	style={cardStyle}
 	{...rest}
 >
-	<video
-		class="bento-card__video"
-		src={video}
-		poster={poster}
-		autoplay
-		muted
-		loop
-		playsinline
-		preload="metadata"
-		tabindex="-1"
-		aria-hidden="true"
-		data-bento-video
-	></video>
+	<div class="bento-card__media">
+		<video
+			class="bento-card__video"
+			src={video}
+			poster={poster}
+			autoplay
+			muted
+			loop
+			playsinline
+			preload="metadata"
+			tabindex="-1"
+			aria-hidden="true"
+			data-bento-video
+		></video>
 
-	{/* The frost only exists to keep the caption readable, so it goes with it. */}
-	{!hideTitle && <div class="bento-card__frost" aria-hidden="true" />}
+		{/* The frost only exists to keep the caption readable, so it goes with it. */}
+		{!hideTitle && <div class="bento-card__frost" aria-hidden="true" />}
+	</div>
 
 	<div class:list={['bento-card__content', hideTitle && 'bento-card__content--hidden']}>
 		<h3 class="bento-card__title">{title}</h3>
@@ -115,6 +117,18 @@ const cardStyle = [
 	.bento-card--link:focus-visible {
 		outline: 2px solid rgba(232, 234, 240, 0.75);
 		outline-offset: 3px;
+	}
+
+	/* Holds the video and frost. Safari ignores the card's rounded overflow for
+	   video and blurred layers, so this clip-path rounds them instead; it sits
+	   on an inner layer so the card's focus ring outside it stays visible. */
+	.bento-card__media {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		overflow: hidden;
+		border-radius: inherit;
+		clip-path: inset(0 round var(--bento-radius));
 	}
 
 	/* Background video — covers the card whatever its intrinsic size is. */
@@ -190,14 +204,15 @@ const cardStyle = [
 			rgba(255, 255, 255, 0.1) 70%,
 			rgba(255, 255, 255, 0.45) 100%
 		);
-		mask:
-			linear-gradient(#000 0 0) content-box,
-			linear-gradient(#000 0 0);
-		mask-composite: exclude;
-		-webkit-mask:
-			linear-gradient(#000 0 0) content-box,
-			linear-gradient(#000 0 0);
+		/* Longhands only: the production minifier reorders declarations, and a
+		   `mask` shorthand landing after `mask-composite` would reset it, filling
+		   the whole surface with the gradient instead of just its rim. */
+		-webkit-mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+		-webkit-mask-clip: content-box, border-box;
 		-webkit-mask-composite: xor;
+		mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+		mask-clip: content-box, border-box;
+		mask-composite: exclude;
 	}
 
 	.bento-card__content {

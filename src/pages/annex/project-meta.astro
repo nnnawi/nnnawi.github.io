@@ -553,6 +553,9 @@ const options = [
 		block-size: clamp(7rem, 16vw, 11rem);
 		overflow: hidden;
 		border-radius: 20px 20px 0 0;
+		/* Safari ignores the rounded overflow for video and blurred layers;
+		   a clip-path rounds them reliably. */
+		clip-path: inset(0 round 20px 20px 0 0);
 		background: #0a0c11;
 		mask-image: linear-gradient(to bottom, #000 30%, transparent);
 		-webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent);
