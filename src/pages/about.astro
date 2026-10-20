@@ -3,8 +3,8 @@ import Aura from '../shared/aura/Aura.astro';
 import Nav from '../shared/nav/Nav.astro';
 
 // ---------------------------------------------------------------------------
-// About page — a sticky identity column beside one rail carrying education and
-// then experience. Résumé wording is kept verbatim in the bullets.
+// About page — a sticky identity column beside one rail carrying experience and
+// then education. Résumé wording is kept verbatim in the bullets.
 // Projects live on /projects, so nothing here repeats them.
 // ---------------------------------------------------------------------------
 
@@ -69,40 +69,46 @@ const education = [
 
 const experience = [
 	{
-		period: 'Summer 2025 · 6 months',
+		period: 'Jun — Dec 2025 · 6 months',
 		role: 'Software Engineer Intern',
 		org: 'Brio · Paris, France',
 		points: [
-			'Owned an end-to-end resume analyser from prototype to production in a team of five: document parsing, OCR, orchestrated LLM / rule-based scoring; 20,000+ analyses run.',
-			'Led a full UX/UI redesign of the interview product’s overview and extended the client-facing back office (data, access control and dashboards), as the user base grew.',
+			'Owned the company’s second product, a resume analyser, from prototype to production within a five-person team: document parsing, OCR, orchestrated LLM workflows and rule-based scoring. Processed **20,000+ analyses** at ~20 s and under $0.05 per CV, with ~85% agreement against 40+ hand-labelled resumes.',
+			'Built a platform-wide LLM observability layer using Langfuse tracing and PostHog analytics, **roughly halving debugging time** by pinpointing faulty prompts and pipeline stages.',
 		],
 	},
 	{
-		period: '2022 — Today · 4 years',
+		period: '2023 — Today · 3 years',
 		role: 'Software & Web Developer',
 		org: 'Freelance · Paris, France',
 		points: [
-			'Shipped 10+ full-stack projects for French SMEs, spanning SEO-optimized websites (UI/UX, hosting, security) and AI automation tools including OCR pipelines and document-processing systems.',
+			'Designed and refactored backends for multiple client products, improving scalability and performance; **halved search latency** for an AI semantic-search engine through optimised embedding retrieval, distance computation, caching and batched parallel LLM API calls.',
+			'Developed a financial dashboard for a video production company, integrating a custom receipt and invoice scanner to generate per-project cost tables reconciled against bank statements. Reduced reconciliation errors to **near zero** and processing time by **3×**.',
+			'Delivered **10+ projects** for French SMEs, spanning SEO-optimised websites and AI automations for document parsing, data extraction, visualisation and workflow organisation.',
 		],
 	},
 	{
-		period: 'Summer 2022 · 3 months',
-		role: 'Software Engineer Intern',
-		org: 'Infogene · Paris, France',
-		points: [
-			'Built a Flutter/Dart mobile app for L’Oréal employees to manage sales and stock requests, serving a target population of 500+ users.',
-		],
-	},
-	{
-		period: '2021 — 2025 · 4 years',
+		period: '2022 — 2025 · 3 years',
 		role: 'Video Production',
 		org: 'Freelance · Paris, France',
 		points: [
-			'Cut editorial turnaround 15–30% for top-10 French YouTube channels (5M+ subs) with custom Premiere and After Effects tooling automating derushing, indexing and ingest.',
-			'Delivered end-to-end production: editing, motion graphics, camera operation and direction, on content reaching 10M+ views.',
+			'Saved **~2 hours per 10-hour edit** for top-10 French YouTube channels (5M+ subscribers) through Python and JavaScript automation for Premiere Pro and After Effects, including footage grouping, action-moment isolation and programmable HUD animations.',
+			'Handled end-to-end video production across editing, motion graphics, camera operation and direction for content reaching **10M+ views**.',
+		],
+	},
+	{
+		period: 'Jun — Aug 2022 · 3 months',
+		role: 'Software Engineer Intern',
+		org: 'Infogene · Paris, France',
+		points: [
+			'Shipped a Flutter/Dart application for **500+ L’Oréal employees** to manage sales and stock requests, backed by a Symfony/PHP API.',
 		],
 	},
 ];
+
+// Bullets mark résumé highlights with **…**; split them into plain and bold runs.
+const emphasis = (point: string) =>
+	point.split(/\*\*(.+?)\*\*/).map((text, i) => ({ text, bold: i % 2 === 1 }));
 
 const interests = [
 	'Piano · 15 years',
@@ -115,8 +121,8 @@ const software = ['After Effects', 'Premiere Pro', 'Fusion 360'];
 const languages = 'French (native) · English (fluent)';
 
 const sections = [
-	{ id: 'education', title: 'Education', items: education },
 	{ id: 'experience', title: 'Experience', items: experience },
+	{ id: 'education', title: 'Education', items: education },
 ];
 ---
 
@@ -210,7 +216,9 @@ const sections = [
 												{item.points.map((point) => (
 													<li class="points__item">
 														<span class="points__dot" aria-hidden="true" />
-														<span>{point}</span>
+														<span>
+															{emphasis(point).map(({ text, bold }) => (bold ? <strong>{text}</strong> : text))}
+														</span>
 													</li>
 												))}
 											</ul>
@@ -564,6 +572,11 @@ const sections = [
 		line-height: 1.55;
 		color: var(--muted);
 		text-wrap: pretty;
+	}
+
+	.points__item strong {
+		font-weight: 550;
+		color: var(--fg);
 	}
 
 	.points__dot {
